@@ -16,5 +16,18 @@ namespace Shockky.Shockwave.Chunks
             VersionHex = BitConverter.ToString(versionBytes)
                 .Replace("-", string.Empty);;
         }
+
+        public override void WriteTo(ShockwaveWriter output)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int GetBodySize()
+        {
+            int size = 0;
+            size += 36;
+            size += sizeof(byte) * 2;
+            return size;
+        }
     }
 }

@@ -1,9 +1,16 @@
-﻿using Shockky.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
     public class FileInfoChunk : ChunkItem
     {
+        public byte[] BitField { get; set; }
+
+        public List<int> Offsets { get; set; }
+
         public string CreatedBy { get; set; }
         public string ModifiedBy { get; set; }
 
@@ -12,17 +19,18 @@ namespace Shockky.Shockwave.Chunks
         public FileInfoChunk(ShockwaveReader input, ChunkEntry entry)
             : base(entry.Header)
         {
-            int bitfieldLen = input.ReadInt32(true);
-            byte[] bitField = input.ReadBytes(bitfieldLen);
+            int bitfieldLen = input.ReadBigEndian<int>();
+            BitField = input.ReadBytes(bitfieldLen);
 
-            short offsetCount = input.ReadInt16(true);
+	        short offsetCount = input.ReadBigEndian<short>();
+
             int[] offsets = new int[offsetCount];
 
             input.ReadByte();
 
             for (short i = 0; i < offsetCount; i++)
             {
-                offsets[i] = input.ReadInt32(true);
+                offsets[i] = input.ReadBigEndian<int>();
             }
 
             input.ReadByte();
@@ -31,6 +39,35 @@ namespace Shockky.Shockwave.Chunks
             ModifiedBy = input.ReadString();
             input.ReadByte();
             FilePath = input.ReadString();
+        }
+
+        public override void WriteTo(ShockwaveWriter output)
+        {
+            output.Write(BitField.Length);
+            output.Write(BitField);
+
+            output.Write((ushort)Offsets.Count);
+            //TODO
+        }
+
+        public override int GetBodySize()
+        {
+            int size = 0;
+            size += sizeof(int);
+            size += BitField.Length;
+
+            size += sizeof(short);
+            size += sizeof(byte);
+            size += (sizeof(int) * Offsets.Count);
+            size += sizeof(byte);
+
+            size += (Encoding.ASCII.GetByteCount(CreatedBy) + 1);
+            size += sizeof(byte);
+            size += (Encoding.ASCII.GetByteCount(ModifiedBy) + 1);
+            size += sizeof(byte);
+            size += (Encoding.ASCII.GetByteCount(FilePath) + 1);
+
+            return size;
         }
     }
 }

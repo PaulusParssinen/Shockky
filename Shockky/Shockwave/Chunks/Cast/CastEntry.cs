@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using Shockky.IO;
 using Shockky.Shockwave.Chunks.Enum;
-using Shockky.Utilities;
 
 namespace Shockky.Shockwave.Chunks.Cast
 {
@@ -14,13 +15,29 @@ namespace Shockky.Shockwave.Chunks.Cast
         public string Name { get; set; }
         public ChunkType Type { get; set; }
 
-        public CastEntry(ref ShockwaveReader input)
+        public CastEntry(ShockwaveReader input)
         {
             FileSlot = input.ReadInt32();
             Slot = input.ReadInt32();
 
-            Name = input.ReadString(4, true);
+	        Name = input.ReadReversedString(4);
             Type = Name.ToChunkType();
+        }
+
+        public override int GetBodySize()
+        {
+            int size = 0;
+            size += sizeof(int);
+            size += sizeof(int);
+            size += Encoding.ASCII.GetByteCount(Name);
+            return size;
+        }
+
+        public override void WriteTo(ShockwaveWriter output)
+        {
+            output.Write(FileSlot);
+            output.Write(Slot);
+            output.Write(Name.Reverse().ToString()); //TODO
         }
     }
 }

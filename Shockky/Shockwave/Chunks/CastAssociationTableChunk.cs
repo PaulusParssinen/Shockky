@@ -13,18 +13,26 @@ namespace Shockky.Shockwave.Chunks
             : base(entry.Header)
         {
             int amount = entry.Header.Length / 4;
-            var members = new int[amount + 1];
+            Members = new List<int>(amount + 1);
             
             for (int i = 0; i < amount; i++)
             {
-                int castSlot = input.ReadInt32(true);
+                int castSlot = input.ReadBigEndian<int>();
 
                 if(castSlot == 0) continue;
 
-                members[i + 1] = castSlot; //Add
+                Members[i + 1] = castSlot; //Add
             }
+        }
 
-            Members = new List<int>(members);
+        public override void WriteTo(ShockwaveWriter output)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int GetBodySize()
+        {
+            throw new NotImplementedException();
         }
     }
 }

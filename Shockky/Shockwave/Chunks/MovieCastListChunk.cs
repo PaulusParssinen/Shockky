@@ -34,5 +34,24 @@ namespace Shockky.Shockwave.Chunks
                 string name = input.ReadString();
             }
         }
+
+        public override void WriteTo(ShockwaveWriter output)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int GetBodySize()
+        {
+            int size = 0;
+            size += sizeof(int);
+            size += sizeof(int);
+            size += sizeof(int);
+            size += sizeof(int);
+            size += ((sizeof(int) * 4) * CastCount);
+            size += sizeof(short);
+            size += sizeof(int);
+            //TODO
+            return size;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Shockky.IO;
+﻿using System.Text;
+using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
@@ -9,23 +10,39 @@ namespace Shockky.Shockwave.Chunks
         public ScriptableTextChunk(ShockwaveReader input, ChunkEntry entry)
             : base(entry.Header)
         {
-            int headerLength = input.ReadInt32(true);
-            int textLength = input.ReadInt32(true);
-            int footerLength = input.ReadInt32(true);
+            int headerLength = input.ReadBigEndian<int>();
+            int textLength = input.ReadBigEndian<int>();
+            int footerLength = input.ReadBigEndian<int>();
 
-            Text = input.ReadString(textLength);
+	        Text = Encoding.UTF8.GetString(input.ReadBytes(textLength));//input.ReadString(textLength);
 
             //TODO: if footer Length > 0? and more validation
 
-            short arrLength = input.ReadInt16(true);
+            short arrLength = input.ReadBigEndian<short>();
             for (short i2 = 0; i2 < arrLength; i2++)
             {
-                int offset = input.ReadInt32(true);
-                int constantiguess = input.ReadInt32(true);
+                int offset = input.ReadBigEndian<int>();
+                int constantiguess = input.ReadBigEndian<int>();
                 int unk3 = input.ReadInt32();
-                short unk4 = input.ReadInt16(true);
-                string color = input.ReadString(6);
+                short unk4 = input.ReadBigEndian<short>();
+				/*string color = */
+				input.ReadBytes(6); //input.ReadString(6);
+
             }
+        }
+
+        public override void WriteTo(ShockwaveWriter output)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override int GetBodySize()
+        {
+            int size = 0;
+            size += sizeof(int);
+            size += sizeof(int);
+            size += sizeof(int);
+            return size;
         }
     }
 }

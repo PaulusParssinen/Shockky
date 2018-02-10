@@ -4,15 +4,15 @@ using Shockky.IO;
 namespace Shockky.Shockwave.Chunks
 {
     [DebuggerDisplay("{Header.Name} | Length: {Header.Length}")]
-    public class ChunkItem
+    public abstract class ChunkItem : ShockwaveItem
     {
         public ChunkHeader Header { get; set; }
 
-        public ChunkItem(ref ShockwaveReader input)
-        {
-            Header = new ChunkHeader(ref input);
-        }
-        public ChunkItem(ChunkHeader header)
+        protected ChunkItem(ShockwaveReader input)
+            : this(new ChunkHeader(input))
+        { }
+        
+        protected ChunkItem(ChunkHeader header)
         {
             Header = header;
         }

@@ -10,5 +10,15 @@ namespace Shockky.Shockwave.Chunks
         {
             var paletteCount = Math.Round((decimal)entry.Header.Length / 6);
         }
+
+        public override void WriteTo(ShockwaveWriter output)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override int GetBodySize()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
