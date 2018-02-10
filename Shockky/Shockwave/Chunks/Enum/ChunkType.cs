@@ -1,5 +1,10 @@
-﻿namespace Shockky.Shockwave.Chunks.Enum
+﻿using System;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+
+namespace Shockky.Shockwave.Chunks.Enum
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")] //fek yoy
     public enum ChunkType
     {
         Unknown = -1,
@@ -50,8 +55,22 @@
         VWtk,
 
         ccl,
-        Sord,
-
-
+        Sord
     }
+
+	public static class ChunkExtensions
+	{
+		public static ChunkType ToChunkType(this string typeName)
+		{
+			try
+			{
+				return (ChunkType)System.Enum.Parse(typeof(ChunkType), typeName.Replace("*", "Star"));
+			}
+			catch (Exception)
+			{
+				Debug.WriteLine("Unknown ChunkType name: " + typeName);
+				return ChunkType.Unknown;
+			}
+		}
+	}
 }

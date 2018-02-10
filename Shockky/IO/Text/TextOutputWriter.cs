@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Shockky.IO.Text
 {
-    class TextOutputWriter : TextWriter
+    public class TextOutputWriter : TextWriter
     {
         private readonly ITextOutput _output;
 

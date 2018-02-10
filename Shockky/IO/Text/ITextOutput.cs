@@ -1,6 +1,6 @@
 ﻿namespace Shockky.IO.Text
 {
-    interface ITextOutput
+    public interface ITextOutput
     {
         void Indent();
         void Unindent();
