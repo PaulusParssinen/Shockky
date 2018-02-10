@@ -1,9 +1,8 @@
-﻿using Shockky.Shockwave.Lingo.Bytecode.AST;
-
-namespace Shockky.Shockwave.Lingo.Bytecode
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.AST.Statements
 {
-    public class Block : AstNode
+    public class ExitStatement : Statement
     {
+
 	    public override void AcceptVisitor(IAstVisitor visitor)
 	    {
 		    throw new System.NotImplementedException();

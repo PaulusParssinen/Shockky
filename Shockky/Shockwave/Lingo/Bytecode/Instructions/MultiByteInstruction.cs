@@ -11,7 +11,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             : base(op, handler)
         {
             _value = isMulti ?
-                input.ReadInt16(true) : input.ReadByte();
+                input.ReadBigEndian<short>() : input.ReadByte();
         }
     }
 }

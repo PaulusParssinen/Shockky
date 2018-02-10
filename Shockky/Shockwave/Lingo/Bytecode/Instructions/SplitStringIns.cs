@@ -24,7 +24,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             return 1;
         }
 
-        public override void Translate()
+       /* public override void Translate()
         {
             Body = Handler.Expressions.Pop().ToString();
             var lastLine = Handler.Expressions.Pop();
@@ -60,9 +60,9 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
                 First = firstLine;
                 Last = lastLine;
             }else throw new NotImplementedException("ze fuck is going on over here");
-        }
+        }*/
 
         public override string ToString()
-            => $"{Body}.{Type}[{First}{(!(Last is PushZeroIns) ? $"...{Last}" : string.Empty)}]";//My lord
+            => $"{Body}.{Type}[{First}{(!(Last is PushZeroIns) ? $"...{Last}" : string.Empty)}]";
     }
 }

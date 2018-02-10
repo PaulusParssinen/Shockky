@@ -6,7 +6,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
     public class PushConstantIns : VariableReference
     {
         public override string Name
-            => Handler.Script.Literals[_variableIndex].Value;
+            => null; //Handler.Script.Literals[_variableIndex].Value;
 
         public PushConstantIns(ShockwaveReader input, LingoHandler handler, byte opByte) 
             : base(OPCode.PushConstant, opByte, input, handler)

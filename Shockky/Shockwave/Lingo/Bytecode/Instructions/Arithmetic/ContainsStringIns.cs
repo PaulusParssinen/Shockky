@@ -9,11 +9,11 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
             : base(OPCode.ContainsString, handler, "contains")
         { }
 
-        protected override object Execute(dynamic left, dynamic right)
+        /*protected override object Execute(dynamic left, dynamic right)
         {
             string lhs = left;
             string rhs = right;
             return lhs.IndexOf(rhs, StringComparison.InvariantCultureIgnoreCase);
-        }
+        }*/
     }
 }

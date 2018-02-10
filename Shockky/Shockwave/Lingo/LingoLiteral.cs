@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
 using Shockky.IO;
 
 namespace Shockky.Shockwave.Lingo
@@ -12,8 +13,8 @@ namespace Shockky.Shockwave.Lingo
 
         public LingoLiteral(ShockwaveReader input, int literalsOffset)
         {
-            Type = input.ReadInt32(true);
-            int offset = input.ReadInt32(true);
+            Type = input.ReadBigEndian<int>();
+            int offset = input.ReadBigEndian<int>();
 
             long pos = input.Position; //TODO: #YOLO
             Value = ReadValue(input, offset, literalsOffset);
@@ -27,14 +28,14 @@ namespace Shockky.Shockwave.Lingo
             if (offset < input.Length)
             {
                 input.Position = literalsOffset + offset;
-                length = input.ReadInt32(true);
+                length = input.ReadBigEndian<int>();
             }
 
             switch (Type)
             {
-                case 1: return input.ReadString(length - 1);
-                case 4: return offset;
-                case 9: return input.ReadInt64(true);
+                case 1: return Encoding.UTF8.GetString(input.ReadBytes(length - 1));
+				case 4: return offset;
+                case 9: return input.ReadBigEndian<Int64>();
                 default:
                     throw new Exception("Unsupported Literal type found! Type: " + Type);
             }

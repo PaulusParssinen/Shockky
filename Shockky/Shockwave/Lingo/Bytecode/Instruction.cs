@@ -1,56 +1,41 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Shockky.IO;
-using Shockky.Shockwave.Lingo.Bytecode.AST;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Control_Transfer;
 using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
 namespace Shockky.Shockwave.Lingo.Bytecode
 {
-    [DebuggerDisplay("OPCode: {OP}")]
-    public abstract class Instruction : AstNode
+    [DebuggerDisplay("OPCode: {OP} | Operand: {Operand}")]
+    public class Instruction
     {
         public OPCode OP { get; }
-        public LingoHandler Handler { get; }
+		public object Operand { get; } //int prob or shortyboi
 
-        public Instruction(OPCode op)
+        public virtual int GetPopCount() => 0;
+        public virtual int GetPushCount() => 0;
+
+        public Instruction(OPCode op, object operand)
         {
             OP = op;
+            Operand = operand;
         }
 
-        public Instruction(OPCode op, LingoHandler handler)
-            : this(op)
-        {
-            Handler = handler;
-        }
-
-        public virtual int GetPopCount()
-        {
-            return 0;
-        }
-        public virtual int GetPushCount()
-        {
-            return 0;
-        }
-        public virtual bool IsStatement { get; set; }
-
-        public virtual void Execute(LingoMachine machine)
-        { }
-        public virtual void Translate()
-        { }
-
-        public static Instruction Create(LingoHandler handler, ref ShockwaveReader input)
+        public Instruction(ShockwaveReader input)
         {
             byte opByte = input.ReadByte();
 
-            var op = (OPCode) opByte;
+            OP = (OPCode) opByte;
 
-            if (opByte > 0x40) //TODO: Think something better here instead of this bs
-                op = (OPCode)(opByte % 0x40 + 0x40);
+            if (opByte > 0x40)
+            {
+                OP = (OPCode)(opByte % 0x40 + 0x40);
 
-            Debug.WriteLine("Adding instruction: " + op);
+                Operand = opByte > 0x80 ?
+                    input.ReadInt16() : input.ReadByte();
+            }
+        }
+
+        /*public static void Create(ref ShockwaveReader input)
+        {            
             switch (op)
             {
                 case OPCode.Return:
@@ -183,6 +168,6 @@ namespace Shockky.Shockwave.Lingo.Bytecode
             }
 
            throw new NotImplementedException("Unhandled instruction! " + op);
-        }
+        }*/
     }
 }

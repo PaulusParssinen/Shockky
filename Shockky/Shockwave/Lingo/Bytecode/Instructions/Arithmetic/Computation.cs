@@ -25,7 +25,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
             return 1;
         }
 
-        public override void Execute(LingoMachine machine)
+   /*     public override void Execute(LingoMachine machine)
         {
             object right = machine.Values.Pop();
             object left = machine.Values.Pop();
@@ -38,14 +38,14 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
             machine.Values.Push(result);
         }
         protected abstract object Execute(object left, object right);
-
+		*/
         public static bool IsValid(OPCode op) => true; //TODO:
 
-        public override void Translate()
+        /*public override void Translate()
         {
             Right = Handler.Expressions.Pop();
             Left = Handler.Expressions.Pop();
-        }
+        }*/
 
         public override string ToString()
             => Left + " " + Translation + " " +Right;

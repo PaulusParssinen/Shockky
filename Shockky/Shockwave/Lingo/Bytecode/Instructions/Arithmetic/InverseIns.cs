@@ -17,10 +17,10 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
             return 1;
         }
 
-        public override void Execute(LingoMachine machine)
+       /* public override void Execute(LingoMachine machine)
         {
             int value = (int)machine.Values.Pop(); //TODO: Only integerz?? whatever
             machine.Values.Push(value * -1);
-        }
+        }*/
     }
 }

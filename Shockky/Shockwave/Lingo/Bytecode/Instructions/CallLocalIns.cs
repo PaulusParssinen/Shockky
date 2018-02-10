@@ -6,7 +6,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
     public class CallLocalIns : CallInstruction
     {
         public override string Function
-            => Handler.Script.Handlers[_functionNameIndex].Name;
+            => null; //Handler.Script.Handlers[_functionNameIndex].Name;
 
         public CallLocalIns(ShockwaveReader input, LingoHandler handler) 
             : base(OPCode.CallLocal, false, input, handler)

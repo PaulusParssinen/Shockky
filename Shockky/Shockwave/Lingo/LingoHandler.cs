@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Shockky.IO;
-using Shockky.Shockwave.Lingo.Bytecode;
+using Shockky.Shockwave.Lingo.Bytecode.AST.Statements;
 
 namespace Shockky.Shockwave.Lingo
 {
-    public class LingoHandler : ShockwaveItem
+    [DebuggerDisplay("on {Name,nq}")]
+    public class LingoHandler
     {
         private ShockwaveReader _input;
 
@@ -26,50 +28,52 @@ namespace Shockky.Shockwave.Lingo
 
         public int StackHeight { get; }
 
-        public List<Instruction> Instructions { get; }
-        
-        public Stack<Instruction> Expressions { get; }
+        public BlockStatement HandlerBody { get; private set; }
 
         public LingoScript Script { get; }
 
-        public LingoHandler(LingoScript script, ref ShockwaveReader input)
+        public LingoHandler(LingoScript script, ShockwaveReader input)
         {
             _input = input;
             Script = script;
 
             NameList = script.Names;
 
-            Expressions = new Stack<Instruction>();
-            Instructions = new List<Instruction>(); 
+            Name = NameList[input.ReadBigEndian<short>()];
+            HandlerVectorPosition = input.ReadBigEndian<short>(); 
 
-            Name = NameList[input.ReadInt16(true)];
-            HandlerVectorPosition = input.ReadInt16(true);
+	        CodeLength = input.ReadBigEndian<int>();
+            CodeOffset = input.ReadBigEndian<int>();
 
-            CodeLength = input.ReadInt32(true);
-            CodeOffset = input.ReadInt32(true);
+            int argumentsCount = input.ReadBigEndian<short>();
+            int argumentsOffset = input.ReadBigEndian<int>();
+			 
+            int localsCount = input.ReadBigEndian<short>();
+            int localsOffset = input.ReadBigEndian<int>();
 
-            int argumentsCount = input.ReadInt16(true);
-            int argumentsOffset = input.ReadInt32(true);
+            input.ReadBigEndian<short>(); //unk1Count
+            input.ReadBigEndian<int>(); //unk1Offset
 
-            int localsCount = input.ReadInt16(true);
-            int localsOffset = input.ReadInt32(true);
+            input.ReadBigEndian<int>();
+            input.ReadBigEndian<short>();
 
-            input.ReadInt16(true); //unk1Count
-            input.ReadInt32(true); //unk1Offset
+            LineCount = input.ReadBigEndian<short>();
+            LineOffset = input.ReadBigEndian<int>();
 
-            input.ReadInt32(true);
-            input.ReadInt16(true);
+            StackHeight = input.ReadBigEndian<int>();
 
-            LineCount = input.ReadInt16(true);
-            LineOffset = input.ReadInt32(true);
+            long ogPosition = input.Position;
 
-            StackHeight = input.ReadInt32(true); //TODO: lets see if this isreal
+            Arguments = input.ReadBigEndianList<short>(argumentsCount, argumentsOffset)
+                .Select(i => NameList[i]).ToList();
 
-            Arguments = input.MapNameList(argumentsCount, argumentsOffset, NameList, true);
-            Locals = input.MapNameList(localsCount, localsOffset, NameList, true);
-            
+            Locals = input.ReadBigEndianList<short>(localsCount, localsOffset)
+                .Select(i => NameList[i]).ToList();
+
+            input.Position = ogPosition;
+
         }
-
+		/*
         public void LoadInstructions()
         {
             _input.Position = CodeOffset;
@@ -79,21 +83,7 @@ namespace Shockky.Shockwave.Lingo
                 var ins = Instruction.Create(this, ref _input);
                 Instructions.Add(ins);
             }
-
-            Translate(); //TODO: Move bitch
         }
-
-        public void Translate()
-        {
-            foreach (var ins in Instructions)
-            {
-                ins.Translate();
-
-                if(!ins.IsStatement)
-                    Expressions.Push(ins);
-
-                Debug.WriteLine((ins.IsStatement ? "Statement: ": "Expression: ") + ins);
-            }
-        }
+*/
     }
 }

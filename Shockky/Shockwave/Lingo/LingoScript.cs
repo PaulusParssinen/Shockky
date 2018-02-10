@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Shockky.IO;
 using Shockky.Shockwave.Chunks;
 using Shockky.Shockwave.Chunks.Enum;
@@ -7,18 +8,22 @@ namespace Shockky.Shockwave.Lingo
 {
     public class LingoScript
     {
+        private readonly ShockwaveReader _input;
+
         public List<LingoHandler> Handlers { get; }
 
-        public List<string> Properties { get; }
         public List<LingoLiteral> Literals { get; }
+        public List<string> Properties { get; }
         public List<string> Globals { get; }
-
         public List<string> Names { get; }
 
-        private ShockwaveReader _input;
-
-        public LingoScript(ScriptChunk chunk, ShockwaveReader input) 
+        public LingoScript(ScriptChunk chunk, ShockwaveReader input)
         {
+            List<string> MapScriptEntryList(int len, int offset) =>
+                input.ReadBigEndianList<short>(len, offset)
+                    .Where(i => i > 0 && i < Names.Count)  //TODO: wazzzuuup
+                    .Select(i => Names[i]).ToList();
+
             _input = input;
             Names = chunk.NameList;
 
@@ -28,8 +33,8 @@ namespace Shockky.Shockwave.Lingo
             var handlers = chunk[ScriptEntryType.Handlers];
             var globals = chunk[ScriptEntryType.Globals];
 
-            Properties = input.MapNameList(properties.Length, properties.Offset, Names);
-            Globals = input.MapNameList(globals.Length, globals.Offset, Names);
+            Properties = MapScriptEntryList(properties.Length, properties.Offset);
+            Globals = MapScriptEntryList(globals.Length, globals.Offset);
 
             input.Position = literals.Offset;
             Literals = new List<LingoLiteral>(literals.Length);
@@ -38,17 +43,14 @@ namespace Shockky.Shockwave.Lingo
                 Literals.Add(new LingoLiteral(input, literalsData.Offset));
             }
 
+            //AST starts here
+
             input.Position = handlers.Offset;
             Handlers = new List<LingoHandler>(handlers.Length);
 
             for (int i = 0; i < handlers.Length; i++)
             {
-                Handlers.Add(new LingoHandler(this, ref input));
-            }
-
-            foreach (var handler in Handlers)
-            {
-                handler.LoadInstructions();
+                Handlers.Add(new LingoHandler(this, input));
             }
         }
     }

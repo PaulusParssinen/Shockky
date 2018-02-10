@@ -6,7 +6,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
     public class CallExternalIns : CallInstruction
     {
         public override string Function
-            => Handler.NameList[_functionNameIndex];
+            => null; //Handler.NameList[_functionNameIndex];
 
         public CallExternalIns(ShockwaveReader input, LingoHandler handler, byte opByte)
             : base(OPCode.CallExternal, opByte > 0x80, input, handler)

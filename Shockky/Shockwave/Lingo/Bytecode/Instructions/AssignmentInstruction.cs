@@ -5,7 +5,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public abstract class AssignmentInstruction : VariableReference
     {
-        public override bool IsStatement => true;
+//        public override bool IsStatement => true;
 
         public Instruction Value { get; private set; }
 
@@ -18,10 +18,10 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             return 1;
         }
 
-        public override void Translate()
+   /*     public override void Translate()
         {
             Value = Handler.Expressions.Pop();
-        }
+        }*/
 
         public override string ToString()
             => Name + " = " + Value;

@@ -22,11 +22,11 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             return 1;
         }
 
-        public override void Translate()
+     /*   public override void Translate()
         {
             Arguments = Handler.Expressions.Pop() as NewListIns; //TODO: Check -> if not -> bye bitch
             IsStatement = Arguments == null;
-        }
+        }*/
 
         public override string ToString()
             => Function + '(' + Arguments.ToString(false) + ')';

@@ -6,7 +6,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
     public class GetMoviePropertyIns : MultiByteInstruction
     {
         public string Property
-            => Handler.NameList[_value];
+            => null; //Handler.NameList[_value];
 
         public GetMoviePropertyIns(ShockwaveReader input, LingoHandler handler, byte opByte)
             : base(input, handler, OPCode.GetMovieProp, opByte > 0x80)

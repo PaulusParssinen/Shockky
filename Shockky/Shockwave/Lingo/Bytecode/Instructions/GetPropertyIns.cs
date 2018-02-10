@@ -6,7 +6,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
     public class GetPropertyIns : VariableReference
     {
         public override string Name
-            => Handler.Arguments[_variableIndex];
+            => null; //Handler.Arguments[_variableIndex];
 
         public GetPropertyIns(ShockwaveReader input, LingoHandler handler, byte opByte)
             : base(OPCode.GetProperty, opByte, input, handler)

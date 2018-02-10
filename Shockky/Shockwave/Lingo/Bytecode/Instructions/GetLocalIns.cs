@@ -6,7 +6,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
     public class GetLocalIns : VariableReference
     {
         public override string Name
-            => Handler.Locals[_variableIndex];
+            => null; //Handler.Locals[_variableIndex];
 
         public GetLocalIns(ShockwaveReader input, LingoHandler handler, byte opByte) 
             : base(OPCode.GetLocal, opByte, input, handler)

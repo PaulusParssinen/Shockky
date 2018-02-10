@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Shockky.IO;
 using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
@@ -22,10 +21,10 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             return ItemsCount;
         }
 
-        public override void Translate()
+     /*   public override void Translate()
         {
             Items = Handler.Expressions.Take(ItemsCount).ToList(); //TODO: ToList gayyy, perf
-        }
+        }*/
 
         public string ToString(bool brackets)
         {

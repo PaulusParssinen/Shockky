@@ -18,11 +18,11 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
             return 1;
         }
 
-        public override void Execute(LingoMachine machine)
+      /*  public override void Execute(LingoMachine machine)
         {
             bool value = (bool)machine.Values.Pop(); //TODO: idk it might be a function or shit that is passed ot dis..
 
             machine.Values.Push(!value);
-        }
+        }*/
     }
 }

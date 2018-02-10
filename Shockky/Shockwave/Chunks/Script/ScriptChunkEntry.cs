@@ -13,17 +13,17 @@ namespace Shockky.Shockwave.Chunks
         public int Offset { get; set; }
         public int Flags { get; set; }
 
-        public ScriptChunkEntry(ScriptEntryType type, ref ShockwaveReader input)
+        public ScriptChunkEntry(ScriptEntryType type, ShockwaveReader input)
         {
             Type = type;
 
             Length = (type == ScriptEntryType.LiteralsData) ? 
-                input.ReadInt32(true) : input.ReadInt16(true);
+                input.ReadBigEndian<int>() : input.ReadBigEndian<short>();
 
-            Offset = input.ReadInt32(true);
+            Offset = input.ReadBigEndian<int>();
 
             if (type == ScriptEntryType.HandlerVectors)
-                Flags = input.ReadInt32(true);
+                Flags = input.ReadBigEndian<int>();
         }
     }
 }

@@ -8,9 +8,9 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
             : base(OPCode.Divide, handler, "/")
         { }
 
-        protected override object Execute(dynamic left, dynamic right)
+      /*  protected override object Execute(dynamic left, dynamic right)
         {
             return (left / right);
-        }
+        }*/
     }
 }

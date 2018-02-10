@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Shockky.Shockwave.Lingo.Bytecode.AST;
 
 namespace Shockky.Shockwave.Lingo.Output
 {
@@ -15,39 +14,44 @@ namespace Shockky.Shockwave.Lingo.Output
             _writer = writer;
         }
 
-        public void StartNode(AstNode node)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void EndNode(AstNode node)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public void WriteToken(string token)
         {
-            throw new System.NotImplementedException();
+            WriteIndentation();
+            _writer.Write(token);
         }
 
         public void Space()
         {
-            throw new System.NotImplementedException();
+            //WriteIndentation();
+            _writer.Write(' ');
         }
 
         public void Indent()
         {
-            throw new System.NotImplementedException();
+            _indentCount++;
         }
 
         public void Unindent()
         {
-            throw new System.NotImplementedException();
+            _indentCount--;
+        }
+
+        void WriteIndentation()
+        {
+            if (_needsIndent)
+            {
+                _needsIndent = false;
+                for (int i = 0; i < _indentCount; i++)
+                {
+                    _writer.Write('\t');
+                }
+            }
         }
 
         public void NewLine()
         {
-            throw new System.NotImplementedException();
+            _writer.WriteLine();
+            _needsIndent = true;
         }
     }
 }

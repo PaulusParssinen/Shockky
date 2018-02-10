@@ -10,7 +10,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Control_Transfer
         public Jumper(OPCode op, ShockwaveReader input, LingoHandler handler)
             : base(op, handler)
         {
-            Offset = input.ReadInt16(true);
+            Offset = input.ReadBigEndian<short>();
         }
     }
 }
