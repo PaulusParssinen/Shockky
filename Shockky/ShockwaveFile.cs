@@ -11,7 +11,7 @@ namespace Shockky
 {
     public class ShockwaveFile : IDisposable
     {
-        private ShockwaveReader _input;
+        private readonly ShockwaveReader _reader;
 
         public List<ChunkItem> Chunks { get; set; }
 
@@ -29,108 +29,60 @@ namespace Shockky
             : this(new ShockwaveReader(inputStream))
         { }
 
-        public ShockwaveFile(ShockwaveReader input) //TODO: Validate if it even is a Shockwave movie/cast whatever shit projector
+        public ShockwaveFile(ShockwaveReader reader)
         {
-            IsLittleEndian = (input.ReadString(4, true) == "RIFX"); //Magic header
+            _reader = reader;
+
+            IsLittleEndian = (_reader.ReadReversedString(4) == "RIFX");
 
             if (!IsLittleEndian)
-                throw new NotImplementedException("Yo nigga hol' up");
+                throw new NotImplementedException("Yo nigga wait");
 
-            FileLength = input.ReadInt32();
+            FileLength = _reader.ReadInt32();
 
-            Codec = input.ReadString(4, true); //FGDM || MV93
-
-            _input = input;
+            Codec = _reader.ReadReversedString(4); //FGDM || MV93
         }
 
-        public void Dissassemble()
+        public void Disassemble()
         {
-            if(!(ReadChunk() is IndexMapChunk iMapChunk))
-                throw new InvalidCastException("I didn't see this coming..");
+            Disassemble(null);
+        }
+        public void Disassemble(Action<ChunkItem, MemoryMapChunk> callback)
+        {
+            if(!(ReadChunk(_reader) is IndexMapChunk iMapChunk))
+                throw new InvalidCastException("I did not see this coming..");
 
             foreach (int offset in iMapChunk.MemoryMapOffsets)
             {
-                _input.Position = offset;
+                _reader.Position = offset;
 
-                if(!(ReadChunk() is MemoryMapChunk mmapChunk))
-                    throw new Exception("tf");
-
-                Chunks = new List<ChunkItem>(mmapChunk.ChunksUsed);
-
-                foreach (var entry in mmapChunk.ChunkEntries.Where(e => e.Header.Type != ChunkType.free))
+                if (ReadChunk(_reader) is MemoryMapChunk mmapChunk)
                 {
-                    Console.WriteLine($"[{mmapChunk.ChunkEntries.IndexOf(entry)}] Name: {entry.Header.Name}, Offset: {entry.Offset}, Length: {entry.Header.Length}");
+                    Chunks = new List<ChunkItem>(mmapChunk.ChunksUsed);
 
-                   // if(entry.Header.Type == ChunkType.mmap) continue;
-
-                    var chunk = ReadChunk(entry);
-                    Chunks.Add(chunk);
-
-                    //Area51 (Sandbox/Debugging)
-                    switch (chunk.Header.Type)
+                    foreach (var entry in mmapChunk.ChunkEntries)
                     {
-                        case ChunkType.CASStar:
-                        {
-                            var castAssocChunk = chunk as CastAssociationTableChunk;
-                            for (int i = 1; i < castAssocChunk.Members.Count; i++)
-                            {
-                                var castMemberEntry = mmapChunk.ChunkEntries[castAssocChunk.Members[i]];
-                                var castMember = ReadChunk(castMemberEntry) as CastChunk;
-                            }
-                        }
-                        break;
-                        case ChunkType.LctX:
-                        {
-                            var contextChunk = chunk as ScriptContextChunk;
+                        var chunk = ReadChunk(entry, _reader);
+                        Chunks.Add(chunk);
 
-                            var nameListChunk =
-                                ReadChunk(mmapChunk.ChunkEntries[contextChunk.NameTableSectionId])  as NameTableChunk;
-
-                            if(nameListChunk == null)
-                                throw new Exception("Invalid NameTable chunk ID given in ScriptContextChunk!");
-
-                            foreach (var section in contextChunk.Sections) //so here we loop 'em
-                            {
-                                if(section.SectionId == -1) continue; //GAY yeah idk why this even exist, prob means that they have deleted something from the movie.. idk
-
-                                //var testChunkEntry = mmapChunk.ChunkEntries[section.Link];
-                                var scriptChunkEntry = mmapChunk.ChunkEntries[section.SectionId];//Get the scriptchunk which the section refers to
-                                _input.Position = scriptChunkEntry.Offset + 8; //string 4 length = chunk name, int32 length //skippy da header ye | we currently are at the position where the script chunk begins!
-
-                                var chunkInput = new ShockwaveReader(_input, scriptChunkEntry.Header.Length);//Let's cut the reader again inorder to align the offset for the chunk, chunks usually use the starting position of the chunk in those..
-
-                                var scriptChunk = new ScriptChunk(chunkInput, entry, nameListChunk.Names); //Pass the new reader, entry, and the list of names to it.
-                            }
-                        }
-                        break;
-                        case ChunkType.Lnam:
-                        {
-                            var nameChunk = chunk as NameTableChunk;
-
-                            Console.Write("Name Table: ");
-                            foreach (var name in nameChunk.Names.OrderBy(n => n))
-                            {
-                                Console.Write(name +  ", ");
-                            }
-                        }
-                        break;
+                        callback?.Invoke(chunk, mmapChunk);
                     }
                 }
+                else throw new Exception("What the actual fuck, tho this could be obfuscation troll in \"future\"");
             }
         }
-
-        public ChunkItem ReadChunk()
+        public ChunkItem ReadChunk(ShockwaveReader input)
         {
-            return ReadChunk(new ChunkEntry(ref _input, false));
+            return ReadChunk(new ChunkEntry(input, -1, false), input); //TODO: -1? Rethink this
         }
-        public ChunkItem ReadChunk(ChunkEntry entry)
+        public ChunkItem ReadChunk(ChunkEntry entry, ShockwaveReader input)
         {
             if (entry.Offset > 0)
-                _input.Position = entry.Offset + 8; //We readed the header already, skip that
+                _reader.Position = entry.Offset + 8; //We already read the header, skip that
 
-            var chunkInput = new ShockwaveReader(_input, entry.Header.Length); //In the future when we read these chunks
+	        var chunkInput = _reader.Cut(entry.Header.Length);
 
-            switch (entry.Header.Type) //TODO: I can do better
+            switch (entry.Header.Type)
             {
                 case ChunkType.imap:
                     return new IndexMapChunk(chunkInput, entry);
@@ -142,14 +94,14 @@ namespace Shockky
                     return new FileInfoChunk(chunkInput, entry);
                 case ChunkType.KEYStar:
                     return new AssociationTableChunk(chunkInput, entry);
-                case ChunkType.CASStar:
-                    return new CastAssociationTableChunk(chunkInput, entry);
+             //   case ChunkType.CASStar: return null;
+                    //return new CastAssociationTableChunk(chunkInput, entry);
                 case ChunkType.LctX:
                     return new ScriptContextChunk(chunkInput, entry);
                 case ChunkType.Lnam:
                     return new NameTableChunk(chunkInput, entry);
-                case ChunkType.CASt:
-                    return new CastChunk(chunkInput, entry);
+                //case ChunkType.CASt:
+                  //  return null;//new CastChunk(chunkInput, entry);
                 case ChunkType.CLUT:
                     return new PaletteChunk(chunkInput, entry);
                 case ChunkType.MCsL:
@@ -157,9 +109,14 @@ namespace Shockky
                 case ChunkType.STXT:
                     return new ScriptableTextChunk(chunkInput, entry);
                 default:
-                    Debug.WriteLine("Unknown section! Name: " + entry.Header.Name);
-                    return new ChunkItem(entry.Header);
+                    Debug.WriteLine("Unknown section occurred! Name: " + entry.Header.Name);
+                    return new UnknownChunk(entry.Header, chunkInput);
             }
+        }
+
+        public void Assemble()
+        {
+            //TODO: Adjust stuff here etc
         }
 
         public void Dispose()
@@ -170,7 +127,7 @@ namespace Shockky
         {
             if (disposing)
             {
-                _input.Dispose();
+                _reader.Dispose();
             }
         }
     }
