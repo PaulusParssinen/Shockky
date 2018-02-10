@@ -2,157 +2,125 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Shockky.IO.Conversion;
+using System.Runtime.InteropServices;
+using System.Text;
+using Shockky.IO.Utils;
 using Shockky.Shockwave;
-using Shockky.Utilities;
-using static Shockky.Utilities.Utils;
 
-namespace Shockky.IO
+namespace Shockky.IO //TODO: System.Memory
 {
-    public class ShockwaveReader : EndianBinaryReader
+    public class ShockwaveReader : BinaryReader
     {
-        /* TODO:s
-         * - Implement jumping
-         * 
-         */
-
-        public long Length => BaseStream.Length;
-        public bool IsDataAvailable => Position < Length;
-
         public long Position
         {
             get => BaseStream.Position;
             set => BaseStream.Position = value;
         }
-
-        protected int BitPosition { get; set; }
-        protected byte BitContainer { get; set; }
+        public long Length => BaseStream.Length;
+        public bool IsDataAvailable => (Position < Length);
 
         public ShockwaveReader(byte[] data)
             : this(new MemoryStream(data))
         { }
-        public ShockwaveReader(Stream stream)
-            : base(EndianBitConverter.Little, stream)
+        public ShockwaveReader(Stream input)
+            : base(input)
+        { }
+        public ShockwaveReader(Stream input, bool leaveOpen)
+            : this(input, Encoding.ASCII, leaveOpen)
+        { }
+        public ShockwaveReader(Stream input, Encoding encoding)
+            : base(input, encoding)
+        { }
+        public ShockwaveReader(Stream input, Encoding encoding, bool leaveOpen)
+            : base(input, encoding, leaveOpen)
         { }
 
-        public ShockwaveReader(ShockwaveReader input, int length)
-            : this(new MemoryStream(input.ReadBytes(length)))
-        { }
-
-        public ShockwaveReader(EndianBitConverter endianness, Stream stream)
-            : base(endianness, stream)
-        { }
-
-        public float ReadInt64(bool swapEndianness)
+        public T ReadBigEndian<T>()
         {
-            byte[] floatBites = ReadBytes(8);
+            byte[] data = ReadBytes(Marshal.SizeOf<T>());
 
-            if(swapEndianness)
-                Array.Reverse(floatBites);
+            if (data.All(b => b == 0)) return default(T);
+            Array.Reverse(data);
 
-            return BitConverter.ToInt64(floatBites, 0);
+            IntPtr valuePtr = Marshal.AllocHGlobal(data.Length);
+            Marshal.Copy(data, 0, valuePtr, data.Length);
+
+            var value = (T)Marshal.PtrToStructure(valuePtr, typeof(T));
+            Marshal.FreeHGlobal(valuePtr);
+
+            return value;
         }
-        public int ReadInt32(bool swapEndianness)
+        public new int Read7BitEncodedInt()
         {
-            int val = ReadInt32();
-            return swapEndianness ? Swap(val) : val;
-        }
-        public short ReadInt16(bool swapEndianness)
-        {
-            short val = ReadInt16();
-            return swapEndianness ? Swap(val) : val;
-        }
-
-        //TODO: Absolute bullshit
-        public string ReadString(int length = -1, bool followEndianness = false)
-        {
-            if (length < 0)
-                length = ReadByte();
-
-            string value = Encoding.GetString(ReadBytes(length));
-
-            return followEndianness ? Reverse(value) : value;
-        }
-
-        public List<T> ReadList<T>(int count, int offset = 0)
-            where T : ShockwaveItem
-        {
-            if(offset > 0) //TODO: auto entry count reading niggas? nah i guess
-                Position = offset;
-
-            //I wanna die btw
-            var newItem = ObjectCreator.GetItemConstructor<T>();
-
-            var list = new List<T>(count);
-            for (int i = 0; i < count; i++)
-            { 
-                list.Add(newItem(this));
+            int result = 0;
+            byte lastByte;
+            do
+            {
+                lastByte = ReadByte();
+                result |= lastByte & 0x7F;
+                result <<= 7;
             }
-
-            return list;
+            while ((lastByte & 128) >> 7 == 1);
+            return (result >> 7);
         }
 
-        public List<int> ReadIntList(int count, int offset = 0, bool bigEndian = true)
+        public string ReadString(int length)
+            => new string(ReadChars(length));
+
+        public string ReadReversedString(int length)
+        {
+            char[] characters = ReadChars(length);
+            Array.Reverse(characters);
+
+            return new string(characters);
+        }
+
+        public List<T> ReadBigEndianList<T>(int count, int offset = 0)
+            where T : struct
         {
             if (offset > 0)
                 Position = offset;
 
-            var list = new List<int>(count);
+            var array = new T[count];
             for (int i = 0; i < count; i++)
             {
-                list.Add(ReadInt32(bigEndian));
-            }
-            return list;
-        }
-        public List<short> ReadShortList(int count, int offset = 0, bool bigEndian = true)
-        { 
-            if(offset > 0)
-                Position = offset;
-
-            var list = new List<short>(count);
-            for (int i = 0; i < count; i++)
-            {
-                list.Add(ReadInt16(bigEndian));
+                array[i] = ReadBigEndian<T>();
             }
 
-            return list;
+            return new List<T>(array);
         }
-        public List<string> ReadStringList(int count, int stringLength = 0, int offset = 0)
+
+        public List<T> ReadList<T>(int count, int offset = 0) //TODO: Get rid of these, useless imo
+            where T : IConvertible
         {
-            if (offset > 0)
-                Position = offset;
-
-            var list = new List<string>(count);
-            for (int i = 0; i < count; i++)
+            object Read()
             {
-                list.Add(ReadString(stringLength));
+                if (typeof(T) == typeof(int)) return ReadInt32();
+                if (typeof(T) == typeof(short)) return ReadInt16();
+                if (typeof(T) == typeof(string)) return ReadString();
+                if (typeof(T) == typeof(uint)) return ReadUInt32();
+                if (typeof(T) == typeof(ushort)) return ReadUInt16();
+
+                throw new NotSupportedException();
             }
-
-            return list;
-        }
-
-        public List<string> MapNameList(int count, int offset, List<string> nameList, bool resetPosition = false, bool bigEndian = true) //Absolutely horrible
-        {
-            long ogPos = Position;
 
             if (offset > 0)
                 Position = offset;
 
-            var list = new List<string>(count);
+            var array = new T[count];
             for (int i = 0; i < count; i++)
             {
-                short index = ReadInt16(bigEndian);
-
-                if(index == -1) continue;
-
-                list.Add(index > nameList.Count
-                    ? "OUTOFBOUNDS" : nameList[index]); //TODO: GOD FUCKING DAMN IT FUCK YOU SHOCKWAVE
+                array[i] = (T) Read();
             }
 
-            if(resetPosition)
-                Position = ogPos;
-
-            return list;
+            return new List<T>(array);
         }
+
     }
+
+	public static class ShockwaveReaderExtensions
+	{
+		public static ShockwaveReader Cut(this ShockwaveReader reader, int length) //TODO: Instead some alignment tricky, this is way too heavy
+		    => new ShockwaveReader(reader.ReadBytes(length));
+	}
 }
