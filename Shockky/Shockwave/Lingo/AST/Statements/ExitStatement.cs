@@ -1,11 +1,10 @@
-﻿namespace Shockky.Shockwave.Lingo.Bytecode.AST.Statements
+﻿namespace Shockky.Shockwave.Lingo.AST.Statements
 {
     public class ExitStatement : Statement
     {
-
 	    public override void AcceptVisitor(IAstVisitor visitor)
 	    {
-		    throw new System.NotImplementedException();
+		    visitor.VisitExitStatement(this);
 	    }
     }
 }

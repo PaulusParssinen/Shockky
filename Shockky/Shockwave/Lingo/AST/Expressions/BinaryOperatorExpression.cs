@@ -1,4 +1,4 @@
-﻿namespace Shockky.Shockwave.Lingo.Bytecode.AST.Expressions
+﻿namespace Shockky.Shockwave.Lingo.AST.Expressions
 {
     public class BinaryOperatorExpression : Expression
     {

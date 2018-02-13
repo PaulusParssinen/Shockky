@@ -37,7 +37,7 @@ namespace Shockky.Shockwave.Chunks
 
             for (int i = 0; i < ChunksUsed; i++)
             {
-                ChunkEntries.Add(new ChunkEntry(input));
+                ChunkEntries.Add(new ChunkEntry(input, i));
             }
         }
 

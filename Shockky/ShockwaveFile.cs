@@ -98,6 +98,8 @@ namespace Shockky
                     //return new CastAssociationTableChunk(chunkInput, entry);
                 case ChunkType.LctX:
                     return new ScriptContextChunk(chunkInput, entry);
+                case ChunkType.Lscr:
+                    return new ScriptChunk(chunkInput, entry);
                 case ChunkType.Lnam:
                     return new NameTableChunk(chunkInput, entry);
                 //case ChunkType.CASt:

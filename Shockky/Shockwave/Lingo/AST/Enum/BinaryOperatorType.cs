@@ -1,4 +1,4 @@
-﻿namespace Shockky.Shockwave.Lingo.Bytecode.AST.Enum
+﻿namespace Shockky.Shockwave.Lingo.AST.Enum
 {
 	public enum BinaryOperatorType
 	{

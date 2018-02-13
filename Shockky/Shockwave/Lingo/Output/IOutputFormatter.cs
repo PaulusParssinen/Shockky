@@ -1,14 +1,11 @@
-﻿using Shockky.Shockwave.Lingo.Bytecode.AST;
-
-namespace Shockky.Shockwave.Lingo.Output
+﻿namespace Shockky.Shockwave.Lingo.Output
 {
     public interface IOutputFormatter
     {   
+		int Indentation { get; set; }
+
         void WriteToken(string token);
         void Space();
-
-        void Indent();
-        void Unindent();
 
         void NewLine();
     }

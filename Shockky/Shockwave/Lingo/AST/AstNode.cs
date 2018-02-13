@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using Shockky.Shockwave.Lingo.AST.Interface;
+using System.Collections.Generic;
 using System.Diagnostics;
+using Shockky.Shockwave.Lingo.Bytecode.Roles;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.AST
+namespace Shockky.Shockwave.Lingo.AST
 {
-    public abstract class AstNode
+    public abstract class AstNode //: ICloneable
     {
         public AstNode Parent { get; private set; }
         public AstNode NextSibling { get; private set; }

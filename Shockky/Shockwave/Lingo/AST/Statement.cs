@@ -1,4 +1,4 @@
-﻿namespace Shockky.Shockwave.Lingo.Bytecode.AST
+﻿namespace Shockky.Shockwave.Lingo.AST
 {
 	public abstract class Statement : AstNode
 	{

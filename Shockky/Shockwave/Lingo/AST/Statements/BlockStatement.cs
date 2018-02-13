@@ -1,4 +1,4 @@
-﻿namespace Shockky.Shockwave.Lingo.Bytecode.AST.Statements
+﻿namespace Shockky.Shockwave.Lingo.AST.Statements
 {
     public class BlockStatement : Statement
     {

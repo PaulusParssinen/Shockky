@@ -2,12 +2,12 @@
 
 namespace Shockky.Shockwave.Lingo.Output
 {
-    class LingoOutputFormatter : IOutputFormatter
+    public class LingoOutputFormatter : IOutputFormatter
     {
         private readonly TextWriter _writer;
+	    private bool _needsIndent = true;
 
-        private int _indentCount;
-        private bool _needsIndent = true;
+		public int Indentation { get; set; }
 
         public LingoOutputFormatter(TextWriter writer)
         {
@@ -26,26 +26,12 @@ namespace Shockky.Shockwave.Lingo.Output
             _writer.Write(' ');
         }
 
-        public void Indent()
+        private void WriteIndentation()
         {
-            _indentCount++;
-        }
+	        if (!_needsIndent) return;
 
-        public void Unindent()
-        {
-            _indentCount--;
-        }
-
-        void WriteIndentation()
-        {
-            if (_needsIndent)
-            {
-                _needsIndent = false;
-                for (int i = 0; i < _indentCount; i++)
-                {
-                    _writer.Write('\t');
-                }
-            }
+	        _needsIndent = false;
+			_writer.Write(new string('\t', Indentation));
         }
 
         public void NewLine()

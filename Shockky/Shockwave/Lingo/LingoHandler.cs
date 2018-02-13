@@ -2,7 +2,8 @@
 using System.Diagnostics;
 using System.Linq;
 using Shockky.IO;
-using Shockky.Shockwave.Lingo.Bytecode.AST.Statements;
+using Shockky.Shockwave.Lingo.AST.Statements;
+using Shockky.Shockwave.Lingo.Bytecode;
 
 namespace Shockky.Shockwave.Lingo
 {
@@ -73,17 +74,17 @@ namespace Shockky.Shockwave.Lingo
             input.Position = ogPosition;
 
         }
-		/*
-        public void LoadInstructions()
+		
+        public void Disassemble()
         {
             _input.Position = CodeOffset;
 
             while (_input.Position < CodeOffset + CodeLength)
             {
-                var ins = Instruction.Create(this, ref _input);
-                Instructions.Add(ins);
+                //var ins = Instruction.Create(this, ref _input);
+                //Instructions.Add(ins);
             }
         }
-*/
+
     }
 }

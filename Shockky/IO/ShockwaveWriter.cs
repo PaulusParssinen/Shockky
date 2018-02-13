@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using Shockky.Shockwave;
 
@@ -48,6 +51,19 @@ namespace Shockky.IO
         public void Write(ShockwaveItem item)
         {
             item.WriteTo(this);
+        }
+
+        public void WriteBigEndian<T>(T value) //yoloing dis, prob gonna just go bitconverter and do overloads on every type, rip | TODO
+        {
+            int size = Marshal.SizeOf(value);
+            byte[] bytes = new byte[size];
+
+            IntPtr valPtr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(value, valPtr, true);
+            Marshal.Copy(valPtr, bytes, 0, size);
+
+            Array.Reverse(bytes);
+            Write(bytes);
         }
     }
 }

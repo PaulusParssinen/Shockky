@@ -1,4 +1,4 @@
-﻿using Shockky.Shockwave.Lingo.Bytecode.AST;
+﻿using Shockky.Shockwave.Lingo.AST;
 
 namespace Shockky.Shockwave.Lingo.Bytecode
 {

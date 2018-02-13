@@ -1,9 +1,9 @@
-﻿using Shockky.Shockwave.Lingo.Bytecode.AST.Expressions;
-using Shockky.Shockwave.Lingo.Bytecode.AST.Statements;
+﻿using Shockky.Shockwave.Lingo.AST.Expressions;
+using Shockky.Shockwave.Lingo.AST.Statements;
 
 namespace Shockky.Shockwave.Lingo
 {
-	public interface IAstVisitor
+	public interface IAstVisitor : IVisitor
 	{
 		//Statements
 		void VisitExitStatement(ExitStatement exitStatement);

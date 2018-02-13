@@ -17,7 +17,7 @@ namespace Shockky.Shockwave.Lingo
         public List<string> Globals { get; }
         public List<string> Names { get; }
 
-        public LingoScript(ScriptChunk chunk, ShockwaveReader input)
+        public LingoScript(ScriptChunk chunk, ShockwaveReader input, List<string> nameList)
         {
             List<string> MapScriptEntryList(int len, int offset) =>
                 input.ReadBigEndianList<short>(len, offset)
@@ -25,7 +25,7 @@ namespace Shockky.Shockwave.Lingo
                     .Select(i => Names[i]).ToList();
 
             _input = input;
-            Names = chunk.NameList;
+            Names = nameList;
 
             var literalsData = chunk[ScriptEntryType.LiteralsData];
             var properties = chunk[ScriptEntryType.Properties];
@@ -53,5 +53,10 @@ namespace Shockky.Shockwave.Lingo
                 Handlers.Add(new LingoHandler(this, input));
             }
         }
+
+	    public void Disassemble()
+	    {
+
+	    }
     }
 }

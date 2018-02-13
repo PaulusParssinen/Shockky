@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Shockky.Shockwave.Lingo.AST.Expressions;
 using Shockky.Shockwave.Lingo.AST.Statements;
 
-namespace Shockky.Shockwave.Lingo.Output.Visitor
+namespace Shockky.Shockwave.Lingo.Bytecode.Output.Visitor
 {
-    public class LingoOutputVisitor : IAstVisitor
+    public class LingoBytecodeOutputVisitor : IAstVisitor
     {
-	    public LingoOutputVisitor()
+	    public LingoBytecodeOutputVisitor()
 	    {
 		    
 	    }

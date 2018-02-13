@@ -1,6 +1,8 @@
-﻿namespace Shockky.Shockwave.Lingo.Bytecode.AST.Statements
+﻿using Shockky.Shockwave.Lingo.AST;
+
+namespace Shockky.Shockwave.Lingo.Bytecode
 {
-    public class AssignmentStatement : Statement
+    public class Block : AstNode
     {
 	    public override void AcceptVisitor(IAstVisitor visitor)
 	    {

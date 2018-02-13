@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Shockky.IO;
 using Shockky.Shockwave.Chunks.Enum;
 using Shockky.Shockwave.Lingo;
@@ -8,30 +9,40 @@ namespace Shockky.Shockwave.Chunks
 {
     public class ScriptChunk : ChunkItem
     {
+        private readonly ShockwaveReader _input;
+
         public List<ScriptChunkEntry> Entries { get; }
         public List<string> NameList { get; }
 
-        public LingoScript Script { get; }
+        public LingoScript Script { get; private set; }
 
         public ScriptChunkEntry this[ScriptEntryType type]
             => Entries[(int) type];
 
-        public ScriptChunk(ShockwaveReader input, ChunkEntry entry, List<string> nameList)
+        public int Unknown1 { get; set; }
+        public int Unknown2 { get; set; }
+
+        public int TotalLength { get; set; }
+
+        public short HeaderLength { get; set; }
+        public short ScriptNumber { get; set; }
+
+        public int BehaviourScript { get; set; }
+
+        public ScriptChunk(ShockwaveReader input, ChunkEntry entry)
             : base(entry.Header)
         {
-            NameList = nameList;
-
-            int unknown1 = input.ReadBigEndian<int>();
-            int unknown2 = input.ReadBigEndian<int>();
+            Unknown1 = input.ReadBigEndian<int>();
+            Unknown2 = input.ReadBigEndian<int>();
            
-            int totalLength = input.ReadBigEndian<int>();
-            int totalLength2 = input.ReadBigEndian<int>();
+            TotalLength = input.ReadBigEndian<int>();
+            input.ReadBigEndian<int>(); //totalLength2
 
-            short headerLength = input.ReadBigEndian<short>();
-            short scriptNumber = input.ReadBigEndian<short>();
+            HeaderLength = input.ReadBigEndian<short>();
+            ScriptNumber = input.ReadBigEndian<short>();
             
-            input.Position = 38;
-            int behaviourScript = input.ReadBigEndian<int>(); 
+            input.Position = 38; //TODO: We need to figure this stuff out!
+            BehaviourScript = input.ReadBigEndian<int>(); 
 
             input.Position = 50;
 
@@ -45,7 +56,12 @@ namespace Shockky.Shockwave.Chunks
                 new ScriptChunkEntry(ScriptEntryType.LiteralsData, input),
             };
 
-            Script = new LingoScript(this, input); 
+            _input = input;
+        }
+
+        public void Disassemble(List<string> nameList) //TODO: or something idk
+        {
+            Script = new LingoScript(this, _input, nameList); //TODO: callback for handler dissasembly or somethign
         }
 
         public override int GetBodySize()
@@ -66,14 +82,20 @@ namespace Shockky.Shockwave.Chunks
 
             size += 8;
 
-            
-
             return size;
         }
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            throw new NotImplementedException();
+            Debugger.Break(); //Not finished, noob
+            output.WriteBigEndian(Unknown1);
+            output.WriteBigEndian(Unknown2);
+
+            output.WriteBigEndian(TotalLength);
+            output.WriteBigEndian(TotalLength);
+
+            output.WriteBigEndian(HeaderLength);
+            output.WriteBigEndian(ScriptNumber);
         }
     }
 }

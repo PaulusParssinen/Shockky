@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Shockky.IO;
-using Shockky.Shockwave.Lingo.Bytecode.AST.Statements;
+using Shockky.Shockwave.Lingo.AST.Statements;
+using Shockky.Shockwave.Lingo.Bytecode;
 using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.AST
+namespace Shockky.Shockwave.Lingo.AST
 {
 	public class AstBuilder //TODO: Maybeh rename cause most of this stuff is specificially for handlers
 	{
