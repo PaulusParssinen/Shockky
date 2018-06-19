@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using Shockky.IO.Utils;
-using Shockky.Shockwave;
 
-namespace Shockky.IO //TODO: System.Memory
+namespace Shockky.IO
 {
     public class ShockwaveReader : BinaryReader
     {
@@ -50,6 +48,7 @@ namespace Shockky.IO //TODO: System.Memory
 
             return value;
         }
+
         public new int Read7BitEncodedInt()
         {
             int result = 0;
@@ -74,53 +73,19 @@ namespace Shockky.IO //TODO: System.Memory
 
             return new string(characters);
         }
-
-        public List<T> ReadBigEndianList<T>(int count, int offset = 0)
-            where T : struct
+        public Rectangle ReadRect(bool bigEndian)
         {
-            if (offset > 0)
-                Position = offset;
-
-            var array = new T[count];
-            for (int i = 0; i < count; i++)
-            {
-                array[i] = ReadBigEndian<T>();
-            }
-
-            return new List<T>(array);
+            short x1 = ReadBigEndian<short>();
+            short x2 = ReadBigEndian<short>();
+            short y1 = ReadBigEndian<short>();
+            short y2 = ReadBigEndian<short>();
+            return new Rectangle(x1, y1, x2/* - x1*/, y2/* - y1*/); //TODO
         }
-
-        public List<T> ReadList<T>(int count, int offset = 0) //TODO: Get rid of these, useless imo
-            where T : IConvertible
-        {
-            object Read()
-            {
-                if (typeof(T) == typeof(int)) return ReadInt32();
-                if (typeof(T) == typeof(short)) return ReadInt16();
-                if (typeof(T) == typeof(string)) return ReadString();
-                if (typeof(T) == typeof(uint)) return ReadUInt32();
-                if (typeof(T) == typeof(ushort)) return ReadUInt16();
-
-                throw new NotSupportedException();
-            }
-
-            if (offset > 0)
-                Position = offset;
-
-            var array = new T[count];
-            for (int i = 0; i < count; i++)
-            {
-                array[i] = (T) Read();
-            }
-
-            return new List<T>(array);
-        }
-
     }
 
-	public static class ShockwaveReaderExtensions
+	public static class ReaderExtensions
 	{
-		public static ShockwaveReader Cut(this ShockwaveReader reader, int length) //TODO: Instead some alignment tricky, this is way too heavy
-		    => new ShockwaveReader(reader.ReadBytes(length));
-	}
+		public static ShockwaveReader Cut(this ShockwaveReader input, long length) //TODO: ewwwwwwwwwwwwwwwwwwwwww
+		    => new ShockwaveReader(input.ReadBytes((int)length));
+    }
 }
