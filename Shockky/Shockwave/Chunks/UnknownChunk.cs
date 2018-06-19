@@ -6,18 +6,15 @@ namespace Shockky.Shockwave.Chunks
     {
         public byte[] Data { get; set; }
 
-        public UnknownChunk(ChunkHeader header, ShockwaveReader input)
+        public UnknownChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Data = input.ReadBytes(header.Length);
+            Data = input.ReadBytes((int)header.Length);
         }
 
-        public override int GetBodySize()
-        {
-            return Data.Length;
-        }
+        public override int GetBodySize() => Data.Length;
 
-        public override void WriteTo(ShockwaveWriter output)
+        public override void WriteBodyTo(ShockwaveWriter output)
         {
             output.Write(Data);
         }

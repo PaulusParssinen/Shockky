@@ -16,8 +16,8 @@ namespace Shockky.Shockwave.Chunks
 
         public string FilePath { get; set; }
 
-        public FileInfoChunk(ShockwaveReader input, ChunkEntry entry)
-            : base(entry.Header)
+        public FileInfoChunk(ShockwaveReader input, ChunkHeader header)
+            : base(header)
         {
             int bitfieldLen = input.ReadBigEndian<int>();
             BitField = input.ReadBytes(bitfieldLen);
@@ -41,7 +41,7 @@ namespace Shockky.Shockwave.Chunks
             FilePath = input.ReadString();
         }
 
-        public override void WriteTo(ShockwaveWriter output)
+        public override void WriteBodyTo(ShockwaveWriter output)
         {
             output.Write(BitField.Length);
             output.Write(BitField);

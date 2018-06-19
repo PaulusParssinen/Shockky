@@ -5,13 +5,15 @@ namespace Shockky.Shockwave.Chunks
 {
     public class PaletteChunk : ChunkItem
     {
-        public PaletteChunk(ShockwaveReader input, ChunkEntry entry)
-            : base(entry.Header)
+        public PaletteChunk(ShockwaveReader input, ChunkHeader header)
+            : base(header)
         {
-            var paletteCount = Math.Round((decimal)entry.Header.Length / 6);
+            //while(input.IsDataAvailable) test dis | TODO:
+
+            var paletteCount = Math.Round((decimal)header.Length / 6);
         }
 
-        public override void WriteTo(ShockwaveWriter output)
+        public override void WriteBodyTo(ShockwaveWriter output)
         {
             throw new NotImplementedException();
         }

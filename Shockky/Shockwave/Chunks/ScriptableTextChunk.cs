@@ -3,18 +3,19 @@ using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
+    //Called styledtext actually
     public class ScriptableTextChunk : ChunkItem
     {
         public string Text { get; set; }
 
-        public ScriptableTextChunk(ShockwaveReader input, ChunkEntry entry)
-            : base(entry.Header)
+        public ScriptableTextChunk(ShockwaveReader input, ChunkHeader header)
+            : base(header)
         {
             int headerLength = input.ReadBigEndian<int>();
             int textLength = input.ReadBigEndian<int>();
             int footerLength = input.ReadBigEndian<int>();
 
-	        Text = Encoding.UTF8.GetString(input.ReadBytes(textLength));//input.ReadString(textLength);
+            Text = input.ReadString(textLength);
 
             //TODO: if footer Length > 0? and more validation
 
@@ -31,7 +32,7 @@ namespace Shockky.Shockwave.Chunks
             }
         }
 
-        public override void WriteTo(ShockwaveWriter output)
+        public override void WriteBodyTo(ShockwaveWriter output)
         {
             throw new System.NotImplementedException();
         }
