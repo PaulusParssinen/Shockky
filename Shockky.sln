@@ -1,13 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shockky", "Shockky\Shockky.csproj", "{0F807D73-1838-4227-B6D3-932D83E99D9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shockky.Sandbox", "Shockky.Sandbox\Shockky.Sandbox.csproj", "{EA11D934-A772-4E2A-B368-3D919D588B3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shockky.Sandbox", "Shockky.Sandbox\Shockky.Sandbox.csproj", "{EA11D934-A772-4E2A-B368-3D919D588B3D}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
