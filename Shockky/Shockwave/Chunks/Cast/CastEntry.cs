@@ -1,19 +1,17 @@
-﻿using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using Shockky.IO;
+﻿using Shockky.IO;
 using Shockky.Shockwave.Chunks.Enum;
 
 namespace Shockky.Shockwave.Chunks.Cast
 {
-    [DebuggerDisplay("{Name} | File Slot: {FileSlot} | Slot: {Slot}")]
     public class CastEntry : ShockwaveItem
     {
+        protected override string DebuggerDisplay => $"Slot: {Slot}";
+
         public int FileSlot { get; set; }
         public int Slot { get; set; }
 
         public string Name { get; set; }
-        public ChunkType Type { get; set; }
+        public ChunkKind Kind { get; set; }
 
         public CastEntry(ShockwaveReader input)
         {
@@ -21,7 +19,7 @@ namespace Shockky.Shockwave.Chunks.Cast
             Slot = input.ReadInt32();
 
 	        Name = input.ReadReversedString(4);
-            Type = Name.ToChunkType();
+            Kind = Name.ToChunkKind();
         }
 
         public override int GetBodySize()
@@ -29,7 +27,7 @@ namespace Shockky.Shockwave.Chunks.Cast
             int size = 0;
             size += sizeof(int);
             size += sizeof(int);
-            size += Encoding.ASCII.GetByteCount(Name);
+            size += 4;
             return size;
         }
 
@@ -37,7 +35,7 @@ namespace Shockky.Shockwave.Chunks.Cast
         {
             output.Write(FileSlot);
             output.Write(Slot);
-            output.Write(Name.Reverse().ToString()); //TODO
+            output.WriteBigEndian(Name);
         }
     }
 }

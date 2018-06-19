@@ -1,11 +1,12 @@
-﻿using System.Diagnostics;
-using Shockky.IO;
+﻿using Shockky.IO;
+using System.Diagnostics;
 
 namespace Shockky.Shockwave.Chunks
 {
-    [DebuggerDisplay("{Header.Name} | Length: {Header.Length}")]
+    [DebuggerDisplay("{Kind}")]
     public abstract class ChunkItem : ShockwaveItem
     {
+        public ChunkKind Kind => Header.Kind;
         public ChunkHeader Header { get; set; }
 
         protected ChunkItem(ShockwaveReader input)
@@ -16,5 +17,14 @@ namespace Shockky.Shockwave.Chunks
         {
             Header = header;
         }
+
+        public override void WriteTo(ShockwaveWriter output)
+        {
+            Header.Length = GetBodySize();
+            output.Write(Header);
+            WriteBodyTo(output);
+        }
+
+        public abstract void WriteBodyTo(ShockwaveWriter output);
     }
 }
