@@ -1,43 +1,37 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using Shockky.IO;
+using Shockky.Shockwave.Chunks.Interface;
 
 namespace Shockky.Shockwave.Chunks
 {
     [DebuggerDisplay("{Header.Name} | Length: {Header.Length} | Offset: {Offset}")]
-    public class ChunkEntry : ShockwaveItem
+    public class ChunkEntry : ShockwaveItem, IChunkEntry
     {
-        public int Index { get; set; }
-
-        public List<int> LinkedEntries { get; set; }
+        public int Id { get; set; }
 
         public ChunkHeader Header { get; set; }
 
         public int Offset { get; set; }
         public short Padding { get; set; }
+        public short Unknown { get; set; }
         public int Link { get; set; }
 
-        public ChunkEntry(ShockwaveReader input)
-        {
-            Header = new ChunkHeader(input);
+        public bool IsCompressed => false;
 
-            Offset = input.ReadInt32();
-            Padding = input.ReadInt16();
-            input.ReadInt16();
-            Link = input.ReadInt32();
+        public ChunkEntry(ChunkHeader header)
+        {
+            Header = header;
         }
-
-        public ChunkEntry(ShockwaveReader input, int index, bool hasEntryData = true)
+        public ChunkEntry(ShockwaveReader input, int id)
+            : this(new ChunkHeader(input))
         {
-            Index = index;
-
-            Header = new ChunkHeader(input, index);
-
-            if (!hasEntryData) return;
+            Id = id;
 
             Offset = input.ReadInt32();
             Padding = input.ReadInt16();
-            input.ReadInt16();
+            Unknown = input.ReadInt16();
+            //short here?
             Link = input.ReadInt32();
         }
 
@@ -45,13 +39,21 @@ namespace Shockky.Shockwave.Chunks
         {
             int size = 0;
             size += Header.GetBodySize();
-            //TODO
+            size += sizeof(int);
+            size += sizeof(short);
+            size += sizeof(short);
+            size += sizeof(int);
             return size;
         }
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.Write(Header);
+            Header.WriteTo(output);
+
+            output.Write(Offset);
+            output.Write(Padding);
+            output.Write(Unknown);
+            output.Write(Link);
             //TODO
         }
     }

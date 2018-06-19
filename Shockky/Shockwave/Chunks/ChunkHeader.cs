@@ -7,40 +7,37 @@ namespace Shockky.Shockwave.Chunks
     [DebuggerDisplay("{Name} | {Length}")]
     public class ChunkHeader : ShockwaveItem
     {
-        public int Index { get; set; }
-
         public string Name { get; set; }
-        public ChunkType Type { get; set; }
+        public ChunkKind Kind { get; set; }
 
-        public int Length { get; set; }
-        
-        public ChunkHeader(ChunkType type)
+        public long Length { get; set; }
+
+        public ChunkHeader(ChunkKind kind)
         {
-            Type = type;
+            Kind = kind;
         }
-        public ChunkHeader(ShockwaveReader input, int index)
-            : this(input)
+        public ChunkHeader(string name)
+            : this(name.ToChunkKind())
         {
-            Index = index;
+            Name = name;
         }
         public ChunkHeader(ShockwaveReader input)
+            : this(input.ReadReversedString(4))
         {
-            Name = input.ReadReversedString(4);
-            Type = Name.ToChunkType();
             Length = input.ReadInt32();
         }
 
         public override int GetBodySize()
         {
             int size = 0;
-            size += 4; //fourCC
+            size += 4;
             size += sizeof(int);
             return size;
         }
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.Write(Name); //fourcc so reverse TODO
+            output.Write(Name); //fourcc so reverse TODO:
             output.Write(Length);
         }
     }

@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Shockky.IO;
+using Shockky.Shockwave.Chunks.Interface;
 
 namespace Shockky.Shockwave.Chunks
 {
-    public class MemoryMapChunk : ChunkItem
+    public class MemoryMapChunk : ChunkItem, IChunkEntryMap
     {
-        public List<ChunkEntry> ChunkEntries { get; set; }
+        public List<IChunkEntry> Entries { get; set; }
 
         public short Unknown1 { get; set; }
         public short Unknown2 { get; set; }
@@ -17,11 +19,11 @@ namespace Shockky.Shockwave.Chunks
         public int ChunkCountMax { get; } //TODO: Calculate these
         public int ChunksUsed { get; } //TODO: Calculate these
 
-        public ChunkEntry this[int index]
-            => ChunkEntries[index];
-
-        public MemoryMapChunk(ShockwaveReader input, ChunkEntry entry)
-            : base(entry.Header)
+        public ChunkEntry this[int index] 
+            => (ChunkEntry)Entries[index];
+        
+        public MemoryMapChunk(ShockwaveReader input, ChunkHeader header)
+            : base(header)
         {
             Unknown1 = input.ReadInt16();
             Unknown2 = input.ReadInt16();
@@ -33,17 +35,17 @@ namespace Shockky.Shockwave.Chunks
             Unknown3 = input.ReadInt32();
             FreePtr = input.ReadInt32();
 
-            ChunkEntries = new List<ChunkEntry>(ChunksUsed);
+            Entries = new List<IChunkEntry>(ChunksUsed);
 
             for (int i = 0; i < ChunksUsed; i++)
             {
-                ChunkEntries.Add(new ChunkEntry(input, i));
+                Entries.Add(new ChunkEntry(input, i));
             }
         }
 
         //TODO: Adjust indexes method or somethign
-
-        public override void WriteTo(ShockwaveWriter output)
+        
+        public override void WriteBodyTo(ShockwaveWriter output)
         {
             output.Write(Unknown1);
             output.Write(Unknown2);
@@ -52,9 +54,9 @@ namespace Shockky.Shockwave.Chunks
             output.Write(JunkPtr);
             output.Write(Unknown3);
             output.Write(FreePtr);
-            for (int i = 0; i < ChunkEntries.Count; i++)
+            for (int i = 0; i < Entries.Count; i++)
             {
-                output.Write(ChunkEntries[i]);
+                Entries[i].WriteTo(output);
             }
         }
 
@@ -68,6 +70,7 @@ namespace Shockky.Shockwave.Chunks
             size += sizeof(int);
             size += sizeof(int);
             size += sizeof(int);
+            size += Entries.Sum(e => e.GetBodySize());
             return size;
         }
     }

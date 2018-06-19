@@ -1,24 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Shockky.IO;
 using Shockky.Shockwave.Chunks;
-using Shockky.Shockwave.Chunks.Enum;
+using Shockky.Shockwave.Chunks.Container;
+using Shockky.Shockwave.Chunks.Interface;
 
 namespace Shockky
 {
-    public class ShockwaveFile : IDisposable
+    public class ShockwaveFile : ChunkContainer, IDisposable
     {
-        private readonly ShockwaveReader _reader;
+        private readonly ShockwaveReader _input;
 
-        public List<ChunkItem> Chunks { get; set; }
-
-        public bool IsLittleEndian { get; set; }
-        public int FileLength { get; set; }
-        public string Codec { get; set; }
-
+        public FileMetadataChunk Metadata { get; set; }
+        
         public ShockwaveFile(string path)
             : this(File.OpenRead(path))
         { }
@@ -29,97 +25,88 @@ namespace Shockky
             : this(new ShockwaveReader(inputStream))
         { }
 
-        public ShockwaveFile(ShockwaveReader reader)
+        public ShockwaveFile(ShockwaveReader input)
+            : base()
         {
-            _reader = reader;
+            _input = input;
 
-            IsLittleEndian = (_reader.ReadReversedString(4) == "RIFX");
-
-            if (!IsLittleEndian)
-                throw new NotImplementedException("Yo nigga wait");
-
-            FileLength = _reader.ReadInt32();
-
-            Codec = _reader.ReadReversedString(4); //FGDM || MV93
+            Metadata = new FileMetadataChunk(input);
         }
-
-        public void Disassemble()
+        public void Disassemble(Action<ChunkItem> callback = null)
         {
-            Disassemble(null);
-        }
-        public void Disassemble(Action<ChunkItem, MemoryMapChunk> callback)
-        {
-            if(!(ReadChunk(_reader) is IndexMapChunk iMapChunk))
-                throw new InvalidCastException("I did not see this coming..");
-
-            foreach (int offset in iMapChunk.MemoryMapOffsets)
+            //temporarily here
+            
+            if (Metadata.Codec == CodecKind.FGDM)
             {
-                _reader.Position = offset;
-
-                if (ReadChunk(_reader) is MemoryMapChunk mmapChunk)
+                if (ReadChunk(true) is FileVersionChunk version)
                 {
-                    Chunks = new List<ChunkItem>(mmapChunk.ChunksUsed);
+                    var fcdr = ReadChunk(true);
+                    if (fcdr.Kind != ChunkKind.Fcdr) return;
 
-                    foreach (var entry in mmapChunk.ChunkEntries)
+                    if (ReadChunk(true) is AfterburnerMapChunk afterburnerMap)
                     {
-                        var chunk = ReadChunk(entry, _reader);
-                        Chunks.Add(chunk);
+                        var containerHeader = new CompressedChunkHeader(_input);
+                        var container = new CompressedChunkContainer(_input, containerHeader);
 
-                        callback?.Invoke(chunk, mmapChunk);
+                        container.ReadChunks(afterburnerMap, callback);
                     }
                 }
-                else throw new Exception("What the actual fuck, tho this could be obfuscation troll in \"future\"");
+            }
+            else if (Metadata.Codec == CodecKind.MV93)
+            {
+                var imapChunk = ReadChunk() as IndexMapChunk;
+
+                if (imapChunk == null)
+                    throw new InvalidCastException("I did not see this coming..");
+
+                foreach (int offset in imapChunk.MemoryMapOffsets)
+                {
+                    if (ReadChunk(_input, offset) is MemoryMapChunk mmapChunk)
+                    {
+                        ReadChunks(mmapChunk, callback);
+                    }
+                    else throw new Exception("what");
+                }
             }
         }
-        public ChunkItem ReadChunk(ShockwaveReader input)
+
+        private ChunkItem ReadChunk(bool isCompressed = false)
         {
-            return ReadChunk(new ChunkEntry(input, -1, false), input); //TODO: -1? Rethink this
+            var header = isCompressed ? new CompressedChunkHeader(_input) : new ChunkHeader(_input);
+            return ReadChunk(_input, header);
         }
-        public ChunkItem ReadChunk(ChunkEntry entry, ShockwaveReader input)
+        private ChunkItem ReadChunk(ShockwaveReader input, int offset)
         {
-            if (entry.Offset > 0)
-                _reader.Position = entry.Offset + 8; //We already read the header, skip that
+            _input.Position = offset;
 
-	        var chunkInput = _reader.Cut(entry.Header.Length);
+            var header = new ChunkHeader(input);
+            var chunkInput = input.Cut(header.Length);
 
-            switch (entry.Header.Type)
+            return ReadChunk(chunkInput, header);
+        }
+
+        public override void ReadChunks(IChunkEntryMap entryMap, Action<ChunkItem> callback)
+        {
+            foreach (var entry in entryMap.Entries)
             {
-                case ChunkType.imap:
-                    return new IndexMapChunk(chunkInput, entry);
-                case ChunkType.mmap:
-                    return new MemoryMapChunk(chunkInput, entry);
-                case ChunkType.DRCF:
-                    return new DRCFChunk(chunkInput, entry);
-                case ChunkType.VWFI:
-                    return new FileInfoChunk(chunkInput, entry);
-                case ChunkType.KEYStar:
-                    return new AssociationTableChunk(chunkInput, entry);
-             //   case ChunkType.CASStar: return null;
-                    //return new CastAssociationTableChunk(chunkInput, entry);
-                case ChunkType.LctX:
-                    return new ScriptContextChunk(chunkInput, entry);
-                case ChunkType.Lscr:
-                    return new ScriptChunk(chunkInput, entry);
-                case ChunkType.Lnam:
-                    return new NameTableChunk(chunkInput, entry);
-                //case ChunkType.CASt:
-                  //  return null;//new CastChunk(chunkInput, entry);
-                case ChunkType.CLUT:
-                    return new PaletteChunk(chunkInput, entry);
-                case ChunkType.MCsL:
-                    return new MovieCastListChunk(chunkInput, entry);
-                case ChunkType.STXT:
-                    return new ScriptableTextChunk(chunkInput, entry);
-                default:
-                    Debug.WriteLine("Unknown section occurred! Name: " + entry.Header.Name);
-                    return new UnknownChunk(entry.Header, chunkInput);
+                if (entry.Header.Kind == ChunkKind.free ||
+                    entry.Header.Kind == ChunkKind.junk)
+                {
+                    Chunks.Add(new UnknownChunk(_input, entry.Header)); //TODO: eww
+                    continue;
+                }
+                var chunk = ReadChunk(_input, entry.Offset);
+                Chunks.Add(chunk);
+
+                callback?.Invoke(chunk);
             }
         }
 
         public void Assemble()
         {
-            //TODO: Adjust stuff here etc
+            throw new NotImplementedException();
         }
+
 
         public void Dispose()
         {
@@ -129,7 +116,7 @@ namespace Shockky
         {
             if (disposing)
             {
-                _reader.Dispose();
+                _input.Dispose();
             }
         }
     }
