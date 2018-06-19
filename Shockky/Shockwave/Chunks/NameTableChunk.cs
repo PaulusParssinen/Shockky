@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Shockky.IO;
 
@@ -15,25 +16,32 @@ namespace Shockky.Shockwave.Chunks
         public int Length { get; set; }
         public int Length2 { get; set; }
 
-        public NameTableChunk(ShockwaveReader input, ChunkEntry entry)
-            : base(entry.Header)
+        public NameTableChunk(ShockwaveReader input, ChunkHeader header)
+            : base(header)
         {
             Unknown1 = input.ReadBigEndian<int>();
             Unknown2 = input.ReadBigEndian<int>();
             Length = input.ReadBigEndian<int>();
             Length2 = input.ReadBigEndian<int>();
-            short nameOffset = input.ReadBigEndian<short>();
-            short nameCount = input.ReadBigEndian<short>();
 
-            Names = input.ReadList<string>(nameCount, nameOffset);
+            short nameOffset = input.ReadBigEndian<short>();
+            
+            Names = new List<string>(input.ReadBigEndian<short>());
+
+            input.Position = nameOffset;
+            for (int i = 0; i < Names.Capacity; i++)
+            {
+                Names.Add(input.ReadString());
+            }
         }
 
-        public override void WriteTo(ShockwaveWriter output)
+        public override void WriteBodyTo(ShockwaveWriter output)
         {
             output.Write(Unknown1);
             output.Write(Unknown2);
             output.Write(Length);
             output.Write(Length2);
+
         }
 
         public override int GetBodySize()

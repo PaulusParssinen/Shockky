@@ -1,16 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
     public class IndexMapChunk : ChunkItem
     {
-        public List<int> MemoryMapOffsets;
+        public List<int> MemoryMapOffsets { get; }
 
-        public IndexMapChunk(ShockwaveReader input, ChunkEntry entry)
-            : base(entry.Header)
+        public IndexMapChunk(ShockwaveReader input, ChunkHeader header)
+            : base(header)
         {
-            MemoryMapOffsets = input.ReadList<int>(input.ReadInt32());
+            MemoryMapOffsets = new List<int>(input.ReadInt32());
+            for (int i = 0; i < MemoryMapOffsets.Capacity; i++)
+            {
+                MemoryMapOffsets.Add(input.ReadInt32());
+            }
         }
 
         public override int GetBodySize()
@@ -21,7 +26,13 @@ namespace Shockky.Shockwave.Chunks
             return size;
         }
 
-        public override void WriteTo(ShockwaveWriter output)
-            => throw new System.NotImplementedException();
+        public override void WriteBodyTo(ShockwaveWriter output)
+        {
+            output.Write(MemoryMapOffsets.Count);
+            for (int i = 0; i < MemoryMapOffsets.Count; i++)
+            {
+                output.Write(MemoryMapOffsets[i]);
+            }
+        }
     }
 }

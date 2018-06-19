@@ -11,8 +11,8 @@ namespace Shockky.Shockwave.Chunks
 
         public int NameTableSectionIndex { get; set; }
 
-        public ScriptContextChunk(ShockwaveReader input, ChunkEntry entry)
-            : base(entry.Header)
+        public ScriptContextChunk(ShockwaveReader input, ChunkHeader header)
+            : base(header)
         {
             int unk0 = input.ReadBigEndian<int>();
             int unk1 = input.ReadBigEndian<int>();
@@ -26,16 +26,17 @@ namespace Shockky.Shockwave.Chunks
 
             int fileType = input.ReadBigEndian<int>(); // TODO: Enum in future
             int unk5 = input.ReadBigEndian<int>();
-            NameTableSectionIndex = input.ReadBigEndian<int>(); //So there can be multiple nametable chunks in a movie and this specifies which of those this scriptcontext uses
+            NameTableSectionIndex = input.ReadBigEndian<int>();
 
             short validCount = input.ReadBigEndian<short>();
             byte[] flags = input.ReadBytes(2);
             short freePointer = input.ReadBigEndian<short>();
 
-            int handlerNameCount = (entryOffset - (int)input.Position) / 2; //TODO: Yeah this sketchy, idk whatsup here yet
-            var list = input.ReadBigEndianList<short>(handlerNameCount); //Map to namelist?
-
-            input.Position = entryOffset;
+            var handlerNameList = new List<short>();
+            for (int i = 0; i < entryCount; i++)
+            {
+                handlerNameList.Add(input.ReadBigEndian<short>());
+            }
 
             Sections = new List<ScriptContextSection>(entryCount);
             for (int i = 0; i < entryCount; i++)
@@ -44,7 +45,7 @@ namespace Shockky.Shockwave.Chunks
             }
         }
 
-        public override void WriteTo(ShockwaveWriter output)
+        public override void WriteBodyTo(ShockwaveWriter output)
         {
             throw new System.NotImplementedException();
         }
