@@ -3,7 +3,7 @@ using Shockky.Shockwave.Lingo.AST.Statements;
 
 namespace Shockky.Shockwave.Lingo
 {
-	public interface IAstVisitor : IVisitor
+	public interface IAstVisitor
 	{
 		//Statements
 		void VisitExitStatement(ExitStatement exitStatement);

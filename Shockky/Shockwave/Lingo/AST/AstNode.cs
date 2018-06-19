@@ -1,8 +1,5 @@
-﻿using System;
-using Shockky.Shockwave.Lingo.AST.Interface;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using Shockky.Shockwave.Lingo.Bytecode.Roles;
 
 namespace Shockky.Shockwave.Lingo.AST
 {

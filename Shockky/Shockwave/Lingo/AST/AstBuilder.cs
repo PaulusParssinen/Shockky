@@ -15,16 +15,15 @@ namespace Shockky.Shockwave.Lingo.AST
         {
             var handlerBody = new BlockStatement();
             _stack = new Stack<Expression>();
+            
 
-            input.Position = handler.CodeOffset;
-
-			while (input.Position < handler.CodeOffset + handler.CodeLength)
+			/*while (input.Position < handler.CodeOffset + handler.CodeLength)
 			{
 				var ins = new Instruction(input);
 				var node = TransformInstruction(ins);
 
                 handlerBody.AddChild(node);
-			}
+			}*/
 
 		    return handlerBody;
 		}
