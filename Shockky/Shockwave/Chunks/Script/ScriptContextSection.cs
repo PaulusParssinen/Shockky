@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using Shockky.IO;
+﻿using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
@@ -32,10 +30,10 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.Write(Unknown0);
-            output.Write(SectionId);
-            output.Write(Used);
-            output.Write(Link);
+            output.WriteBigEndian(Unknown0);
+            output.WriteBigEndian(SectionId);
+            output.WriteBigEndian(Used ? 4 : 0); // TODO:
+            output.WriteBigEndian(Link);
         }
     }
 }
