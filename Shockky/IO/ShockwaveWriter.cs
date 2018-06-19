@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using Shockky.Shockwave;
@@ -47,7 +46,7 @@ namespace Shockky.IO
         {
             _leaveOpen = leaveOpen;
         }
-
+        
         public void Write(ShockwaveItem item)
         {
             item.WriteTo(this);
@@ -64,6 +63,11 @@ namespace Shockky.IO
 
             Array.Reverse(bytes);
             Write(bytes);
+        }
+
+        public new void Write7BitEncodedInt(int value)
+        {
+            base.Write7BitEncodedInt(value);
         }
     }
 }
