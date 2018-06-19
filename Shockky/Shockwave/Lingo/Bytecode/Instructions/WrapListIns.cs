@@ -4,8 +4,8 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class WrapListIns : Instruction
     {
-        public WrapListIns(LingoHandler handler) 
-            : base(OPCode.WrapList, handler)
+        public WrapListIns() 
+            : base(OPCode.WrapList)
         { }
 
         public override int GetPopCount()

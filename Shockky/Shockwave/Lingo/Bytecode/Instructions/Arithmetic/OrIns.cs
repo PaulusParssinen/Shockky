@@ -1,11 +1,11 @@
 ﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class OrIns : Computation
     {
-        public OrIns(LingoHandler handler)
-            : base(OPCode.Or, handler, "or")
+        public OrIns()
+            : base(OPCode.Or)
         { }
 
        /* protected override object Execute(dynamic left, dynamic right)

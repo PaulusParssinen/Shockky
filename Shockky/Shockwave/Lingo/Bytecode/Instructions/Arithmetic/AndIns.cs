@@ -1,11 +1,11 @@
 ﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class AndIns : Computation
     {
-        public AndIns(LingoHandler handler)
-            : base(OPCode.And, handler, "and")
+        public AndIns()
+            : base(OPCode.And)
         { }
 
        /* protected override object Execute(dynamic left, dynamic right)

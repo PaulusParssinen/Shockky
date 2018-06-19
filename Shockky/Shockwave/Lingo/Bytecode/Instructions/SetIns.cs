@@ -1,16 +1,14 @@
-﻿using System.Diagnostics;
-using Shockky.IO;
+﻿using Shockky.IO;
 using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class SetIns : Instruction
     {
-        public SetIns(ShockwaveReader input, LingoHandler handler) 
-            : base(OPCode.Set, handler)
+        public SetIns(LingoHandler handler, ShockwaveReader input, byte opByte) 
+            : base(OPCode.Set, handler, input, opByte)
         {
-            int id = input.ReadByte();
-            Debug.WriteLine("TODO SET INSTRUCTION ID: " + id);
+            //int id = input.ReadByte();
         }
     }
 }

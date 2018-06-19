@@ -1,12 +1,12 @@
 ﻿using System;
 using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class ContainsStringIns : Computation
     {
-        public ContainsStringIns(LingoHandler handler)
-            : base(OPCode.ContainsString, handler, "contains")
+        public ContainsStringIns()
+            : base(OPCode.ContainsString)
         { }
 
         /*protected override object Execute(dynamic left, dynamic right)

@@ -1,12 +1,22 @@
 ﻿using Shockky.IO;
 using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Control_Transfer
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class JumpIns : Jumper
     {
-        public JumpIns(ShockwaveReader input, LingoHandler handler)
-            : base(OPCode.Jump, input, handler)
+        public JumpIns(LingoHandler handler)
+            : base(OPCode.Jump, handler)
         { }
+        public JumpIns(LingoHandler handler, int offset)
+            : this(handler)
+        {
+            Value = offset;
+        }
+        public JumpIns(LingoHandler handler, ShockwaveReader input, byte opByte)
+            : base(OPCode.Jump, handler, input, opByte)
+        { }
+
+        public override bool? RunCondition(LingoMachine machine) => true;
     }
 }

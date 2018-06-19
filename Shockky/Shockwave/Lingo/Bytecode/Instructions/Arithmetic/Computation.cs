@@ -1,6 +1,6 @@
 ﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public abstract class Computation : Instruction
     {
@@ -9,11 +9,9 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
         public Instruction Right { get; private set; }
         public Instruction Left { get; private set; }
 
-        protected Computation(OPCode op, LingoHandler handler, string translation)
-            : base(op, handler)
-        {
-            Translation = translation;
-        }
+        protected Computation(OPCode op)
+            : base(op)
+        { }
 
         public override int GetPopCount()
         {
@@ -40,14 +38,5 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
         protected abstract object Execute(object left, object right);
 		*/
         public static bool IsValid(OPCode op) => true; //TODO:
-
-        /*public override void Translate()
-        {
-            Right = Handler.Expressions.Pop();
-            Left = Handler.Expressions.Pop();
-        }*/
-
-        public override string ToString()
-            => Left + " " + Translation + " " +Right;
     }
 }

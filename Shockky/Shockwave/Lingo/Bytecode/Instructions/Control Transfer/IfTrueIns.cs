@@ -1,14 +1,25 @@
 ﻿using Shockky.IO;
 using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Control_Transfer
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class IfTrueIns : Jumper
     {
-        public IfTrueIns(ShockwaveReader input, LingoHandler handler)
-            : base(OPCode.IfTrue, input, handler)
+        public IfTrueIns()
+            : base(OPCode.IfTrue)
+        {
+
+        }
+
+        public IfTrueIns(LingoHandler handler, ShockwaveReader input, byte opByte)
+            : base(OPCode.IfTrue, handler, input, opByte)
         {
             
+        }
+
+        public override bool? RunCondition(LingoMachine machine)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

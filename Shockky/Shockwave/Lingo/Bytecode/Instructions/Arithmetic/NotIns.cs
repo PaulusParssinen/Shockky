@@ -1,11 +1,11 @@
 ﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class NotIns : Instruction
     {
-        public NotIns(LingoHandler handler) 
-            : base(OPCode.Not, handler)
+        public NotIns() 
+            : base(OPCode.Not)
         { }
 
         public override int GetPopCount()

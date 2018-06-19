@@ -10,8 +10,8 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
         public Instruction First { get; private set; }
         public Instruction Last { get; private set; }
 
-        public SplitStringIns(LingoHandler handler)
-            : base(OPCode.SplitString, handler)
+        public SplitStringIns()
+            : base(OPCode.SplitString)
         { }
 
         public override int GetPopCount()

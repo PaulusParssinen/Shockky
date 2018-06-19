@@ -1,11 +1,11 @@
 ﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     class LessEqualsIns : Computation
     {
-        public LessEqualsIns(LingoHandler handler) 
-            : base(OPCode.LessThanEquals, handler, "<=")
+        public LessEqualsIns() 
+            : base(OPCode.LessThanEquals)
         { }
 
        /* protected override object Execute(dynamic left, dynamic right)

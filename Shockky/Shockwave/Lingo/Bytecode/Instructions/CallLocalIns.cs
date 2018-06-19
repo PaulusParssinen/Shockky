@@ -3,13 +3,16 @@ using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
-    public class CallLocalIns : CallInstruction
+    public class CallLocalIns : Instruction
     {
-        public override string Function
-            => null; //Handler.Script.Handlers[_functionNameIndex].Name;
+        public int LocalHandlerIndex { get; set; }
+        public LingoHandler LocalHandler => Pool.Handlers[LocalHandlerIndex];
 
-        public CallLocalIns(ShockwaveReader input, LingoHandler handler) 
-            : base(OPCode.CallLocal, false, input, handler)
+        public CallLocalIns(LingoHandler handler)
+            : base(OPCode.CallLocal, handler)
+        { }
+        public CallLocalIns(LingoHandler handler, ShockwaveReader input, byte opByte)
+            : base(OPCode.CallLocal, handler, input, opByte)
         { }
     }
 }

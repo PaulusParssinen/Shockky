@@ -1,11 +1,11 @@
 ﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class JoinPadStringIns : Computation
     {
-        public JoinPadStringIns(LingoHandler handler) 
-            : base(OPCode.JoinPadString, handler, "&&")
+        public JoinPadStringIns() 
+            : base(OPCode.JoinPadString)
         { }
 
        /* protected override object Execute(dynamic left, dynamic right)

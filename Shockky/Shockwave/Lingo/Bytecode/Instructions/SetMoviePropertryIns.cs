@@ -3,13 +3,20 @@ using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
-    public class SetMoviePropertryIns : AssignmentInstruction
+    public class SetMoviePropertryIns : Instruction
     {
-        public override string Name
-            => "SETMOVIEPROPERTYINSTODO";
+        //TODO
 
-        public SetMoviePropertryIns(ShockwaveReader input, LingoHandler handler, byte opByte)
-            : base(OPCode.SetMovieProp, opByte, input, handler)
+        public SetMoviePropertryIns(LingoHandler handler)
+            : base(OPCode.SetMovieProp, handler)
         { }
+        public SetMoviePropertryIns(LingoHandler handler, int moviePropertyIndex)
+            : this(handler)
+        { }
+        public SetMoviePropertryIns(LingoHandler handler, ShockwaveReader input, byte opByte)
+            : base(OPCode.SetMovieProp, handler, input, opByte)
+        { }
+
+        public override int GetPopCount() => 1;
     }
 }

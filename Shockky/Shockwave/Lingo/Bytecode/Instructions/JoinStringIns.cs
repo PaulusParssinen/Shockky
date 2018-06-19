@@ -4,8 +4,8 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class JoinStringIns : Instruction
     {
-        public JoinStringIns(LingoHandler handler)
-            : base(OPCode.JoinString, handler)
+        public JoinStringIns()
+            : base(OPCode.JoinString)
         { }
 
         public override int GetPopCount()

@@ -1,12 +1,12 @@
 ﻿using System;
 using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Arithmetic
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class StartsWithIns : Computation
     {
-        public StartsWithIns(LingoHandler handler) 
-            : base(OPCode.Contains0String, handler, "starts")
+        public StartsWithIns() 
+            : base(OPCode.Contains0String)
         { }
 
        /* protected override object Execute(dynamic left, dynamic right)

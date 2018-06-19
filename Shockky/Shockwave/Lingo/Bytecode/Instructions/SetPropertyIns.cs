@@ -3,13 +3,23 @@ using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
-    public class SetPropertyIns : AssignmentInstruction
+    public class SetPropertyIns : Instruction
     {
-        public override string Name
-            => null; //Handler.NameList[_variableIndex];
+        public int NameIndex => Value;
+        public string Name => Pool.NameList[Pool.Properties[NameIndex]];
 
-        public SetPropertyIns(ShockwaveReader input, LingoHandler handler, byte opByte) 
-            : base(OPCode.SetProperty, opByte, input, handler)
+        public SetPropertyIns(LingoHandler handler)
+            : base(OPCode.SetProperty, handler)
         { }
+        public SetPropertyIns(LingoHandler handler, int propertyNameIndex)
+            : this(handler)
+        {
+            Value = propertyNameIndex;
+        }
+        public SetPropertyIns(LingoHandler handler, ShockwaveReader input, byte opByte)
+            : base(OPCode.SetProperty, handler, input, opByte)
+        { }
+
+        public override int GetPopCount() => 1;
     }
 }

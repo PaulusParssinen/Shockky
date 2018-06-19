@@ -57,7 +57,7 @@
         CallExternal,
         CallObjOld, //?
         Op_59,
-        Op_5a = 0x5a,
+        Op_5a,
         Op_5b,
         Get,
         Set,
@@ -65,7 +65,10 @@
         SetMovieProp,
         GetObjProp,
         SetObjProp,
-        GetMovieInfo = 0x66,
+        Op_63,
+        DubMAYBE, //Dup? Shockwabsorber
+        PopMAYBE, //Pop
+        GetMovieInfo,
         CallObj,
         PushInt2 = 0x6e
     }

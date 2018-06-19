@@ -3,15 +3,21 @@ using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
-    public class CallObjectIns : CallInstruction
+    public class CallObjectIns : Instruction
     {
+        public int HandlerNameIndex => Value;
+        public string HandlerName => Pool.NameList[HandlerNameIndex];
 
-
-        public override string Function
-            => null; //Handler.NameList[_functionNameIndex];
-
-        public CallObjectIns(ShockwaveReader input, LingoHandler handler, byte opByte)
-            : base(OPCode.CallObj, opByte > 0x80, input, handler)
+        public CallObjectIns(LingoHandler handler)
+            : base(OPCode.CallObj, handler)
+        { }
+        public CallObjectIns(LingoHandler handler, int handlerNameIndex)
+            : base(OPCode.CallObj, handler)
+        {
+            Value = handlerNameIndex;
+        }
+        public CallObjectIns(LingoHandler handler, ShockwaveReader input, byte opByte)
+            : base(OPCode.CallObj, handler, input, opByte)
         { }
     }
 }

@@ -4,8 +4,8 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class NewPropListIns : Instruction
     {
-        public NewPropListIns(LingoHandler handler) 
-            : base(OPCode.NewPropList, handler)
+        public NewPropListIns() 
+            : base(OPCode.NewPropList)
         { }
 
         public override int GetPopCount()
