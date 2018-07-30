@@ -4,6 +4,7 @@
     {
         MV93,
         FGDM,
+        FGDC,
         Unknown
     }
 }
