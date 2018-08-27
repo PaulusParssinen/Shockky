@@ -1,24 +1,28 @@
-﻿using System;
+﻿using System.Text;
 using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
     public class FontMapChunk : ChunkItem
     {
+        public string FontMap { get; set; }
+
         public FontMapChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            string fontmap = input.ReadString((int)header.Length);
+            FontMap = input.ReadString((int)header.Length);
         }
 
         public override int GetBodySize()
         {
-            throw new NotImplementedException();
+            int size = 0;
+            size += FontMap.Length;
+            return size;
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            throw new NotImplementedException();
+            output.Write(Encoding.UTF8.GetBytes(FontMap));
         }
     }
 }

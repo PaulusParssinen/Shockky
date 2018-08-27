@@ -1,4 +1,5 @@
 ﻿using Shockky.IO;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Shockky.Shockwave.Chunks
@@ -9,13 +10,16 @@ namespace Shockky.Shockwave.Chunks
         public ChunkKind Kind => Header.Kind;
         public ChunkHeader Header { get; set; }
 
+        public Queue<object> Remnants { get; set; }
+
         protected ChunkItem(ShockwaveReader input)
             : this(new ChunkHeader(input))
         { }
-        
         protected ChunkItem(ChunkHeader header)
         {
             Header = header;
+
+            Remnants = new Queue<object>();
         }
 
         public override void WriteTo(ShockwaveWriter output)
