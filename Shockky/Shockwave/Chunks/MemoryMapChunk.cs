@@ -5,9 +5,9 @@ using Shockky.Shockwave.Chunks.Interface;
 
 namespace Shockky.Shockwave.Chunks
 {
-    public class MemoryMapChunk : ChunkItem, IChunkEntryMap
+    public class MemoryMapChunk : ChunkItem
     {
-        public List<IChunkEntry> Entries { get; set; }
+        public List<ChunkEntry> Entries { get; set; }
 
         public short Unknown1 { get; set; }
         public short Unknown2 { get; set; }
@@ -20,7 +20,7 @@ namespace Shockky.Shockwave.Chunks
         public int ChunksUsed { get; } //TODO: Calculate these
 
         public ChunkEntry this[int index] 
-            => (ChunkEntry)Entries[index];
+            => Entries[index];
         
         public MemoryMapChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
@@ -35,7 +35,7 @@ namespace Shockky.Shockwave.Chunks
             Unknown3 = input.ReadInt32();
             FreePtr = input.ReadInt32();
 
-            Entries = new List<IChunkEntry>(ChunksUsed);
+            Entries = new List<ChunkEntry>(ChunksUsed);
 
             for (int i = 0; i < ChunksUsed; i++)
             {
@@ -56,7 +56,7 @@ namespace Shockky.Shockwave.Chunks
             output.Write(FreePtr);
             for (int i = 0; i < Entries.Count; i++)
             {
-                Entries[i].WriteTo(output);
+                output.Write(Entries[i]);
             }
         }
 

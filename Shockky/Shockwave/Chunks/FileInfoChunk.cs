@@ -22,15 +22,13 @@ namespace Shockky.Shockwave.Chunks
             int bitfieldLen = input.ReadBigEndian<int>();
             BitField = input.ReadBytes(bitfieldLen);
 
-	        short offsetCount = input.ReadBigEndian<short>();
-
-            int[] offsets = new int[offsetCount];
+	        Offsets = new List<int>(input.ReadBigEndian<short>());
 
             input.ReadByte();
 
-            for (short i = 0; i < offsetCount; i++)
+            for (short i = 0; i < Offsets.Capacity; i++)
             {
-                offsets[i] = input.ReadBigEndian<int>();
+                Offsets.Add(input.ReadBigEndian<int>());
             }
 
             input.ReadByte();
@@ -43,10 +41,14 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.Write(BitField.Length);
+            output.WriteBigEndian(BitField.Length);
             output.Write(BitField);
 
-            output.Write((ushort)Offsets.Count);
+            output.WriteBigEndian((ushort)Offsets.Count);
+            for(int i = 0; i < Offsets.Count; i++)
+            {
+                output.WriteBigEndian(Offsets[i]);
+            }
             //TODO
         }
 
@@ -59,8 +61,8 @@ namespace Shockky.Shockwave.Chunks
             size += sizeof(short);
             size += sizeof(byte);
             size += (sizeof(int) * Offsets.Count);
-            size += sizeof(byte);
 
+            size += sizeof(byte);
             size += (Encoding.ASCII.GetByteCount(CreatedBy) + 1);
             size += sizeof(byte);
             size += (Encoding.ASCII.GetByteCount(ModifiedBy) + 1);
