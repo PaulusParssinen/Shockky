@@ -82,10 +82,4 @@ namespace Shockky.IO
             return new Rectangle(x1, y1, x2/* - x1*/, y2/* - y1*/); //TODO
         }
     }
-
-	public static class ReaderExtensions
-	{
-		public static ShockwaveReader Cut(this ShockwaveReader input, long length) //TODO: ewwwwwwwwwwwwwwwwwwwwww
-		    => new ShockwaveReader(input.ReadBytes((int)length));
-    }
 }
