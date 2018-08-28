@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+
 using Shockky.IO;
 using Shockky.Shockwave.Chunks.Enum;
 
@@ -7,6 +8,23 @@ namespace Shockky.Shockwave.Chunks
     [DebuggerDisplay("{Name} | {Length}")]
     public class ChunkHeader : ShockwaveItem
     {
+        public bool IsVariableLength
+        {
+            get
+            {
+                switch (Kind)
+                {
+                    case ChunkKind.Fver:
+                    case ChunkKind.Fcdr:
+                    case ChunkKind.ABMP:
+                    case ChunkKind.FGEI:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+
         public string Name { get; set; }
         public ChunkKind Kind { get; set; }
 
@@ -24,7 +42,8 @@ namespace Shockky.Shockwave.Chunks
         public ChunkHeader(ShockwaveReader input)
             : this(input.ReadReversedString(4))
         {
-            Length = input.ReadInt32();
+            Length = (IsVariableLength ? 
+                input.Read7BitEncodedInt() : input.ReadInt32());
         }
 
         public override int GetBodySize()

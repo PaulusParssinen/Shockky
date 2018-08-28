@@ -3,12 +3,12 @@ using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
-    public class FileCompressionTypesChunk : CompressedChunkItem
+    public class FileCompressionTypesChunk : ChunkItem
     {
         public FileCompressionTypesChunk(ShockwaveReader input, ChunkHeader header)
-            : base(ref input, header, true)
+            : base(header)
         {
-            //TODO: finish dis chunk
+            //TODO: finish
             var dataTest = input.ReadBytes((int)header.Length);
 
             /*short test1 = input.ReadInt16();
