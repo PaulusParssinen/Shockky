@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Collections.Generic;
+
 using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
@@ -10,17 +10,14 @@ namespace Shockky.Shockwave.Chunks
     {
         public List<string> Names { get; set; }
 
-        public int Unknown1 { get; set; }
-        public int Unknown2 { get; set; }
-
         public int Length { get; set; }
         public int Length2 { get; set; }
 
         public NameTableChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Unknown1 = input.ReadBigEndian<int>();
-            Unknown2 = input.ReadBigEndian<int>();
+            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadBigEndian<int>());
             Length = input.ReadBigEndian<int>();
             Length2 = input.ReadBigEndian<int>();
 
@@ -37,15 +34,16 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.Write(Unknown1);
-            output.Write(Unknown2);
+            throw new NotImplementedException();
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
             output.Write(Length);
             output.Write(Length2);
-
         }
 
         public override int GetBodySize()
         {
+            throw new NotImplementedException();
             int size = 0;
             size += sizeof(int);
             size += sizeof(int);

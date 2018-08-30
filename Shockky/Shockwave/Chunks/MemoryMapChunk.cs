@@ -9,10 +9,6 @@ namespace Shockky.Shockwave.Chunks
     {
         public List<ChunkEntry> Entries { get; set; }
 
-        public short Unknown1 { get; set; }
-        public short Unknown2 { get; set; }
-        public int Unknown3 { get; set; }
-
         public int JunkPtr { get; set; }
         public int FreePtr { get; set; }
 
@@ -25,14 +21,14 @@ namespace Shockky.Shockwave.Chunks
         public MemoryMapChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Unknown1 = input.ReadInt16();
-            Unknown2 = input.ReadInt16();
+            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt16());
 
             ChunkCountMax = input.ReadInt32();
             ChunksUsed = input.ReadInt32();
 
             JunkPtr = input.ReadInt32();
-            Unknown3 = input.ReadInt32();
+            Remnants.Enqueue(input.ReadInt32());
             FreePtr = input.ReadInt32();
 
             Entries = new List<ChunkEntry>(ChunksUsed);
@@ -47,12 +43,12 @@ namespace Shockky.Shockwave.Chunks
         
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.Write(Unknown1);
-            output.Write(Unknown2);
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
             output.Write(ChunkCountMax);
             output.Write(ChunksUsed);
             output.Write(JunkPtr);
-            output.Write(Unknown3);
+            output.Write((int)Remnants.Dequeue());
             output.Write(FreePtr);
             for (int i = 0; i < Entries.Count; i++)
             {
