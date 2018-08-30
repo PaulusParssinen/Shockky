@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
+using System.Drawing;
+using System.IO.Compression;
+using System.Runtime.InteropServices;
 
 namespace Shockky.IO
 {
@@ -35,19 +35,15 @@ namespace Shockky.IO
         { }
 
         public T ReadBigEndian<T>()
+            where T : struct
         {
-            byte[] data = ReadBytes(Marshal.SizeOf<T>());
+            int size = Marshal.SizeOf<T>();
+            Span<byte> buffer = stackalloc byte[size];
 
-            if (data.All(b => b == 0)) return default(T);
-            Array.Reverse(data);
+            int read = BaseStream.Read(buffer);
+            buffer.Reverse();
 
-            IntPtr valuePtr = Marshal.AllocHGlobal(data.Length);
-            Marshal.Copy(data, 0, valuePtr, data.Length);
-
-            var value = (T)Marshal.PtrToStructure(valuePtr, typeof(T));
-            Marshal.FreeHGlobal(valuePtr);
-
-            return value;
+            return MemoryMarshal.Read<T>(buffer);
         }
 
         public new int Read7BitEncodedInt()
