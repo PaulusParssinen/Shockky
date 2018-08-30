@@ -1,11 +1,10 @@
 ﻿using System.Diagnostics;
 using Shockky.IO;
-using Shockky.Shockwave.Chunks.Interface;
 
 namespace Shockky.Shockwave.Chunks
 {
     [DebuggerDisplay("{Header.Name} | Length: {Header.Length} | Offset: {Offset}")]
-    public class ChunkEntry : ShockwaveItem, IChunkEntry
+    public class ChunkEntry : ShockwaveItem
     {
         public int Id { get; set; }
 
@@ -30,7 +29,6 @@ namespace Shockky.Shockwave.Chunks
             Offset = input.ReadInt32();
             Padding = input.ReadInt16();
             Unknown = input.ReadInt16();
-            //short here?
             Link = input.ReadInt32();
         }
 

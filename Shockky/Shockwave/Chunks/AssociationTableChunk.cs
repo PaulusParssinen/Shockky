@@ -38,7 +38,7 @@ namespace Shockky.Shockwave.Chunks
             output.Write(CastEntries.Count); //TODO: nil check
             foreach (var entry in CastEntries)
             {
-                entry.WriteTo(output);
+                output.Write(entry);
             }
         }
 

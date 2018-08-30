@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+
 using Shockky.IO;
-using Shockky.Shockwave.Chunks.Interface;
 
 namespace Shockky.Shockwave.Chunks
 {

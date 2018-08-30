@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
+
 using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
