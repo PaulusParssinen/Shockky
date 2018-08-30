@@ -2,7 +2,6 @@
 
 namespace Shockky.Shockwave.Chunks
 {
-    [DebuggerDisplay("SectionId: {SectionId}")]
     public class ScriptContextSection : ShockwaveItem
     {
         public int Unknown0 { get; set; }

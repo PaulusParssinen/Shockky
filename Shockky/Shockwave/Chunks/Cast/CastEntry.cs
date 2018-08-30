@@ -5,8 +5,6 @@ namespace Shockky.Shockwave.Chunks.Cast
 {
     public class CastEntry : ShockwaveItem
     {
-        protected override string DebuggerDisplay => $"Slot: {Slot}";
-
         public int FileSlot { get; set; }
         public int Slot { get; set; }
 
