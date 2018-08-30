@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -80,6 +81,14 @@ namespace Shockky.IO
             short y1 = ReadBigEndian<short>();
             short y2 = ReadBigEndian<short>();
             return new Rectangle(x1, y1, x2/* - x1*/, y2/* - y1*/); //TODO
+        }
+
+        public ShockwaveReader WrapDecompressor(int decompressedLength)
+        {
+            BaseStream.Seek(2, SeekOrigin.Current);
+
+            var data = ReadBytes(decompressedLength);
+            return new ShockwaveReader(new DeflateStream(new MemoryStream(data), CompressionMode.Decompress));
         }
     }
 }

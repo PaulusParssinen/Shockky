@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using Shockky.IO;
-using Shockky.Shockwave.Chunks.Interface;
 
 namespace Shockky.Shockwave.Chunks
 {
     [DebuggerDisplay("[{Header.Name}] Id: {Id}, Offset: {Offset}, CompressionType: {CompressionType}")]
-    public class AfterBurnerMapEntry : ShockwaveItem, IChunkEntry
+    public class AfterBurnerMapEntry : ShockwaveItem
     {
         public ChunkHeader Header { get; set; }
 
@@ -28,7 +27,7 @@ namespace Shockky.Shockwave.Chunks
 
             Header = new ChunkHeader(input.ReadReversedString(4))
             {
-                Length = CompressedLength
+                Length = DecompressedLength
             };
         }
 

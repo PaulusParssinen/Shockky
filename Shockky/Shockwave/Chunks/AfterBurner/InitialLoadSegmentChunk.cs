@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Shockky.IO;
-using Shockky.Shockwave.Chunks.Container;
-using Shockky.Shockwave.Chunks.Interface;
 
 namespace Shockky.Shockwave.Chunks
 {
@@ -13,23 +12,21 @@ namespace Shockky.Shockwave.Chunks
         public InitialLoadSegmentChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            _input = input;
+            _input = WrapDecompressor(input);
         }
         
-        public bool TryReadChunks(Dictionary<int, IChunkEntry> entries, out List<ChunkItem> chunks)
+        public bool TryReadChunks(List<AfterBurnerMapEntry> entries, out List<ChunkItem> chunks)
         {
             chunks = new List<ChunkItem>(entries.Count);
 
-            //TODO: Remove "unnecessary" checks and locals
             for(int i = 0; i < entries.Count; i++)
             {
                 int id = _input.Read7BitEncodedInt();
 
-                if (!entries.ContainsKey(id))
-                    return false;
+                var entry = entries.FirstOrDefault(e => e.Id == id);
+                if (entry == null) throw new Exception("fuq"); //TODO: Is this possible?
 
-                var entry = entries[id];
-                var chunk = ChunkContainer.ReadChunk(_input, entry.Header);
+                var chunk = Read(_input, entry.Header);
                 chunks.Add(chunk);
             }
             return true;

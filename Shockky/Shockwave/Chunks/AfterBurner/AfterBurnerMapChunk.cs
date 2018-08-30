@@ -1,27 +1,21 @@
 ﻿using System.Collections.Generic;
 using Shockky.IO;
-using Shockky.Shockwave.Chunks.Interface;
 
 namespace Shockky.Shockwave.Chunks
 {
-    public class AfterburnerMapChunk : CompressedChunkItem, IChunkEntryMap
+    public class AfterburnerMapChunk : ChunkItem
     {
-        public byte[] UnknownData { get; }
-
-        public int Unknown1 { get; set; }
-        public int Unknown2 { get; set; }
-
-        public List<IChunkEntry> Entries { get; set; }
+        public List<AfterBurnerMapEntry> Entries { get; set; }
 
         public AfterburnerMapChunk(ShockwaveReader input, ChunkHeader header)
-            : base(ref input, header, false)
+            : base(header)
         {
-            UnknownData = input.ReadBytes(3); //TODO: Wthell
+            Remnants.Enqueue(input.ReadBytes(3)); //TODO: Wthell
             input = WrapDecompressor(input);
-            Unknown1 = input.Read7BitEncodedInt();
-            Unknown2 = input.Read7BitEncodedInt();
+            Remnants.Enqueue(input.Read7BitEncodedInt());
+            Remnants.Enqueue(input.Read7BitEncodedInt());
 
-            Entries = new List<IChunkEntry>(input.Read7BitEncodedInt());
+            Entries = new List<AfterBurnerMapEntry>(input.Read7BitEncodedInt());
             for(int i = 0; i < Entries.Capacity; i++)
             {
                 Entries.Add(new AfterBurnerMapEntry(input));
@@ -30,13 +24,25 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.Write(UnknownData);
+            output.Write((byte[])Remnants.Dequeue());
             //TODO: Wrap dat compressor
-            output.Write7BitEncodedInt(Unknown1);
-            output.Write7BitEncodedInt(Unknown2);
+            output.Write7BitEncodedInt((int)Remnants.Dequeue());
+            output.Write7BitEncodedInt((int)Remnants.Dequeue());
+
             output.Write7BitEncodedInt(Entries.Count);
             foreach (var entry in Entries)
-                entry.WriteTo(output);
+            {
+                output.Write(entry);
+            }
+        }
+
+        public override int GetBodySize()
+        {
+            throw new System.NotImplementedException();
+            int size = 0;
+            size += 3;
+            //TODO:
+            return size;
         }
     }
 }
