@@ -15,8 +15,6 @@ namespace Shockky.Shockwave.Chunks
         public short Unknown { get; set; }
         public int Link { get; set; }
 
-        public bool IsCompressed => false;
-
         public ChunkEntry(ChunkHeader header)
         {
             Header = header;

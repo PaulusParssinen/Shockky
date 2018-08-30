@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Shockky.IO;
+﻿using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {

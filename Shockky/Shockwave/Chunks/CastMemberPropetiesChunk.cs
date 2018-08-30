@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
-using Shockky.IO;
-using Shockky.Shockwave.Chunks.Cast.Member.Properties;
+﻿using Shockky.IO;
 using Shockky.Shockwave.Chunks.Enum;
+using Shockky.Shockwave.Chunks.Cast.Member.Properties;
 
 namespace Shockky.Shockwave.Chunks
 {

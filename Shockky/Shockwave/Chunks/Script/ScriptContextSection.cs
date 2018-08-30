@@ -13,7 +13,7 @@ namespace Shockky.Shockwave.Chunks
         {
             Unknown0 = input.ReadBigEndian<int>();
             SectionId = input.ReadBigEndian<int>();
-            Used = input.ReadBigEndian<short>() == 4;
+            Used = (input.ReadBigEndian<short>() == 4);
             Link = input.ReadBigEndian<short>(); //TODO: If not used, link to next unused !?
         }
 
@@ -31,7 +31,7 @@ namespace Shockky.Shockwave.Chunks
         {
             output.WriteBigEndian(Unknown0);
             output.WriteBigEndian(SectionId);
-            output.WriteBigEndian(Used ? 4 : 0); // TODO:
+            output.WriteBigEndian((short)(Used ? 4 : 0)); // TODO:
             output.WriteBigEndian(Link);
         }
     }

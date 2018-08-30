@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using Shockky.IO;
+﻿using Shockky.IO;
 using Shockky.Shockwave.Chunks.Enum;
 
 namespace Shockky.Shockwave.Chunks.Script
