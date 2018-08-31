@@ -1,6 +1,4 @@
-﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class InverseIns : Instruction
     {
@@ -8,19 +6,13 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             : base(OPCode.Inverse)
         { }
 
-        public override int GetPopCount()
-        {
-            return 1;
-        }
-        public override int GetPushCount()
-        {
-            return 1;
-        }
+        public override int GetPopCount() => 1;
+        public override int GetPushCount() => 1;
 
-       /* public override void Execute(LingoMachine machine)
+        public override void Execute(LingoMachine machine)
         {
             int value = (int)machine.Values.Pop(); //TODO: Only integerz?? whatever
             machine.Values.Push(value * -1);
-        }*/
+        }
     }
 }

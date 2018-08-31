@@ -1,6 +1,6 @@
-﻿using Shockky.IO;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-using System;
+﻿using System;
+
+using Shockky.IO;
 
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Stack_Management
 {
@@ -18,7 +18,6 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Stack_Management
             : base(op, handler, input, opByte)
         { }
 
-        public override int GetPopCount() => 0;
         public override int GetPushCount() => 1;
 
         public override void WriteTo(ShockwaveWriter output)

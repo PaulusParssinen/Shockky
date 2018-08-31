@@ -1,6 +1,4 @@
-﻿using Shockky.IO;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-
+﻿using Shockky.IO;
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class CallExternalIns : Instruction
@@ -21,6 +19,6 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             : base(OPCode.CallExternal, handler, input, opByte)
         {
             ExternalFunctionNameIndex = Value;
-        } //6Y8-4611
+        }
     }
 }

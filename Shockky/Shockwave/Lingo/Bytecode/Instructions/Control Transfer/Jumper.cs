@@ -1,6 +1,4 @@
-﻿using Shockky.IO;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-
+﻿using Shockky.IO;
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public abstract class Jumper : Instruction
@@ -30,8 +28,10 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             {
                 case OPCode.IfTrue:
                 case OPCode.Jump:
-                case OPCode.EndRepeat: return true;
-                default: return false;
+                case OPCode.EndRepeat:
+                    return true;
+                default:
+                    return false;
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Stack_Management;
+﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Stack_Management;
 
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {

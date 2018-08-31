@@ -1,6 +1,4 @@
-﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class WrapListIns : Instruction
     {
@@ -8,14 +6,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             : base(OPCode.WrapList)
         { }
 
-        public override int GetPopCount()
-        {
-            return 1;
-        }
-
-        public override int GetPushCount()
-        {
-            return 1;
-        }
+        public override int GetPopCount() => 1;
+        public override int GetPushCount() => 1;
     }
 }

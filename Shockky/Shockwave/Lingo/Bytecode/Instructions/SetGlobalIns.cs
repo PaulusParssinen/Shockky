@@ -1,6 +1,4 @@
-﻿using Shockky.IO;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-
+﻿using Shockky.IO;
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class SetGlobalIns : Instruction
@@ -42,6 +40,5 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
         { }
 
         public override int GetPopCount() => 1;
-        public override int GetPushCount() => 0;
     }
 }

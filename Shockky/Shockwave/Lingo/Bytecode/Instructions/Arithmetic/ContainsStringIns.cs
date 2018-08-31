@@ -1,6 +1,4 @@
-﻿using System;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-
+﻿using System;
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class ContainsStringIns : Computation
@@ -9,11 +7,11 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             : base(OPCode.ContainsString)
         { }
 
-        /*protected override object Execute(dynamic left, dynamic right)
+        protected override object Execute(dynamic left, dynamic right)
         {
             string lhs = left;
             string rhs = right;
-            return lhs.IndexOf(rhs, StringComparison.InvariantCultureIgnoreCase);
-        }*/
+            return lhs.IndexOf(rhs, StringComparison.InvariantCultureIgnoreCase) != -1;
+        }
     }
 }

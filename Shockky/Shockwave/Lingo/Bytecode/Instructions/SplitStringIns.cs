@@ -1,7 +1,4 @@
-﻿using System;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class SplitStringIns : Instruction
     {
@@ -14,15 +11,8 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             : base(OPCode.SplitString)
         { }
 
-        public override int GetPopCount()
-        {
-            return 9;
-        }
-
-        public override int GetPushCount()
-        {
-            return 1;
-        }
+        public override int GetPopCount() => 9;
+        public override int GetPushCount() => 1;
 
        /* public override void Translate()
         {

@@ -1,6 +1,4 @@
-﻿using Shockky.IO;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-
+﻿using Shockky.IO;
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class GetParameterIns : Instruction

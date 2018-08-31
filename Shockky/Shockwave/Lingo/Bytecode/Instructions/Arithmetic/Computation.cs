@@ -1,29 +1,15 @@
-﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public abstract class Computation : Instruction
     {
-        public string Translation { get; } //TODO: maybe rename idk
-
-        public Instruction Right { get; private set; }
-        public Instruction Left { get; private set; }
-
         protected Computation(OPCode op)
             : base(op)
         { }
 
-        public override int GetPopCount()
-        {
-            return 2;
-        }
+        public override int GetPopCount() => 2;
+        public override int GetPushCount() => 1;
 
-        public override int GetPushCount()
-        {
-            return 1;
-        }
-
-   /*     public override void Execute(LingoMachine machine)
+        public override void Execute(LingoMachine machine)
         {
             object right = machine.Values.Pop();
             object left = machine.Values.Pop();
@@ -36,7 +22,34 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             machine.Values.Push(result);
         }
         protected abstract object Execute(object left, object right);
-		*/
-        public static bool IsValid(OPCode op) => true; //TODO:
+
+        public static bool IsValid(OPCode op)
+        {
+            switch (op)
+            {
+                case OPCode.Multiple:
+                case OPCode.Add:
+                case OPCode.Substract:
+                case OPCode.Divide:
+                case OPCode.Modulo:
+                case OPCode.Inverse:
+                case OPCode.JoinString:
+                case OPCode.JoinPadString:
+                case OPCode.LessThan:
+                case OPCode.LessThanEquals:
+                case OPCode.NotEqual:
+                case OPCode.Equals:
+                case OPCode.GreaterThan:
+                case OPCode.GreaterEquals:
+                case OPCode.And:
+                case OPCode.Or:
+                case OPCode.Not:
+                case OPCode.ContainsString:
+                case OPCode.Contains0String:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using Shockky.IO;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-using Shockky.Shockwave.Lingo.Enum;
 
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {

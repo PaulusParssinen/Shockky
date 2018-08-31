@@ -1,6 +1,4 @@
-﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class MultipleIns : Computation
     {
@@ -8,9 +6,9 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             : base(OPCode.Multiple)
         { }
 
-       /* protected override object Execute(dynamic left, dynamic right)
+        protected override object Execute(dynamic left, dynamic right)
         {
             return (left * right);
-        }*/
+        }
     }
 }

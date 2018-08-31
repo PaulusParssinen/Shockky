@@ -1,4 +1,4 @@
-﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public enum OPCode
     {

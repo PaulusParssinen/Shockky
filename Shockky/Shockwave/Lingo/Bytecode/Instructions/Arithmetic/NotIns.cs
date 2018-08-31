@@ -1,6 +1,4 @@
-﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
-
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class NotIns : Instruction
     {
@@ -8,21 +6,13 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             : base(OPCode.Not)
         { }
 
-        public override int GetPopCount()
-        {
-            return 1;
-        }
+        public override int GetPopCount() => 1;
+        public override int GetPushCount() => 1;
 
-        public override int GetPushCount()
+        public override void Execute(LingoMachine machine)
         {
-            return 1;
-        }
-
-      /*  public override void Execute(LingoMachine machine)
-        {
-            bool value = (bool)machine.Values.Pop(); //TODO: idk it might be a function or shit that is passed ot dis..
-
+            bool value = (bool)machine.Values.Pop();
             machine.Values.Push(!value);
-        }*/
+        }
     }
 }

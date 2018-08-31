@@ -1,5 +1,4 @@
 ﻿using System;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
@@ -9,11 +8,11 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             : base(OPCode.Contains0String)
         { }
 
-       /* protected override object Execute(dynamic left, dynamic right)
+        protected override object Execute(dynamic left, dynamic right)
         {
-            string lfs = left;
+            string lhs = left;
             string rhs = right;
-            return lfs.StartsWith(rhs, StringComparison.InvariantCultureIgnoreCase);
-        }*/
+            return lhs.StartsWith(rhs, StringComparison.InvariantCultureIgnoreCase);
+        }
     }
 }
