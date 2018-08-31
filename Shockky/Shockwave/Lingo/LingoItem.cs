@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Shockky.Shockwave.Chunks;
 
 namespace Shockky.Shockwave.Lingo

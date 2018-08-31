@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 
 using Shockky.IO;
-using Shockky.Shockwave.Chunks.Enum;
 
 namespace Shockky.Shockwave.Chunks
 {

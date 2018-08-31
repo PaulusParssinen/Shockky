@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+
 using Shockky.IO;
 using Shockky.Shockwave.Lingo.Bytecode.Instructions;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
 namespace Shockky.Shockwave.Lingo.Bytecode
 {

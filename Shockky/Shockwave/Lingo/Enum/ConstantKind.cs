@@ -1,4 +1,4 @@
-﻿namespace Shockky.Shockwave.Lingo.Enum
+﻿namespace Shockky.Shockwave.Lingo
 {
     public enum ConstantKind
     {

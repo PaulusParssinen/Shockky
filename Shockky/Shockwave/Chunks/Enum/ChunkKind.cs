@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Shockky.Shockwave.Chunks
+﻿namespace Shockky.Shockwave.Chunks
 {
     public enum ChunkKind
     {
@@ -12,8 +10,7 @@ namespace Shockky.Shockwave.Chunks
         GRID,
         DRCF,
         SCRF,
-
-        //tf
+        
         Fver,
         Fcdr,
         ABMP,

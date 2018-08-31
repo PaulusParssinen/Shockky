@@ -1,5 +1,4 @@
 ﻿using Shockky.IO;
-using Shockky.Shockwave.Lingo.Enum;
 
 namespace Shockky.Shockwave.Lingo
 {
@@ -23,7 +22,7 @@ namespace Shockky.Shockwave.Lingo
             Offset = input.ReadBigEndian<int>();
         }
 
-        public void ReadValue(int dataOffset, ShockwaveReader input)
+        public void ReadValue(ShockwaveReader input, int dataOffset)
         {
             if (Kind != LiteralKind.Integer) 
             {

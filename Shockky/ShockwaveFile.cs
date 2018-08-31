@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using System.Diagnostics;
+using System.Collections.Generic;
 
 using Shockky.IO;
 using Shockky.Shockwave.Chunks;

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+
 using Shockky.IO;
 using Shockky.Shockwave.Lingo.Bytecode;
 using Shockky.Shockwave.Lingo.Bytecode.Instructions;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Enum;
 
 namespace Shockky.Shockwave.Lingo
 {

@@ -1,5 +1,6 @@
-﻿using Shockky.IO;
-using System;
+﻿using System;
+
+using Shockky.IO;
 
 namespace Shockky.Shockwave.Lingo
 {

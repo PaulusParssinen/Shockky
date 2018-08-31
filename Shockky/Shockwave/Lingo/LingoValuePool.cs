@@ -3,9 +3,7 @@ using System.Collections.Generic;
 
 using Shockky.IO;
 using Shockky.Shockwave.Chunks;
-using Shockky.Shockwave.Chunks.Enum;
 using Shockky.Shockwave.Chunks.Script;
-using Shockky.Shockwave.Lingo.Enum;
 
 namespace Shockky.Shockwave.Lingo
 {
@@ -80,7 +78,7 @@ namespace Shockky.Shockwave.Lingo
             for (int i = 0; i < Literals.Count; i++)
             {
                 LingoLiteral literal = Literals[i];
-                literal.ReadValue(_literalDataEntry.Offset, input);
+                literal.ReadValue(input, _literalDataEntry.Offset);
             }
 
             //TODO: reset input pos imo?
@@ -156,7 +154,6 @@ namespace Shockky.Shockwave.Lingo
             _input.Position = ogPos;
         }
 
-
         public override int GetBodySize()
         {
             int size = 0;
@@ -172,6 +169,12 @@ namespace Shockky.Shockwave.Lingo
         public override void WriteTo(ShockwaveWriter output)
         {
             throw new NotImplementedException();
+            output.Write(_handlerVectorsEntry);
+            output.Write(_propertiesEntry);
+            output.Write(_globalsEntry);
+            output.Write(_handlersEntry);
+            output.Write(_literalsEntry);
+            output.Write(_literalDataEntry);
         }
     }
 }

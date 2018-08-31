@@ -1,4 +1,4 @@
-﻿namespace Shockky.Shockwave.Chunks.Enum
+﻿namespace Shockky.Shockwave.Chunks
 {
     public enum ScriptEntryType
     {

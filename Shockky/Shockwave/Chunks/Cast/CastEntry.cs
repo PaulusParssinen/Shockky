@@ -1,5 +1,6 @@
-﻿using Shockky.IO;
-using Shockky.Shockwave.Chunks.Enum;
+﻿using System;
+
+using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks.Cast
 {
@@ -31,9 +32,9 @@ namespace Shockky.Shockwave.Chunks.Cast
 
         public override void WriteTo(ShockwaveWriter output)
         {
+            throw new NotImplementedException();
             output.Write(FileSlot);
             output.Write(Slot);
-            output.WriteBigEndian(Name);
         }
     }
 }
