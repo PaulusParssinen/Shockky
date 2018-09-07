@@ -1,33 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using Shockky.IO;
+﻿using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
     public class CastAssociationTableChunk : ChunkItem
     {
-        public List<int> Members { get; }
+        public int[] Members { get; }
 
         public CastAssociationTableChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Members = new List<int>((int)header.Length / 4);
+            Members = new int[(int)header.Length / sizeof(int)];
 
-            for (int i = 0; i < Members.Capacity; i++)
+            for (int i = 0; i < Members.Length; i++)
             {
-                int castSlot = input.ReadBigEndian<int>();
+                Members[i] = input.ReadBigEndian<int>();
 
-               // if (castSlot == 0) continue; //TODO: check if castSlot == 0 matters
-
-                Members.Add(castSlot);
-
-                Console.WriteLine(castSlot);
+                // if (castSlot == 0) continue;
             }
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            for(int i = 0; i < Members.Count; i++)
+            for(int i = 0; i < Members.Length; i++)
             {
                 output.WriteBigEndian(Members[i]);
             }
@@ -36,7 +30,7 @@ namespace Shockky.Shockwave.Chunks
         public override int GetBodySize()
         {
             int size = 0;
-            size += Members.Count * sizeof(int);
+            size += Members.Length * sizeof(int);
             return size;
         }
     }
