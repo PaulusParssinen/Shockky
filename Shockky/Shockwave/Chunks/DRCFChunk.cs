@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
+using System.Diagnostics;
+
 using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
@@ -8,8 +9,7 @@ namespace Shockky.Shockwave.Chunks
     public class DRCFChunk : ChunkItem
     {
         public string VersionHex { get; set; }
-
-        //What a beauty
+        
         public DRCFChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

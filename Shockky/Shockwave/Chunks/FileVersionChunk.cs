@@ -1,4 +1,5 @@
 ﻿using System.Text;
+
 using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
@@ -19,7 +20,7 @@ namespace Shockky.Shockwave.Chunks
         {
             int size = 0;
             size += 5; //TODO
-            size += Encoding.UTF8.GetByteCount(Version);
+            size += Encoding.UTF8.GetByteCount(Version) + 1;
             return size;
         }
 

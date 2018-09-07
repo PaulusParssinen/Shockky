@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+
 using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
@@ -49,7 +50,6 @@ namespace Shockky.Shockwave.Chunks
             output.Write(Padding);
             output.Write(Unknown);
             output.Write(Link);
-            //TODO
         }
     }
 }

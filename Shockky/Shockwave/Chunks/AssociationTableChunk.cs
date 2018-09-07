@@ -27,8 +27,7 @@ namespace Shockky.Shockwave.Chunks
                 CastEntries.Add(new CastEntry(input));
             }
 
-            //TODO
-            CastEntries.RemoveRange(AssignedCount, TotalCount - AssignedCount);
+            //CastEntries.RemoveRange(AssignedCount, TotalCount - AssignedCount);
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
