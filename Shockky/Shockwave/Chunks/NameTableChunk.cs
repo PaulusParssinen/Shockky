@@ -25,7 +25,7 @@ namespace Shockky.Shockwave.Chunks
             
             Names = new List<string>(input.ReadBigEndian<short>());
 
-            input.Position = nameOffset;
+            input.Position = Header.Offset + nameOffset;
             for (int i = 0; i < Names.Capacity; i++)
             {
                 Names.Add(input.ReadString());

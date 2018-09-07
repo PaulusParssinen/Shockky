@@ -84,7 +84,7 @@ namespace Shockky.Shockwave.Lingo
             //TODO: reset input pos imo?
         }
 
-        private LingoLiteral ReadLiteral() => new LingoLiteral(_input);
+        private LingoLiteral ReadLiteral() => new LingoLiteral(Script, _input);
         private LingoHandler ReadHandler() => new LingoHandler(Script, _input);
         
         public string GetName(int index)
@@ -142,7 +142,7 @@ namespace Shockky.Shockwave.Lingo
         public void Populate<T>(ScriptChunkEntry entry, List<T> list, Func<T> reader)
         {
             long ogPos = _input.Position;
-            _input.Position = entry.Offset;
+            _input.Position = Script.Header.Offset + entry.Offset;
 
             list.Capacity = entry.Length;
             for (int i = 0; i < list.Capacity; i++)

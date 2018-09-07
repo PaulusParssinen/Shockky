@@ -1,4 +1,5 @@
 ﻿using Shockky.IO;
+using Shockky.Shockwave.Chunks;
 
 namespace Shockky.Shockwave.Lingo
 {
@@ -7,7 +8,7 @@ namespace Shockky.Shockwave.Lingo
         protected override string DebuggerDisplay => $"{Kind} | Value: {Value ?? "NULL"}";
 
         public LiteralKind Kind { get; set; }
-        public int Offset { get; set; }
+        public long Offset { get; set; }
         public object Value { get; set; }
 
         public LingoLiteral(LiteralKind kind, object value)
@@ -16,10 +17,10 @@ namespace Shockky.Shockwave.Lingo
             Value = value;
         }
 
-        public LingoLiteral(ShockwaveReader input)
+        public LingoLiteral(ScriptChunk script, ShockwaveReader input)
         {
             Kind = (LiteralKind)input.ReadBigEndian<int>();
-            Offset = input.ReadBigEndian<int>();
+            Offset = script.Header.Offset + input.ReadBigEndian<int>();
         }
 
         public void ReadValue(ShockwaveReader input, int dataOffset)

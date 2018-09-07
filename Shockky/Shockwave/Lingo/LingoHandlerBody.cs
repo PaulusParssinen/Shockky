@@ -27,7 +27,7 @@ namespace Shockky.Shockwave.Lingo
 
             long pos = input.Position;
 
-            input.Position = CodeOffset;
+            input.Position = handler.GetScript().Header.Offset + CodeOffset;
             Code = input.ReadBytes(CodeLength);
 
             input.Position = pos;
