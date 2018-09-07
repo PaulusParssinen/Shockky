@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+
 using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
@@ -11,14 +12,14 @@ namespace Shockky.Shockwave.Chunks
             : base(header)
         {
             Remnants.Enqueue(input.ReadBytes(3)); //TODO: Wthell
-            input = WrapDecompressor(input);
-            Remnants.Enqueue(input.Read7BitEncodedInt());
-            Remnants.Enqueue(input.Read7BitEncodedInt());
+            var decompressedInput = WrapDecompressor(input);    
+            Remnants.Enqueue(decompressedInput.Read7BitEncodedInt());
+            Remnants.Enqueue(decompressedInput.Read7BitEncodedInt());
 
-            Entries = new List<AfterBurnerMapEntry>(input.Read7BitEncodedInt());
+            Entries = new List<AfterBurnerMapEntry>(decompressedInput.Read7BitEncodedInt());
             for(int i = 0; i < Entries.Capacity; i++)
             {
-                Entries.Add(new AfterBurnerMapEntry(input));
+                Entries.Add(new AfterBurnerMapEntry(decompressedInput));
             }
         }
 

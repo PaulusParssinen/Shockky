@@ -50,18 +50,23 @@ namespace Shockky
                         {
                             if (ReadChunk() is FGEIChunk fgei)
                             {
-                                Debug.Assert(afterburnerMap.Entries[0].Header.Kind == ChunkKind.ILS, "HM");
-                                
                                 Chunks = new List<ChunkItem>(afterburnerMap.Entries.Count);
 
-                                var ilsChunk = fgei.ReadInitialLoadSegment(afterburnerMap.Entries[0]);
-                                var chunks = fgei.ReadChunks(afterburnerMap.Entries);
+                                void HandleChunks(IEnumerable<ChunkItem> chunks)
+                                {
+                                    foreach (var chunk in chunks)
+                                    {
+                                        callback?.Invoke(chunk);
+                                        Chunks.Add(chunk);
+                                    }
+                                }
 
-                                if (!ilsChunk.TryReadChunks(afterburnerMap.Entries, out var ilsChunks))
-                                    throw new NotImplementedException("Chunk reading failed");
-                                
-                                Chunks.AddRange(ilsChunks);
-                                Chunks.AddRange(chunks);
+                                Debug.Assert(afterburnerMap.Entries[0].Header.Kind == ChunkKind.ILS, "HM");
+
+                                var ilsChunk = fgei.ReadInitialLoadSegment(afterburnerMap.Entries[0]);
+
+                                HandleChunks(fgei.ReadChunks(afterburnerMap.Entries));
+                                HandleChunks(ilsChunk.ReadChunks(afterburnerMap.Entries));
                             }
                         }
                     }

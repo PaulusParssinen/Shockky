@@ -27,6 +27,7 @@ namespace Shockky.Shockwave.Chunks
         public string Name { get; set; }
         public ChunkKind Kind { get; set; }
 
+        public long Offset { get; set; }
         public long Length { get; set; }
 
         public ChunkHeader(ChunkKind kind)
@@ -43,6 +44,7 @@ namespace Shockky.Shockwave.Chunks
         {
             Length = (IsVariableLength ? 
                 input.Read7BitEncodedInt() : input.ReadInt32());
+            Offset = input.Position;
         }
 
         public override int GetBodySize()

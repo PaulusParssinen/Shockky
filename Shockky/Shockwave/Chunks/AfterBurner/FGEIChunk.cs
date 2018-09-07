@@ -9,13 +9,11 @@ namespace Shockky.Shockwave.Chunks
     public class FGEIChunk : ChunkItem
     {
         private readonly ShockwaveReader _input;
-        private readonly long _offset;
 
         public FGEIChunk(ShockwaveReader input, ChunkHeader header)
-            : base(input)
+            : base(header)
         {
             _input = input;
-            _offset = input.Position;
         }
         
         //Gotta confirm that the first entry is ILS..
@@ -26,26 +24,18 @@ namespace Shockky.Shockwave.Chunks
             return Read(_input, ilsEntry.Header) as InitialLoadSegmentChunk;
         }
 
-        public ChunkItem[] ReadChunks(List<AfterBurnerMapEntry> entries)
+        public IEnumerable<ChunkItem> ReadChunks(List<AfterBurnerMapEntry> entries)
         {
-            var chunks = new ChunkItem[entries.Count];
-
-            for (int i = 1; i < entries.Count; i++)
+            foreach (var entry in entries)
             {
-                var entry = entries[i];
+                if (entry.Offset < 1) continue;
+                if (!entry.IsCompressed) throw new NotImplementedException("Gotta find an example movie which has this shit");
 
-                if (entry.Offset == -1) continue;
+                _input.Position = Header.Offset + entry.Offset;
+                var decompressedInput = _input.WrapDecompressor(entry.CompressedLength);
 
-                if (entry.IsCompressed)
-                {
-                    _input.Position = _offset + entry.Offset;
-                    var decompressedInput = _input.WrapDecompressor(entry.DecompressedLength);
-
-                    chunks[i] = Read(decompressedInput, entry.Header);
-                }
-                else throw new NotImplementedException("Gotta find an example movie which has this shit");
+                yield return Read(decompressedInput, entry.Header);
             }
-            return chunks;
         }
 
         public override int GetBodySize()

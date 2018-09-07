@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO.Compression;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
+using System.Collections.Generic;
 
 using Shockky.IO;
 
@@ -10,8 +8,6 @@ namespace Shockky.Shockwave.Chunks
     [DebuggerDisplay("{Kind}")]
     public abstract class ChunkItem : ShockwaveItem
     {
-        private long _offset;
-
         public ChunkKind Kind => Header.Kind;
         public ChunkHeader Header { get; set; }
 
@@ -19,9 +15,7 @@ namespace Shockky.Shockwave.Chunks
 
         protected ChunkItem(ShockwaveReader input)
             : this(new ChunkHeader(input))
-        {
-            _offset = input.Position;
-        }
+        { }
         protected ChunkItem(ChunkHeader header)
         {
             Header = header;
@@ -29,9 +23,10 @@ namespace Shockky.Shockwave.Chunks
             Remnants = new Queue<object>();
         }
 
-        public ShockwaveReader WrapDecompressor(ShockwaveReader input)
+        public ShockwaveReader WrapDecompressor(in ShockwaveReader input)
         {
-            return input.WrapDecompressor((int)(Header.Length - (input.Position - _offset)));
+            long dataLeft = Header.Length - (input.Position - Header.Offset) - 2; // Include ZLib header
+            return input.WrapDecompressor((int)dataLeft);
         }
 
         public override void WriteTo(ShockwaveWriter output)
@@ -86,8 +81,8 @@ namespace Shockky.Shockwave.Chunks
                     return new PaletteChunk(input, header);
                 case ChunkKind.MCsL:
                     return new MovieCastListChunk(input, header);
-                case ChunkKind.STXT:
-                    return new ScriptableTextChunk(input, header);
+                //case ChunkKind.STXT:
+                //    return new StyledTextChunk(input, header);
                 case ChunkKind.FXmp:
                     return new FontMapChunk(input, header);
                 //case ChunkKind.XTRl:

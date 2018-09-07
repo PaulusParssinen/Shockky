@@ -15,23 +15,18 @@ namespace Shockky.Shockwave.Chunks
             _input = WrapDecompressor(input);
         }
         
-        public bool TryReadChunks(List<AfterBurnerMapEntry> entries, out List<ChunkItem> chunks)
+        public IEnumerable<ChunkItem> ReadChunks(List<AfterBurnerMapEntry> entries)
         {
-            chunks = new List<ChunkItem>(entries.Count);
-
             for(int i = 0; i < entries.Count; i++)
             {
                 int id = _input.Read7BitEncodedInt();
 
                 var entry = entries.FirstOrDefault(e => e.Id == id);
-                if (entry == null) throw new Exception("fuq"); //TODO: Is this possible?
-
-                var chunk = Read(_input, entry.Header);
-                chunks.Add(chunk);
+                if (entry == null || entry.Offset != -1) break; //That's enough I guess
+                
+                yield return Read(_input, entry.Header);
             }
-            return true;
         }
-
 
         public override int GetBodySize()
         {
