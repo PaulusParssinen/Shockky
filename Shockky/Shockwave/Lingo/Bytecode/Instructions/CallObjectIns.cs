@@ -1,5 +1,4 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class CallObjectIns : Instruction
     {
@@ -14,8 +13,5 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
         {
             Value = handlerNameIndex;
         }
-        public CallObjectIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.CallObj, handler, input, opByte)
-        { }
     }
 }

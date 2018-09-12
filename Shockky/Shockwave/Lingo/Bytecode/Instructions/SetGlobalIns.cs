@@ -1,5 +1,4 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class SetGlobalIns : Instruction
     {
@@ -20,6 +19,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             get => _valueIndex;
             set
             {
+                base.Value = value;
                 _valueIndex = value;
                 _value = Pool.NameList[value];
             }
@@ -28,16 +28,16 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
         public SetGlobalIns(LingoHandler handler)
             : base(OPCode.SetGlobal, handler)
         { }
-
+        public SetGlobalIns(LingoHandler handler, int globalValueIndex)
+            : this(handler)
+        {
+            ValueIndex = globalValueIndex;
+        }
         public SetGlobalIns(LingoHandler handler, string global)
             : this(handler)
         {
             Value = global;
         }
-
-        public SetGlobalIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.SetGlobal, handler, input, opByte)
-        { }
 
         public override int GetPopCount() => 1;
     }

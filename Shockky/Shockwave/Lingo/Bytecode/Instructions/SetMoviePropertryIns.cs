@@ -1,5 +1,4 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class SetMoviePropertryIns : Instruction
     {
@@ -10,10 +9,9 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
         { }
         public SetMoviePropertryIns(LingoHandler handler, int moviePropertyIndex)
             : this(handler)
-        { }
-        public SetMoviePropertryIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.SetMovieProp, handler, input, opByte)
-        { }
+        {
+            Value = moviePropertyIndex;
+        }
 
         public override int GetPopCount() => 1;
     }

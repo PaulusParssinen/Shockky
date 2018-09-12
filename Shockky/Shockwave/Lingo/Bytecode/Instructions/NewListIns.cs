@@ -1,15 +1,19 @@
-﻿using Shockky.IO;
-
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class NewListIns : Instruction
     {
-        public int ItemCount { get; } 
+        public int ItemCount => Value;
 
-        public NewListIns(LingoHandler handler, ShockwaveReader input, byte opByte, bool argList)
-            : base(OPCode.NewList, handler, input, opByte)
+        public NewListIns(bool argList)
+            : base(argList ? OPCode.NewArgList : OPCode.NewList)
+        { }
+        public NewListIns(LingoHandler handler, bool argList)
+            : base(argList ? OPCode.NewArgList : OPCode.NewList, handler)
+        { }
+        public NewListIns(LingoHandler handler, int itemCount, bool argList)
+            : this(handler, argList)
         {
-            ItemCount = Value; //not sure why I didnt implement short reading here
+            Value = itemCount;
         }
 
         public override int GetPushCount() => ItemCount;

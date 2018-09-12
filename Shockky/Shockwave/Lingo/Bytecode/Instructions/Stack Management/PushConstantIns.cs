@@ -1,5 +1,4 @@
-﻿using Shockky.IO;
-using Shockky.Shockwave.Lingo.Bytecode.Instructions.Stack_Management;
+﻿using System.Diagnostics;
 
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
@@ -24,20 +23,22 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             {
                 base.Value = value;
                 _valueIndex = value;
-                _value = Pool.Literals[value].Value;
+                _value = /*Pool.Literals[value].Value*/ Pool.NameList[value];
             }
         }
 
         public PushConstantIns(LingoHandler handler)
             : base(OPCode.PushConstant, handler)
         { }
+        public PushConstantIns(LingoHandler handler, int valueIndex)
+            : this(handler)
+        {
+            ValueIndex = valueIndex;
+        }
         public PushConstantIns(LingoHandler handler, object value)
             : this(handler)
         {
             Value = value;
         }
-        public PushConstantIns(LingoHandler handler, ShockwaveReader input, byte opByte) 
-            : base(OPCode.PushConstant, handler, input, opByte)
-        { }
     }
 }

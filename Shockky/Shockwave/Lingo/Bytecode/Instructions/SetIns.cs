@@ -1,12 +1,14 @@
-﻿using Shockky.IO;
+﻿using System.Diagnostics;
+
 namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class SetIns : Instruction
     {
-        public SetIns(LingoHandler handler, ShockwaveReader input, byte opByte) 
-            : base(OPCode.Set, handler, input, opByte)
+        public SetIns(LingoHandler handler, int value) 
+            : base(OPCode.Set, handler)
         {
-            //int id = input.ReadByte();
+            Value = value;
+            Debug.WriteLine("SET: " + value);
         }
     }
 }

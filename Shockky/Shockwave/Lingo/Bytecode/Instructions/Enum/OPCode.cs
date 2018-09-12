@@ -3,7 +3,7 @@
     public enum OPCode
     {
         Return = 0x01,
-        PushInt0 = 0x03, //push int 0 literal thing
+        PushInt0 = 0x03,
         Multiple,
         Add,
         Substract,
@@ -22,7 +22,7 @@
         Or,
         Not,
         ContainsString,
-        Contains0String, //startswith i guess
+        Contains0String,
         SplitString,
         LightString,
         OnToSprite,
@@ -42,7 +42,10 @@
         NewList,
         PushConstant,
         PushSymbol,
-        GetGlobal = 0x49,
+        PushObject,
+        Op_47,
+        Op_48,
+        GetGlobal,
         GetProperty,
         GetParameter,
         GetLocal,
@@ -66,10 +69,11 @@
         GetObjProp,
         SetObjProp,
         Op_63,
-        DubMAYBE, //Dup? Shockwabsorber
-        PopMAYBE, //Pop
+        Dup,
+        Pop,
         GetMovieInfo,
         CallObj,
-        PushInt2 = 0x6e
+        PushInt2 = 0x6e,
+        Op_7d = 0x7d
     }
 }

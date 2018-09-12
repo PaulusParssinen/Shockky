@@ -1,6 +1,4 @@
-﻿using Shockky.Shockwave.Lingo.Bytecode.Instructions.Stack_Management;
-
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class PushZeroIns : Primitive
     {

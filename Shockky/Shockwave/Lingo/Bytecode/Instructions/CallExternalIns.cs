@@ -1,5 +1,4 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class CallExternalIns : Instruction
     {
@@ -13,12 +12,6 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             : this(handler)
         {
             ExternalFunctionNameIndex = externalFunctionNameIndex;
-        }
-
-        public CallExternalIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.CallExternal, handler, input, opByte)
-        {
-            ExternalFunctionNameIndex = Value;
         }
     }
 }

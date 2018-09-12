@@ -1,9 +1,14 @@
-﻿using Shockky.IO;namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿using System.Diagnostics;
+
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class GetIns : Instruction
     {
-        public GetIns(LingoHandler handler, ShockwaveReader input, byte opByte) 
-            : base(OPCode.Get, handler, input, opByte)
-        { }
+        public GetIns(LingoHandler handler, int value)
+            : base(OPCode.Get, handler)
+        {
+            Value = value;
+            Debug.WriteLine("GET: " + value);
+        }
     }
 }

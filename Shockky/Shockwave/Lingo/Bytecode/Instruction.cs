@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
-
 using Shockky.IO;
 using Shockky.Shockwave.Lingo.Bytecode.Instructions;
 
 namespace Shockky.Shockwave.Lingo.Bytecode
 {
-    [DebuggerDisplay("{OP}")]
-    public abstract class Instruction : ShockwaveItem
+    public abstract class Instruction : ShockwaveItem, ICloneable
     {
+        protected override string DebuggerDisplay => OP.ToString() + ((byte)OP > 0x40 ? $" {Value}" : string.Empty); //Operand for debugging purposes, gonna be removed later
+
         public OPCode OP { get; }
-        public virtual int Value { get; set; }
+        public virtual int Value { protected get; set; }
 
         protected LingoHandler Handler { get; }
         protected LingoValuePool Pool => Handler.GetScript().Pool;
@@ -23,13 +23,6 @@ namespace Shockky.Shockwave.Lingo.Bytecode
             : this(op)
         {
             Handler = handler;
-        }
-        protected Instruction(OPCode op, LingoHandler handler, ShockwaveReader input, byte opByte)
-            : this(op, handler)
-        {
-            if (opByte > 0x80)
-                Value = input.ReadBigEndian<short>();
-            else Value = input.ReadByte();
         }
 
         public override void WriteTo(ShockwaveWriter output)
@@ -57,12 +50,18 @@ namespace Shockky.Shockwave.Lingo.Bytecode
 
         public static Instruction Create(LingoHandler handler, ShockwaveReader input)
         {
-            byte opByte = input.ReadByte();
+            byte op = input.ReadByte();
+            int operandValue = 0;
 
-            var op = (OPCode)(opByte > 0x40 ?
-                (opByte % 0x40 + 0x40) : opByte); //gayyyyyy y y
+            if (op > 0x40)
+            {
+                op = (byte)(op % 0x40 + 0x40);
+                if (op > 0xC0) throw new Exception("wowowo");
 
-            switch (op)
+                operandValue = op > 0x80 ? input.ReadBigEndian<short>() : input.ReadByte();
+            }
+
+            switch ((OPCode)op)
             {
                 case OPCode.Return:
                     return new ReturnIns();
@@ -121,9 +120,9 @@ namespace Shockky.Shockwave.Lingo.Bytecode
                 case OPCode.CastString:
                     return new CastStringIns();
                 case OPCode.StartObject:
-                    break;
+                    return new StartObjectIns();
                 case OPCode.StopObject:
-                    break;
+                    return new StopObjectIns();
                 case OPCode.WrapList:
                     return new WrapListIns();
                 case OPCode.NewPropList:
@@ -132,41 +131,46 @@ namespace Shockky.Shockwave.Lingo.Bytecode
                 //Multi 
 
                 case OPCode.PushInt:
-                    return new PushIntIns(handler, input, opByte);
+                    return new PushIntIns(handler, operandValue);
                 case OPCode.NewArgList:
-                    return new NewListIns(handler, input, opByte, true); //unparanthesized
+                    return new NewListIns(handler, operandValue, true); //unparanthesized
                 case OPCode.NewList:
-                    return new NewListIns(handler, input, opByte, false); //in paranthesized call expression
+                    return new NewListIns(handler, operandValue, false); //in paranthesized call expression
                 case OPCode.PushConstant:
-                    return new PushConstantIns(handler, input, opByte);
+                    return new PushConstantIns(handler, operandValue);
                 case OPCode.PushSymbol:
-                    return new PushSymbolIns(handler, input, opByte);
+                    return new PushSymbolIns(handler, operandValue);
+                case OPCode.PushObject:
+                    return new PushObjectIns(handler, operandValue);
+                case OPCode.Op_47:
+                case OPCode.Op_48:
+                    break;
                 case OPCode.GetGlobal:
-                    return new GetGlobalIns(handler, input, opByte);
+                    return new GetGlobalIns(handler, operandValue);
                 case OPCode.GetProperty:
-                    return new GetPropertyIns(handler, input, opByte);
+                    return new GetPropertyIns(handler, operandValue);
                 case OPCode.GetParameter:
-                    return new GetParameterIns(handler, input, opByte);
+                    return new GetParameterIns(handler, operandValue);
                 case OPCode.GetLocal:
-                    return new GetLocalIns(handler, input, opByte);
+                    return new GetLocalIns(handler, operandValue);
                 case OPCode.SetGlobal:
-                    return new SetGlobalIns(handler, input, opByte);
+                    return new SetGlobalIns(handler, operandValue);
                 case OPCode.SetProperty:
-                    return new SetPropertyIns(handler, input, opByte);
+                    return new SetPropertyIns(handler, operandValue);
                 case OPCode.SetParameter:
-                    return new SetParameterIns(handler, input, opByte);
+                    return new SetParameterIns(handler, operandValue);
                 case OPCode.SetLocal:
-                    return new SetLocalIns(handler, input, opByte);
+                    return new SetLocalIns(handler, operandValue);
                 case OPCode.Jump:
-                    return new JumpIns(handler, input, opByte);
+                    return new JumpIns(handler, operandValue);
                 case OPCode.EndRepeat:
-                    return new EndRepeatIns(handler, input, opByte);
+                    return new EndRepeatIns(handler, operandValue);
                 case OPCode.IfTrue:
-                    return new IfTrueIns(handler, input, opByte);
+                    return new IfTrueIns(handler, operandValue);
                 case OPCode.CallLocal:
-                    return new CallLocalIns(handler, input, opByte);
+                    return new CallLocalIns(handler, operandValue);
                 case OPCode.CallExternal:
-                    return new CallExternalIns(handler, input, opByte);
+                    return new CallExternalIns(handler, operandValue);
                 case OPCode.CallObjOld:
                     break;
                 case OPCode.Op_59:
@@ -174,33 +178,42 @@ namespace Shockky.Shockwave.Lingo.Bytecode
                 case OPCode.Op_5b:
                     break;
                 case OPCode.Get:
-                    return new GetIns(handler, input, opByte);
+                    return new GetIns(handler, operandValue);
                 case OPCode.Set:
-                    return new SetIns(handler, input, opByte);
+                    return new SetIns(handler, operandValue);
                 case OPCode.GetMovieProp:
-                    return new GetMoviePropertyIns(handler, input, opByte);
+                    return new GetMoviePropertyIns(handler, operandValue);
                 case OPCode.SetMovieProp:
-                    return new SetMoviePropertryIns(handler, input, opByte);
+                    return new SetMoviePropertryIns(handler, operandValue);
                 case OPCode.GetObjProp:
-                    return new GetObjPropertyIns(handler, input, opByte);
+                    return new GetObjPropertyIns(handler, operandValue);
                 case OPCode.SetObjProp:
-                    return new SetObjPropertyIns(handler, input, opByte);
+                    return new SetObjPropertyIns(handler, operandValue);
                 case OPCode.Op_63:
-                case OPCode.DubMAYBE:
-                case OPCode.PopMAYBE: //TODO: Research whether this is true
                     break;
+                case OPCode.Dup:
+                    return new DupIns(operandValue);
+                case OPCode.Pop:
+                    return new PopIns(operandValue);
                 case OPCode.GetMovieInfo:
-                    return new GetMovieInfoIns(handler, input, opByte);
+                    return new GetMovieInfoIns(handler, operandValue);
                 case OPCode.CallObj:
-                    return new CallObjectIns(handler, input, opByte);
+                    return new CallObjectIns(handler, operandValue);
                 case OPCode.PushInt2:
-                    return new PushIntIns(handler, input, opByte);
+                    return new PushIntIns(handler, operandValue);
             }
 
-            var operand = opByte > 0x80 ? input.ReadBigEndian<short>() : input.ReadByte();
-            Debug.WriteLine("Unhandled instruction: " + op);
-
+            Debug.WriteLine($"UNK {op:X}");
             return null;
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+        public Instruction Clone()
+        {
+            return (Instruction)MemberwiseClone();
         }
     }
 }

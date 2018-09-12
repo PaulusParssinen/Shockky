@@ -1,5 +1,4 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class SetParameterIns : Instruction
     {
@@ -12,12 +11,10 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
         public SetParameterIns(LingoHandler handler, int argumentNameIndex)
             : this(handler)
         {
+            Value = argumentNameIndex;
             //TODO: index under int16 in namelist with this one too
         }
-        public SetParameterIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.SetParameter, handler, input, opByte)
-        { }
-        
+
         public override int GetPopCount() => 1;
     }
 }

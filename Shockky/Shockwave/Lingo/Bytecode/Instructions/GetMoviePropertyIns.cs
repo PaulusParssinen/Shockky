@@ -20,23 +20,24 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             get => _nameIndex;
             set
             {
+                base.Value = value;
                 _nameIndex = value;
-                _name = Pool.NameList[Value];
+                _name = Pool.NameList[value];
             }
         }
 
         public GetMoviePropertyIns(LingoHandler handler)
             : base(OPCode.GetMovieProp, handler)
         { }
+        public GetMoviePropertyIns(LingoHandler handler, int propertyNameIndex)
+            : this(handler)
+        {
+            NameIndex = propertyNameIndex;
+        }
         public GetMoviePropertyIns(LingoHandler handler, string moviePropertyName)
             : this(handler)
         {
             Name = moviePropertyName;
-        }
-        public GetMoviePropertyIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.GetMovieProp, handler, input, opByte)
-        {
-            NameIndex = Value;
         }
 
         public override int GetPopCount() => 1;

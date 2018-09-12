@@ -1,5 +1,4 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class GetObjPropertyIns : Instruction
     {
@@ -20,6 +19,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             get => _valueIndex;
             set
             {
+                base.Value = value;
                 _valueIndex = value;
                 _value = Pool.NameList[value];
             }
@@ -28,13 +28,15 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
         public GetObjPropertyIns(LingoHandler handler)
             : base(OPCode.GetObjProp, handler)
         { }
-        public GetObjPropertyIns(LingoHandler handler, string objPropertyName)
+        public GetObjPropertyIns(LingoHandler handler, int propertyNameIndex)
             : this(handler)
         {
-            Value = objPropertyName;
+            ValueIndex = propertyNameIndex;
         }
-        public GetObjPropertyIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.GetObjProp, handler, input, opByte)
-        { }
+        public GetObjPropertyIns(LingoHandler handler, string propertyName)
+            : this(handler)
+        {
+            Value = propertyName;
+        }
     }
 }

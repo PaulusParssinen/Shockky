@@ -1,5 +1,4 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class GetLocalIns : Instruction
     {
@@ -10,16 +9,13 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             : base(OPCode.GetLocal, handler)
         { }
 
-        public GetLocalIns(LingoHandler handler, int localNameIndex)
+        public GetLocalIns(LingoHandler handler, int localIndex)
             : this(handler)
         {
+            Value = localIndex;
             //TODO: Implement this shit
             //Handler.Locals.Add, also adjust its index to be under int16 in namelist
         }
-
-        public GetLocalIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.GetLocal, handler, input, opByte)
-        { }
 
         public override int GetPopCount() => 1;
     }

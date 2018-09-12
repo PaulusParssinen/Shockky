@@ -20,6 +20,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             get => _valueIndex;
             set
             {
+                base.Value = value;
                 _valueIndex = value;
                 _value = Pool.NameList[value];
             }
@@ -28,15 +29,15 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
         public GetGlobalIns(LingoHandler handler)
             : base(OPCode.GetGlobal, handler)
         { }
-
+        public GetGlobalIns(LingoHandler handler, int globalNameIndex)
+            : this(handler)
+        {
+            ValueIndex = globalNameIndex;
+        }
         public GetGlobalIns(LingoHandler handler, string global)
             : this(handler)
         {
             Value = global;
         }
-
-        public GetGlobalIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.GetGlobal, handler, input, opByte)
-        { }
     }
 }

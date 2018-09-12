@@ -1,17 +1,16 @@
-﻿using Shockky.IO;
-
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class CallLocalIns : Instruction
     {
-        public int LocalHandlerIndex { get; set; }
-        public LingoHandler LocalHandler => Pool.Handlers[LocalHandlerIndex];
+        public LingoHandler LocalHandler => Pool.Handlers[Value];
 
         public CallLocalIns(LingoHandler handler)
             : base(OPCode.CallLocal, handler)
         { }
-        public CallLocalIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.CallLocal, handler, input, opByte)
-        { }
+        public CallLocalIns(LingoHandler handler, int handlerIndex)
+            : this(handler)
+        {
+            Value = handlerIndex;
+        }
     }
 }

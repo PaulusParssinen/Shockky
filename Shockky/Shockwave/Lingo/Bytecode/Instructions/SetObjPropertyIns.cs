@@ -1,19 +1,15 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class SetObjPropertyIns : Instruction
     {
-
         public SetObjPropertyIns(LingoHandler handler)
             : base(OPCode.SetObjProp, handler)
         { }
-        public SetObjPropertyIns(LingoHandler handler, string objProperty)
+        public SetObjPropertyIns(LingoHandler handler, int propertyNameIndex)
             : this(handler)
-        { }
-
-        public SetObjPropertyIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.SetObjProp, handler, input, opByte)
-        { }
+        {
+            Value = propertyNameIndex;
+        }
 
         public override int GetPopCount() => 1; //or2
 

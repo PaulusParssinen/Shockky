@@ -1,5 +1,4 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class GetMovieInfoIns : Instruction
     {
@@ -20,6 +19,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
             get => _valueIndex;
             set
             {
+                base.Value = value;
                 _valueIndex = value;
                 _value = Pool.NameList[value];
             }
@@ -28,15 +28,15 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
         public GetMovieInfoIns(LingoHandler handler)
             : base(OPCode.GetMovieInfo, handler)
         { }
-
+        public GetMovieInfoIns(LingoHandler handler, int nameIndex)
+            : this(handler)
+        {
+            ValueIndex = nameIndex;
+        }
         public GetMovieInfoIns(LingoHandler handler, string name)
             : this(handler)
         {
             Value = name;
         }
-
-        public GetMovieInfoIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.GetMovieInfo, handler, input, opByte)
-        { }
     }
 }

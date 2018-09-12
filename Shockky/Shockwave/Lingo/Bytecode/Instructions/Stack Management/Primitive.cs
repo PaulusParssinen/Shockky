@@ -2,20 +2,15 @@
 
 using Shockky.IO;
 
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions.Stack_Management
+namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public abstract class Primitive : Instruction
     {
         public Primitive(OPCode op)
             : base(op)
         { }
-
         public Primitive(OPCode op, LingoHandler handler)
             : base(op, handler)
-        { }
-
-        protected Primitive(OPCode op, LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(op, handler, input, opByte)
         { }
 
         public override int GetPushCount() => 1;

@@ -1,6 +1,6 @@
 ﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
-    public class PushSymbolIns : Instruction
+    public class PushObjectIns : Instruction
     {
         private string _name;
         public string Name
@@ -25,15 +25,15 @@
             }
         }
 
-        public PushSymbolIns(LingoHandler handler)
-            : base(OPCode.PushSymbol, handler)
+        public PushObjectIns(LingoHandler handler)
+            : base(OPCode.PushObject, handler)
         { }
-        public PushSymbolIns(LingoHandler handler, int nameIndex)
+        public PushObjectIns(LingoHandler handler, int nameIndex)
             : this(handler)
         {
             NameIndex = nameIndex;
         }
-        public PushSymbolIns(LingoHandler handler, string name)
+        public PushObjectIns(LingoHandler handler, string name)
             : this(handler)
         {
             Name = name;

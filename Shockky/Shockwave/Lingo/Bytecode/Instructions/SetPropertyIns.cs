@@ -1,5 +1,4 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class SetPropertyIns : Instruction
     {
@@ -14,9 +13,6 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
         {
             Value = propertyNameIndex;
         }
-        public SetPropertyIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.SetProperty, handler, input, opByte)
-        { }
 
         public override int GetPopCount() => 1;
     }

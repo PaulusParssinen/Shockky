@@ -1,19 +1,17 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public class IfTrueIns : Jumper
     {
         public IfTrueIns()
             : base(OPCode.IfTrue)
         { }
-
-        public IfTrueIns(LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(OPCode.IfTrue, handler, input, opByte)
+        public IfTrueIns(LingoHandler handler, int offset)
+            : base(OPCode.IfTrue, handler, offset)
         { }
 
         public override bool? RunCondition(LingoMachine machine)
         {
-            throw new System.NotImplementedException();
+            return (machine.Values.Pop() as bool?);
         }
     }
 }

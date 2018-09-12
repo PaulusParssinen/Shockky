@@ -1,5 +1,4 @@
-﻿using Shockky.IO;
-namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
 {
     public abstract class Jumper : Instruction
     {
@@ -16,9 +15,6 @@ namespace Shockky.Shockwave.Lingo.Bytecode.Instructions
         {
             Value = offset;
         }
-        protected Jumper(OPCode op, LingoHandler handler, ShockwaveReader input, byte opByte)
-            : base(op, handler, input, opByte)
-        { }
 
         public abstract bool? RunCondition(LingoMachine machine);
 
