@@ -32,9 +32,9 @@ namespace Shockky.Shockwave.Chunks.Cast
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            throw new NotImplementedException();
             output.Write(FileSlot);
             output.Write(Slot);
+            output.WriteReversedString(Name);
         }
     }
 }

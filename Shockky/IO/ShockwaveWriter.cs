@@ -17,10 +17,7 @@ namespace Shockky.IO
             set => BaseStream.Position = value;
         }
         public long Length => BaseStream.Length;
-
-        protected int BitPosition { get; set; }
-        protected int BitContainer { get; set; }
-
+        
         public ShockwaveWriter()
             : this(0)
         { }
@@ -51,6 +48,13 @@ namespace Shockky.IO
         public void Write(ShockwaveItem item)
         {
             item.WriteTo(this);
+        }
+
+        public void WriteReversedString(string value)
+        {
+            char[] chars = value.ToCharArray();
+            Array.Reverse(chars);
+            Write(chars);
         }
 
         public void WriteBigEndian<T>(T value)
