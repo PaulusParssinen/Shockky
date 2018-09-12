@@ -55,14 +55,14 @@ namespace Shockky.Shockwave.Lingo
             input.ReadBigEndian<short>();
 
             LineCount = input.ReadBigEndian<short>();
-            LineOffset = input.ReadBigEndian<int>(); //Apparently relative to whole section
+            LineOffset = input.ReadBigEndian<int>();
 
             Body.StackHeight = input.ReadBigEndian<int>();
         }
 
         public void Populate<T>(int length, int offset,
             ShockwaveReader input,
-            List<T> list, Func<T> reader) //uhh, duplicate code
+            List<T> list, Func<T> reader)
         {
             long ogPos = input.Position;
             input.Position = offset;

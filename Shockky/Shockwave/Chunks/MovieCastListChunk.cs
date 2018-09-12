@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using Shockky.IO;
 using Shockky.Shockwave.Chunks.Cast;
@@ -19,9 +18,12 @@ namespace Shockky.Shockwave.Chunks
             Entries = new List<CastListEntry>(input.ReadBigEndian<int>());
 
             Remnants.Enqueue(input.ReadBigEndian<short>());
-            int arraySize = input.ReadBigEndian<int>();
+            int unkLen = input.ReadBigEndian<int>();
 
-            var offsetTableApparently = input.ReadBytes(arraySize * 4); //integers?
+            for(int i = 0; i < unkLen; i++)
+            {
+                Remnants.Enqueue(input.ReadBigEndian<int>());
+            }
 
             EntryLength = input.ReadBigEndian<int>();
             for(int i = 0; i < Entries.Capacity; i++)
@@ -32,12 +34,16 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            throw new NotImplementedException();
-
             output.WriteBigEndian((int)Remnants.Dequeue());
             output.WriteBigEndian(Entries.Count);
             output.WriteBigEndian((int)Remnants.Dequeue());
-            //TODO
+
+            output.WriteBigEndian((int)Remnants.Count);
+            for(int i = 0; i < Remnants.Count; i++)
+            {
+                output.WriteBigEndian((int)Remnants.Dequeue());
+            }
+
             output.WriteBigEndian(EntryLength);
             for(int i = 0; i < Entries.Count; i++)
             {

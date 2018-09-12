@@ -50,13 +50,11 @@ namespace Shockky.Shockwave.Lingo
             Handlers = new List<LingoHandler>();
             Literals = new List<LingoLiteral>();
         }
-
         public LingoValuePool(ScriptChunk script)
             : this()
         {
             Script = script;
         }
-
         public LingoValuePool(ScriptChunk script, ShockwaveReader input)
             : this(script)
         {
@@ -75,9 +73,8 @@ namespace Shockky.Shockwave.Lingo
             Populate(_handlersEntry, Handlers, ReadHandler);
             Populate(_literalsEntry, Literals, ReadLiteral);
 
-            for (int i = 0; i < Literals.Count; i++)
-            {
-                LingoLiteral literal = Literals[i];
+            foreach (var literal in Literals)
+            { 
                 literal.ReadValue(input, _literalDataEntry.Offset);
             }
 

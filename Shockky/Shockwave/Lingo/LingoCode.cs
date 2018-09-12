@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -10,8 +11,6 @@ namespace Shockky.Shockwave.Lingo
 {
     public class LingoCode : ShockwaveItem, IList<Instruction>
     {
-        //Ignore all those IList implementations, temporarily just that for jumper exits and other magic stuff, btw 
-        
         private readonly LingoHandlerBody _body;
         private readonly List<Instruction> _instructions;
 
@@ -101,7 +100,7 @@ namespace Shockky.Shockwave.Lingo
                         }
                         else // Backwards jump.
                         {
-                            Console.WriteLine($"What the actual fuck: {exitPosition}/{input.Length}");
+                            Debug.WriteLine($"What the actual fuck: {exitPosition}/{input.Length}");
                         }
                     }
                 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 using Shockky.IO;
 
@@ -8,20 +7,22 @@ namespace Shockky.Shockwave.Chunks
     public class ScriptContextChunk : ChunkItem
     {
         public List<ScriptContextSection> Sections { get; }
+
         public List<string> HandlerNames { get; set; }
 
+        public short SectionSize { get; set; }
         public int NameTableSectionIndex { get; set; }
 
         public ScriptContextChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            int unk0 = input.ReadBigEndian<int>();
-            int unk1 = input.ReadBigEndian<int>();
+            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadBigEndian<int>());
             int entryCount = input.ReadBigEndian<int>();
-            int entryCount2 = input.ReadBigEndian<int>();
+            Remnants.Enqueue(input.ReadBigEndian<int>()); //entryCount2
             
             short entryOffset = input.ReadBigEndian<short>();
-            short entrySize = input.ReadBigEndian<short>(); //CONST 12 i guess
+            SectionSize = input.ReadBigEndian<short>();
 
             int unk3 = input.ReadBigEndian<int>(); //0
 
@@ -33,11 +34,7 @@ namespace Shockky.Shockwave.Chunks
             byte[] flags = input.ReadBytes(2);
             short freePointer = input.ReadBigEndian<short>();
 
-            var handlerNameList = new List<short>();
-            for (int i = 0; i < entryCount; i++)
-            {
-                handlerNameList.Add(input.ReadBigEndian<short>());
-            }
+            input.Position = Header.Offset + entryOffset;
 
             Sections = new List<ScriptContextSection>(entryCount);
             for (int i = 0; i < entryCount; i++)
@@ -67,7 +64,7 @@ namespace Shockky.Shockwave.Chunks
             size += sizeof(short);
             size += 2;
             size += sizeof(short);
-            size += Sections.Sum(s => s.GetBodySize());
+            size += Sections.Count * SectionSize;
             return size;
         }
     }
