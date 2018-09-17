@@ -7,6 +7,20 @@ namespace Shockky.Shockwave.Chunks
     [DebuggerDisplay("{Name} | {Length}")]
     public class ChunkHeader : ShockwaveItem
     {
+        public bool IsGarbage //TODO: We need to handle these accordingly too, later tho
+        {
+            get
+            {
+                switch (Kind)
+                {
+                    case ChunkKind.free:
+                    case ChunkKind.junk:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
         public bool IsVariableLength
         {
             get

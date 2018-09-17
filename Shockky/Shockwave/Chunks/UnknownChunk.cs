@@ -6,6 +6,9 @@ namespace Shockky.Shockwave.Chunks
     {
         public byte[] Data { get; set; }
 
+        public UnknownChunk(ChunkHeader header)
+            : base(header)
+        { }
         public UnknownChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

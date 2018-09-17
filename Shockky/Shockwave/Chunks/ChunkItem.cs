@@ -38,6 +38,10 @@ namespace Shockky.Shockwave.Chunks
 
         public abstract void WriteBodyTo(ShockwaveWriter output);
 
+        public static ChunkItem Read(ShockwaveReader input)
+        {
+            return ChunkItem.Read(input, new ChunkHeader(input));
+        }
         public static ChunkItem Read(ShockwaveReader input, ChunkHeader header)
         {
             switch (header.Kind)
