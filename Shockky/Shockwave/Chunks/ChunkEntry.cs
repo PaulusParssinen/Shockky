@@ -7,8 +7,6 @@ namespace Shockky.Shockwave.Chunks
     [DebuggerDisplay("{Header.Name} | Length: {Header.Length} | Offset: {Offset}")]
     public class ChunkEntry : ShockwaveItem
     {
-        public int Id { get; set; }
-
         public ChunkHeader Header { get; set; }
 
         public int Offset { get; set; }
@@ -23,7 +21,7 @@ namespace Shockky.Shockwave.Chunks
         public ChunkEntry(ShockwaveReader input, int id)
             : this(new ChunkHeader(input))
         {
-            Id = id;
+            Header.Id = id;
 
             Offset = input.ReadInt32();
             Padding = input.ReadInt16();

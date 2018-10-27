@@ -28,6 +28,7 @@ namespace Shockky.Shockwave.Chunks
 
             Header = new ChunkHeader(input.ReadReversedString(4))
             {
+                Id = Id,
                 Length = DecompressedLength
             };
         }
@@ -39,8 +40,13 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            //TODO TODO TODO
-            throw new NotSupportedException();
+            output.Write7BitEncodedInt(Id);
+            output.Write7BitEncodedInt(Offset);
+            output.Write7BitEncodedInt(CompressedLength);
+            output.Write7BitEncodedInt(DecompressedLength);
+            output.Write7BitEncodedInt((int)CompressionType);
+
+            output.WriteReversedString(Header.Name);
         }
     }
 }
