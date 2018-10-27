@@ -13,7 +13,7 @@ namespace Shockky.Shockwave.Lingo.Bytecode
         public virtual int Value { protected get; set; }
 
         protected LingoHandler Handler { get; }
-        protected LingoValuePool Pool => Handler.GetScript().Pool;
+        protected LingoValuePool Pool => Handler.Script.Pool;
 
         protected Instruction(OPCode op)
         {
