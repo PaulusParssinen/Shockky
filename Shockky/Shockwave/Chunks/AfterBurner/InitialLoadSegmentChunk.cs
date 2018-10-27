@@ -22,6 +22,8 @@ namespace Shockky.Shockwave.Chunks
 
             for(int i = 0; i < ilsChunkCount; i++)
             {
+                if (_input.Position >= Header.Length) break;
+
                 int id = _input.Read7BitEncodedInt();
 
                 var entry = entries.FirstOrDefault(e => e.Id == id);
