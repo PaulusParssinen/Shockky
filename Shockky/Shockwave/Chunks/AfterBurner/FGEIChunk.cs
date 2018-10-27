@@ -29,12 +29,13 @@ namespace Shockky.Shockwave.Chunks
             foreach (var entry in entries)
             {
                 if (entry.Offset < 1) continue;
-                if (!entry.IsCompressed) throw new NotImplementedException("Gotta find an example movie which has this shit");
 
                 _input.Position = Header.Offset + entry.Offset;
-                var decompressedInput = _input.WrapDecompressor(entry.CompressedLength);
 
-                yield return Read(decompressedInput, entry.Header);
+                var chunkInput = (entry.IsCompressed ?
+                    _input.WrapDecompressor(entry.CompressedLength) : _input);
+
+                yield return Read(chunkInput, entry.Header);
             }
         }
 
