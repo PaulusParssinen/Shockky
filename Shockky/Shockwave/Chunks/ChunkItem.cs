@@ -38,10 +38,6 @@ namespace Shockky.Shockwave.Chunks
 
         public abstract void WriteBodyTo(ShockwaveWriter output);
 
-        public static ChunkItem Read(ShockwaveReader input)
-        {
-            return ChunkItem.Read(input, new ChunkHeader(input));
-        }
         public static ChunkItem Read(ShockwaveReader input, ChunkHeader header)
         {
             switch (header.Kind)
@@ -56,7 +52,7 @@ namespace Shockky.Shockwave.Chunks
                     return new FGEIChunk(input, header);
                 case ChunkKind.ILS:
                     return new InitialLoadSegmentChunk(input, header);
-
+                    
                 case ChunkKind.RIFX:
                     return new FileMetadataChunk(input, header);
                 case ChunkKind.imap:

@@ -17,10 +17,11 @@ namespace Shockky.Shockwave.Chunks
         public AssociationTableChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            EntrySize = input.ReadInt16(); //entry size, constant i think
+            EntrySize = input.ReadInt16();
             Remnants.Enqueue(input.ReadInt16());
             TotalCount = input.ReadInt32();
             AssignedCount = input.ReadInt32();
+
             CastEntries = new List<CastEntry>(TotalCount);
             for (int i = 0; i < CastEntries.Capacity; i++)
             {
@@ -35,7 +36,7 @@ namespace Shockky.Shockwave.Chunks
             output.Write(EntrySize);
             output.Write((short)Remnants.Dequeue());
             output.Write(TotalCount);
-            output.Write(CastEntries.Count); //TODO: nil check
+            output.Write(CastEntries?.Count ?? 0);
             foreach (var entry in CastEntries)
             {
                 output.Write(entry);

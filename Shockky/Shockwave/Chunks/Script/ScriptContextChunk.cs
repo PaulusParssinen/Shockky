@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 
 using Shockky.IO;
 
@@ -8,9 +9,7 @@ namespace Shockky.Shockwave.Chunks
     {
         public List<ScriptContextSection> Sections { get; }
 
-        public List<string> HandlerNames { get; set; }
-
-        public short SectionSize { get; set; }
+        public short SectionSize { get; }
         public int NameTableSectionIndex { get; set; }
 
         public ScriptContextChunk(ShockwaveReader input, ChunkHeader header)
@@ -24,10 +23,11 @@ namespace Shockky.Shockwave.Chunks
             short entryOffset = input.ReadBigEndian<short>();
             SectionSize = input.ReadBigEndian<short>();
 
-            int unk3 = input.ReadBigEndian<int>(); //0
+            Remnants.Enqueue(input.ReadBigEndian<int>()); //0
 
             int fileType = input.ReadBigEndian<int>(); // TODO: Enum in future
-            int unk5 = input.ReadBigEndian<int>();
+            Remnants.Enqueue(input.ReadBigEndian<int>());
+
             NameTableSectionIndex = input.ReadBigEndian<int>();
 
             short validCount = input.ReadBigEndian<short>();
@@ -45,7 +45,12 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.WriteBigEndian(Sections.Count);
+            output.WriteBigEndian((int)Remnants.Dequeue());
+
         }
 
         public override int GetBodySize()

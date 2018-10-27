@@ -9,9 +9,12 @@ namespace Shockky.Shockwave.Chunks
         public PaletteChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            //while(input.IsDataAvailable) test dis | TODO:
-
-            var paletteCount = Math.Round((decimal)header.Length / 6);
+            for(int i = 0; i < (header.Length / 6); i++)
+            {
+                int r = input.ReadInt16();
+                int g = input.ReadInt16();
+                int b = input.ReadInt16();
+            }
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)

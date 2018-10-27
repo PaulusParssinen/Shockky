@@ -4,23 +4,9 @@ using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
-    [DebuggerDisplay("{Name} | {Length}")]
+    [DebuggerDisplay("{Name}")]
     public class ChunkHeader : ShockwaveItem
     {
-        public bool IsGarbage //TODO: We need to handle these accordingly too, later tho
-        {
-            get
-            {
-                switch (Kind)
-                {
-                    case ChunkKind.free:
-                    case ChunkKind.junk:
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-        }
         public bool IsVariableLength
         {
             get
@@ -37,6 +23,8 @@ namespace Shockky.Shockwave.Chunks
                 }
             }
         }
+
+        public int Id { get; set; }
 
         public string Name { get; set; }
         public ChunkKind Kind { get; set; }
@@ -71,7 +59,7 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.Write(Name); //fourcc so reverse TODO:
+            output.WriteReversedString(Name);
             output.Write(Length);
         }
     }

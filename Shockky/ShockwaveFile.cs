@@ -40,15 +40,16 @@ namespace Shockky
 
         public void Disassemble(Action<ChunkItem> callback = null)
         {
-            if (Metadata.Codec == CodecKind.FGDM)
+            if (Metadata.Codec == CodecKind.FGDM ||
+                Metadata.Codec == CodecKind.FGDC)
             {
-                if (ChunkItem.Read(_input) is FileVersionChunk version)
+                if (ReadChunk() is FileVersionChunk version)
                 {
-                    if (ChunkItem.Read(_input) is FileCompressionTypesChunk fcdr)
+                    if (ReadChunk() is FileCompressionTypesChunk fcdr)
                     {
-                        if (ChunkItem.Read(_input) is AfterburnerMapChunk afterburnerMap)
+                        if (ReadChunk() is AfterburnerMapChunk afterburnerMap)
                         {
-                            if (ChunkItem.Read(_input) is FGEIChunk fgei)
+                            if (ReadChunk() is FGEIChunk fgei)
                             {
                                 Chunks = new List<ChunkItem>(afterburnerMap.Entries.Count);
 
@@ -61,8 +62,6 @@ namespace Shockky
                                     }
                                 }
 
-                                Debug.Assert(afterburnerMap.Entries[0].Header.Kind == ChunkKind.ILS, "HM");
-
                                 var ilsChunk = fgei.ReadInitialLoadSegment(afterburnerMap.Entries[0]);
 
                                 HandleChunks(fgei.ReadChunks(afterburnerMap.Entries));
@@ -74,7 +73,7 @@ namespace Shockky
             }
             else if (Metadata.Codec == CodecKind.MV93)
             {
-                var imapChunk = ChunkItem.Read(_input) as IndexMapChunk;
+                var imapChunk = ReadChunk() as IndexMapChunk;
 
                 if (imapChunk == null)
                     throw new InvalidCastException("I did not see this coming..");
@@ -82,18 +81,18 @@ namespace Shockky
                 foreach (int offset in imapChunk.MemoryMapOffsets)
                 {
                     _input.Position = offset;
-                    if (ChunkItem.Read(_input) is MemoryMapChunk mmapChunk)
+                    if (ReadChunk() is MemoryMapChunk mmapChunk)
                     {
                         foreach (var entry in mmapChunk.Entries)
                         {
-                            if (entry.Header.IsGarbage)
+                            if (entry.Header.Kind == ChunkKind.free ||
+                                entry.Header.Kind == ChunkKind.junk)
                             {
-                                Chunks.Add(new UnknownChunk(entry.Header));
+                                Chunks.Add(new UnknownChunk(_input, entry.Header)); //TODO: eww
                                 continue;
                             }
-
                             _input.Position = entry.Offset;
-                            var chunk = ChunkItem.Read(_input);
+                            var chunk = ReadChunk();
 
                             callback?.Invoke(chunk);
                             Chunks.Add(chunk);
@@ -102,6 +101,11 @@ namespace Shockky
                     else throw new Exception("what");
                 }
             }
+        }
+
+        private ChunkItem ReadChunk()
+        {
+            return ChunkItem.Read(_input, new ChunkHeader(_input));
         }
 
         public void Assemble()

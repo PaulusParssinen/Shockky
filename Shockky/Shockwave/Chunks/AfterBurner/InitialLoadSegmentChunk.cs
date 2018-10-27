@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System;
+
 using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
@@ -17,13 +18,16 @@ namespace Shockky.Shockwave.Chunks
         
         public IEnumerable<ChunkItem> ReadChunks(List<AfterBurnerMapEntry> entries)
         {
-            for(int i = 0; i < entries.Count; i++)
+            int ilsChunkCount = entries.Count(e => e.Offset == -1);
+
+            for(int i = 0; i < ilsChunkCount; i++)
             {
                 int id = _input.Read7BitEncodedInt();
 
                 var entry = entries.FirstOrDefault(e => e.Id == id);
-                if (entry == null || entry.Offset != -1) break; //That's enough I guess
-                
+                if (entry == null) break; //TODO:
+
+                entry.Header.Offset = _input.Position;
                 yield return Read(_input, entry.Header);
             }
         }
