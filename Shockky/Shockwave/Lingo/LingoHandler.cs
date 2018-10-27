@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 using Shockky.IO;
 using Shockky.Shockwave.Chunks;
@@ -9,7 +8,16 @@ namespace Shockky.Shockwave.Lingo
     public class LingoHandler : LingoItem
     {
         protected override string DebuggerDisplay => $"on {Name}";
-        
+
+        private int _codeLength,
+                    _codeOffset;
+        private int _argumentsLength,
+                    _argumentsOffset;
+        private int _localsLength,
+                    _localsOffset;
+        private int _lineLength,
+                    _lineOffset;
+
         //TODO: Do I really need to wrap them like dis
         public List<short> Arguments { get; }
         public List<short> Locals { get; }
@@ -18,14 +26,11 @@ namespace Shockky.Shockwave.Lingo
         public string Name => Script.Pool.GetName(NameIndex);
 
         public int HandlerVectorPosition { get; }
-
-        public int LineCount { get; }
-        public int LineOffset { get; }
         
         public LingoHandlerBody Body { get; }
 
-        public LingoHandler(ScriptChunk scriptChunk)
-            : base(scriptChunk)
+        public LingoHandler(ScriptChunk script)
+            : base(script)
         {
             Arguments = new List<short>();
             Locals = new List<short>();
@@ -36,45 +41,36 @@ namespace Shockky.Shockwave.Lingo
         {
             NameIndex = input.ReadBigEndian<short>();
             HandlerVectorPosition = input.ReadBigEndian<short>();
+            
+            _codeLength = input.ReadBigEndian<int>();
+            _codeOffset = input.ReadBigEndian<int>();
+
+            _argumentsLength = input.ReadBigEndian<short>();
+            _argumentsOffset = input.ReadBigEndian<int>();
+
+            _localsLength = input.ReadBigEndian<short>();
+            _localsOffset = input.ReadBigEndian<int>();
+            
+            short unk1Length = input.ReadBigEndian<short>();
+            int unk1Offset = input.ReadBigEndian<int>();
+            
+            int unk2Length = input.ReadBigEndian<int>();
+            int unk2Offset = input.ReadBigEndian<short>();
+
+            _lineLength = input.ReadBigEndian<short>();
+            _lineOffset = input.ReadBigEndian<int>();
 
             Body = new LingoHandlerBody(this, input);
-
-            short argumentsLength = input.ReadBigEndian<short>();
-            int argumentsOffset = input.ReadBigEndian<int>();
-
-            short localsLength = input.ReadBigEndian<short>();
-            int localsOffset = input.ReadBigEndian<int>();
-
-            Populate(argumentsLength, argumentsOffset, input, Arguments, input.ReadBigEndian<short>);
-            Populate(localsLength, localsOffset, input, Locals, input.ReadBigEndian<short>);
-
-            input.ReadBigEndian<short>(); //unk1Count
-            input.ReadBigEndian<int>(); //unk1Offset
-
-            input.ReadBigEndian<int>();
-            input.ReadBigEndian<short>();
-
-            LineCount = input.ReadBigEndian<short>();
-            LineOffset = input.ReadBigEndian<int>();
-
-            Body.StackHeight = input.ReadBigEndian<int>();
         }
 
-        public void Populate<T>(int length, int offset,
-            ShockwaveReader input,
-            List<T> list, Func<T> reader)
+        public void Populate(ShockwaveReader input, long scriptChunkOffset)
         {
-            long ogPos = input.Position;
-            input.Position = offset;
+            input.Position = scriptChunkOffset + _codeOffset;
+            Body.Code = input.ReadBytes(_codeLength);
 
-            list.Capacity = length;
-            for (int i = 0; i < list.Capacity; i++)
-            {
-                var value = reader();
-                list.Add(value);
-            }
-
-            input.Position = ogPos;
+            input.PopulateVList(_argumentsLength, scriptChunkOffset + _argumentsOffset, Arguments, input.ReadBigEndian<short>);
+            input.PopulateVList(_localsLength, scriptChunkOffset + _localsOffset, Locals, input.ReadBigEndian<short>);
+            input.PopulateVList(_lineLength, scriptChunkOffset + _lineOffset, new List<byte>(), input.ReadByte);
         }
 
         public override int GetBodySize()
@@ -82,7 +78,8 @@ namespace Shockky.Shockwave.Lingo
             int size = 0;
             size += sizeof(short);
             size += sizeof(short);
-            size += Body.GetBodySize();
+            size += sizeof(int);
+            size += sizeof(int);
             size += sizeof(short);
             size += sizeof(int);
             size += sizeof(short);
@@ -93,13 +90,13 @@ namespace Shockky.Shockwave.Lingo
             size += sizeof(short);
             size += sizeof(short);
             size += sizeof(int);
+
             size += sizeof(int);
             return size;
         }
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            throw new NotImplementedException();
             output.WriteBigEndian(NameIndex);
             output.WriteBigEndian((short)HandlerVectorPosition);
             Body.WriteTo(output);

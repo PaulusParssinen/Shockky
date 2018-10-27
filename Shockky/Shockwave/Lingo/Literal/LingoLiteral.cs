@@ -1,11 +1,10 @@
 ﻿using Shockky.IO;
-using Shockky.Shockwave.Chunks;
 
 namespace Shockky.Shockwave.Lingo
 {
     public class LingoLiteral : ShockwaveItem
     {
-        protected override string DebuggerDisplay => $"{Kind} | Value: {Value ?? "NULL"}";
+        protected override string DebuggerDisplay => $"Offset: {Offset} | Value: {Value ?? "NULL"}";
 
         public LiteralKind Kind { get; set; }
         public long Offset { get; set; }
@@ -17,13 +16,13 @@ namespace Shockky.Shockwave.Lingo
             Value = value;
         }
 
-        public LingoLiteral(ScriptChunk script, ShockwaveReader input)
+        public LingoLiteral(ShockwaveReader input)
         {
             Kind = (LiteralKind)input.ReadBigEndian<int>();
-            Offset = script.Header.Offset + input.ReadBigEndian<int>();
+            Offset = input.ReadBigEndian<int>();
         }
 
-        public void ReadValue(ShockwaveReader input, int dataOffset)
+        public void ReadValue(ShockwaveReader input, long dataOffset)
         {
             if (Kind != LiteralKind.Integer) 
             {
@@ -32,7 +31,7 @@ namespace Shockky.Shockwave.Lingo
                 int length = input.ReadBigEndian<int>();
 
                 if (Kind == LiteralKind.String)
-                    Value = input.ReadString(length - 1); //Might actually also be null byte delimeter str?
+                    Value = input.ReadString(length - 1);
                 else Value = input.ReadBigEndian<long>();
             }
             else Value = Offset;

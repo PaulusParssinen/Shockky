@@ -3,22 +3,11 @@ using System.Collections.Generic;
 
 using Shockky.IO;
 using Shockky.Shockwave.Chunks;
-using Shockky.Shockwave.Chunks.Script;
 
 namespace Shockky.Shockwave.Lingo
 {
-    //TODO: HMM static create method? :thonk:
     public class LingoValuePool : ShockwaveItem
     {
-        private readonly ShockwaveReader _input;
-
-        private readonly ScriptChunkEntry _handlerVectorsEntry;
-        private readonly ScriptChunkEntry _propertiesEntry;
-        private readonly ScriptChunkEntry _globalsEntry;
-        private readonly ScriptChunkEntry _handlersEntry;
-        private readonly ScriptChunkEntry _literalsEntry;
-        private readonly ScriptChunkEntry _literalDataEntry;
-
         private NameTableChunk _nameTableChunk;
         public NameTableChunk NameTableChunk
         {
@@ -58,32 +47,47 @@ namespace Shockky.Shockwave.Lingo
         public LingoValuePool(ScriptChunk script, ShockwaveReader input)
             : this(script)
         {
-            _input = input;
+            LingoHandler ReadHandler() => new LingoHandler(script, input);
+            LingoLiteral ReadLiteral() => new LingoLiteral(input);
 
-            _handlerVectorsEntry = new ScriptChunkEntry(ScriptEntryType.HandlerVectors, input);
-            _propertiesEntry = new ScriptChunkEntry(ScriptEntryType.Properties, input);
-            _globalsEntry = new ScriptChunkEntry(ScriptEntryType.Globals, input);
-            _handlersEntry = new ScriptChunkEntry(ScriptEntryType.Handlers, input);
-            _literalsEntry = new ScriptChunkEntry(ScriptEntryType.Literals, input);
-            _literalDataEntry = new ScriptChunkEntry(ScriptEntryType.LiteralsData, input);
+            short handlerVectorCount = input.ReadBigEndian<short>();
+            int handlerVectorOffset = input.ReadBigEndian<int>();
+            int handlerVectorFlags = input.ReadInt32();
 
-            Populate(_handlerVectorsEntry, HandlerVectors, input.ReadBigEndian<short>);
-            Populate(_propertiesEntry, Properties, input.ReadBigEndian<short>);
-            Populate(_globalsEntry, Globals, input.ReadBigEndian<short>);
-            Populate(_handlersEntry, Handlers, ReadHandler);
-            Populate(_literalsEntry, Literals, ReadLiteral);
+            short propertiesCount = input.ReadBigEndian<short>();
+            int propertiesOffset = input.ReadBigEndian<int>();
 
-            foreach (var literal in Literals)
-            { 
-                literal.ReadValue(input, _literalDataEntry.Offset);
+            short globalsCount = input.ReadBigEndian<short>();
+            int globalsOffset = input.ReadBigEndian<int>();
+
+            short handlersCount = input.ReadBigEndian<short>();
+            int handlersOffset = input.ReadBigEndian<int>();
+
+            short literalsCount = input.ReadBigEndian<short>();
+            int literalsOffset = input.ReadBigEndian<int>();
+
+            int literalsDataCount = input.ReadBigEndian<int>();
+            int literalsDataOffset = input.ReadBigEndian<int>();
+
+            input.PopulateVList(propertiesCount, script.Header.Offset + propertiesOffset, Properties, input.ReadBigEndian<short>);
+            input.PopulateVList(globalsCount, script.Header.Offset + globalsOffset, Globals, input.ReadBigEndian<short>);
+
+            input.PopulateVList(handlersCount, script.Header.Offset + handlersOffset, Handlers, ReadHandler);
+            foreach(var handler in Handlers)
+            {
+                handler.Populate(input, script.Header.Offset);
             }
+            
+            input.PopulateVList(literalsCount, script.Header.Offset + literalsOffset, Literals, ReadLiteral);
+            /*foreach (var literal in Literals)
+            { 
+                literal.ReadValue(input, script.Header.Offset + literalsDataOffset);
+            }*/
 
-            //TODO: reset input pos imo?
+            input.PopulateVList(handlerVectorCount, script.Header.Offset + handlerVectorOffset, HandlerVectors, input.ReadBigEndian<short>, 
+                forceLengthCheck: false);
         }
 
-        private LingoLiteral ReadLiteral() => new LingoLiteral(Script, _input);
-        private LingoHandler ReadHandler() => new LingoHandler(Script, _input);
-        
         public string GetName(int index)
         {
             return NameTableChunk?.Names[index] ?? throw new Exception("u wot");
@@ -136,42 +140,34 @@ namespace Shockky.Shockwave.Lingo
             return index;
         }
 
-        public void Populate<T>(ScriptChunkEntry entry, List<T> list, Func<T> reader)
-        {
-            long ogPos = _input.Position;
-            _input.Position = Script.Header.Offset + entry.Offset;
-
-            list.Capacity = entry.Length;
-            for (int i = 0; i < list.Capacity; i++)
-            {
-                var value = reader();
-                list.Add(value);
-            }
-
-            _input.Position = ogPos;
-        }
-
         public override int GetBodySize()
         {
             int size = 0;
-            size += _handlerVectorsEntry.GetBodySize();
-            size += _propertiesEntry.GetBodySize();
-            size += _globalsEntry.GetBodySize();
-            size += _handlersEntry.GetBodySize();
-            size += _literalsEntry.GetBodySize();
-            size += _literalDataEntry.GetBodySize();
+            size += sizeof(short);
+            size += sizeof(int);
+            size += sizeof(int);
+
+            size += sizeof(short);
+            size += sizeof(int);
+
+            size += sizeof(short);
+            size += sizeof(int);
+
+            size += sizeof(short);
+            size += sizeof(int);
+
+            size += sizeof(short);
+            size += sizeof(int);
+
+            size += sizeof(int);
+            size += sizeof(int);
             return size;
         }
 
         public override void WriteTo(ShockwaveWriter output)
         {
             throw new NotImplementedException();
-            output.Write(_handlerVectorsEntry);
-            output.Write(_propertiesEntry);
-            output.Write(_globalsEntry);
-            output.Write(_handlersEntry);
-            output.Write(_literalsEntry);
-            output.Write(_literalDataEntry);
+
         }
     }
 }
