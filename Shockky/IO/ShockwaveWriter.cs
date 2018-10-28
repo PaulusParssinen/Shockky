@@ -50,6 +50,12 @@ namespace Shockky.IO
             item.WriteTo(this);
         }
 
+        public void WriteNullString(string value)
+        {
+            Write(value.ToCharArray());
+            Write('\0');
+        }
+
         public void WriteReversedString(string value)
         {
             char[] chars = value.ToCharArray();

@@ -6,11 +6,26 @@ namespace Shockky.Shockwave.Chunks
 {
     public class FileCompressionTypesChunk : ChunkItem
     {
+        //TODO: Unreliable
+        public short CompressionTypeId { get; set; }
+        public int ImageQuality { get; set; }
+        public short ImageTypes { get; set; }
+        public short DirTypes { get; set; }
+        public int CompressionLevel { get; set; }
+        public int Speed { get; set; }
+        public string Name { get; set; }
+
         public FileCompressionTypesChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            //TODO:
-            var dataTest = input.ReadBytes((int)header.Length);
+            var decompressedInput = WrapDecompressor(input);
+            CompressionTypeId = decompressedInput.ReadBigEndian<short>();
+            ImageQuality = decompressedInput.ReadBigEndian<int>();
+            ImageTypes = decompressedInput.ReadBigEndian<short>();
+            DirTypes = decompressedInput.ReadBigEndian<short>();
+            CompressionLevel= decompressedInput.ReadBigEndian<int>();
+            Speed = decompressedInput.ReadBigEndian<int>();
+            Name = decompressedInput.ReadNullString();
         }
 
         public override int GetBodySize()
@@ -20,7 +35,13 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            throw new NotImplementedException();
+            output.WriteBigEndian(CompressionTypeId);
+            output.WriteBigEndian(ImageQuality);
+            output.WriteBigEndian(ImageTypes);
+            output.WriteBigEndian(DirTypes);
+            output.WriteBigEndian(CompressionLevel);
+            output.WriteBigEndian(Speed);
+            output.WriteNullString(Name);
         }
     }
 }

@@ -81,6 +81,17 @@ namespace Shockky.IO
             return (result >> 7);
         }
 
+        public string ReadNullString()
+        {
+            char currentChar = '\0';
+            string value = string.Empty;
+            while ((currentChar = ReadChar()) != '\0')
+            {
+                value += currentChar;
+            }
+            return value;
+        }
+
         public string ReadString(int length)
             => new string(ReadChars(length));
 
