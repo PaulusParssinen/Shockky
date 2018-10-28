@@ -107,6 +107,12 @@ namespace Shockky.IO
             _position += read;
             return read;
         }
+        public override int Read(Span<char> buffer)
+        {
+            int read = base.Read(buffer);
+            _position += read;
+            return read;
+        }
         public override int Read(byte[] buffer, int index, int count)
         {
             int read = base.Read(buffer, index, count);

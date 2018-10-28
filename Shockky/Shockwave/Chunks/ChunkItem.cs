@@ -59,18 +59,25 @@ namespace Shockky.Shockwave.Chunks
                     return new IndexMapChunk(input, header);
                 case ChunkKind.mmap:
                     return new MemoryMapChunk(input, header);
-                case ChunkKind.DRCF:
-                    return new DRCFChunk(input, header);
-                case ChunkKind.VWFI:
-                    return new FileInfoChunk(input, header);
                 case ChunkKind.KEYStar:
                     return new AssociationTableChunk(input, header);
+                case ChunkKind.DRCF:
+                    return new DRCFChunk(input, header);
+
+                //case ChunkKind.VWSC:
+                //    return new VWScoreChunk(input, header);
+                case ChunkKind.VWLB:
+                    return new WVLabelChunk(input, header);
+                case ChunkKind.VWFI:
+                    return new FileInfoChunk(input, header);
+
                 case ChunkKind.LctX:
                     return new ScriptContextChunk(input, header);
                 case ChunkKind.Lscr:
                     return new ScriptChunk(input, header);
                 case ChunkKind.Lnam:
                     return new NameTableChunk(input, header);
+
                 case ChunkKind.CASStar:
                     return new CastAssociationTableChunk(input, header);
                 //case ChunkKind.CASt:
