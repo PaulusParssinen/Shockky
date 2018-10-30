@@ -6,11 +6,11 @@ using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
-    public class DRCFChunk : ChunkItem
+    public class ConfigChunk : ChunkItem
     {
         public string VersionHex { get; set; }
         
-        public DRCFChunk(ShockwaveReader input, ChunkHeader header)
+        public ConfigChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
             Debug.Assert(header.Length == 100, "HMMMM");

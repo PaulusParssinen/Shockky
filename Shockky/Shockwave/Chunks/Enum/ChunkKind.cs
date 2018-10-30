@@ -52,6 +52,7 @@
         ediM,
 
         SCVW,
+        VWCF,
         VWFI,
         VWSC,
         VWLB,

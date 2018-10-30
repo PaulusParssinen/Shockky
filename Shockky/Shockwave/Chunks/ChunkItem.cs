@@ -61,8 +61,10 @@ namespace Shockky.Shockwave.Chunks
                     return new MemoryMapChunk(input, header);
                 case ChunkKind.KEYStar:
                     return new AssociationTableChunk(input, header);
+
+                case ChunkKind.VWCF:
                 case ChunkKind.DRCF:
-                    return new DRCFChunk(input, header);
+                    return new ConfigChunk(input, header);
 
                 //case ChunkKind.VWSC:
                 //    return new VWScoreChunk(input, header);
@@ -80,8 +82,11 @@ namespace Shockky.Shockwave.Chunks
 
                 case ChunkKind.CASStar:
                     return new CastAssociationTableChunk(input, header);
-                //case ChunkKind.CASt:
-                //return new CastMemberPropetiesChunk(input, header);
+                case ChunkKind.CASt:
+                    return new CastMemberPropetiesChunk(input, header);
+
+                //case ChunkKind.SCRF:
+                //    return new ScoreReferenceChunk(input, header);
                 case ChunkKind.Sord:
                     return new SortOrderChunk(input, header);
                 case ChunkKind.CLUT:
