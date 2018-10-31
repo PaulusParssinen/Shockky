@@ -56,7 +56,7 @@ namespace Shockky.Shockwave.Chunks
                 case ChunkKind.RIFX:
                     return new FileMetadataChunk(input, header);
                 case ChunkKind.imap:
-                    return new IndexMapChunk(input, header);
+                    return new InitialMapChunk(input, header);
                 case ChunkKind.mmap:
                     return new MemoryMapChunk(input, header);
                 case ChunkKind.KEYStar:
@@ -99,6 +99,12 @@ namespace Shockky.Shockwave.Chunks
                     return new FontMapChunk(input, header);
                 //case ChunkKind.XTRl:
                 //    return new RequiredComponentLinkageChunk(input, header);
+
+                //case ChunkKind.PUBL:
+                //    return new PublishSettingsChunk(input, header);
+                //case ChunkKind.GRID:
+                //    return new GridChunk(input, header);
+
                 default:
                     Debug.WriteLine("Unknown section | " + header.Name);
                     return new UnknownChunk(input, header);

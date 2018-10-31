@@ -8,7 +8,7 @@ namespace Shockky.Shockwave.Chunks
 {
     public class ConfigChunk : ChunkItem
     {
-        public string VersionHex { get; set; }
+        public DirectorVersion Version { get; set; }
         
         public ConfigChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
@@ -16,10 +16,9 @@ namespace Shockky.Shockwave.Chunks
             Debug.Assert(header.Length == 100, "HMMMM");
 
             short length = input.ReadBigEndian<short>();
-            ushort version = input.ReadBigEndian<ushort>();
-            VersionHex = version.ToString("X");
+            Version = (DirectorVersion)input.ReadBigEndian<ushort>();
 
-            var rect = input.ReadRect(true);
+            var rect = input.ReadRect();
 
             short minMember = input.ReadBigEndian<short>(); //and max are Obsolete -Docs
             short maxMember = input.ReadBigEndian<short>();

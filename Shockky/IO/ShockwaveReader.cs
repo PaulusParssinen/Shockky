@@ -102,13 +102,13 @@ namespace Shockky.IO
 
             return new string(characters);
         }
-        public Rectangle ReadRect(bool bigEndian)
+        public Rectangle ReadRect()
         {
-            short x1 = ReadBigEndian<short>();
-            short x2 = ReadBigEndian<short>();
-            short y1 = ReadBigEndian<short>();
-            short y2 = ReadBigEndian<short>();
-            return new Rectangle(x1, y1, x2/* - x1*/, y2/* - y1*/); //TODO
+            short top = ReadBigEndian<short>();
+            short left = ReadBigEndian<short>();
+            short bottom = ReadBigEndian<short>();
+            short right = ReadBigEndian<short>();
+            return new Rectangle(left, top, right - left, bottom - top);
         }
 
         #region Manual position tracking

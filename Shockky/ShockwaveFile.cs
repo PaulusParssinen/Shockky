@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Diagnostics;
 using System.Collections.Generic;
 
 using Shockky.IO;
@@ -73,7 +72,7 @@ namespace Shockky
             }
             else if (Metadata.Codec == CodecKind.MV93)
             {
-                var imapChunk = ReadChunk() as IndexMapChunk;
+                var imapChunk = ReadChunk() as InitialMapChunk;
 
                 if (imapChunk == null)
                     throw new InvalidCastException("I did not see this coming..");
