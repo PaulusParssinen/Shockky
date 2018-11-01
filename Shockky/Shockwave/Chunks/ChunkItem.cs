@@ -85,6 +85,9 @@ namespace Shockky.Shockwave.Chunks
                 case ChunkKind.CASt:
                     return new CastMemberPropetiesChunk(input, header);
 
+
+                //case ChunkKind.Cinf:
+                //    return new CastInfoChunk(input, header);
                 //case ChunkKind.SCRF:
                 //    return new ScoreReferenceChunk(input, header);
                 case ChunkKind.Sord:
@@ -93,8 +96,8 @@ namespace Shockky.Shockwave.Chunks
                     return new PaletteChunk(input, header);
                 case ChunkKind.MCsL:
                     return new MovieCastListChunk(input, header);
-                //case ChunkKind.STXT:
-                //    return new StyledTextChunk(input, header);
+                case ChunkKind.STXT:
+                    return new StyledTextChunk(input, header);
                 case ChunkKind.FXmp:
                     return new FontMapChunk(input, header);
                 //case ChunkKind.XTRl:

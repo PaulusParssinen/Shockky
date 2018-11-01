@@ -1,4 +1,6 @@
-﻿using Shockky.IO;
+﻿using System.Text;
+
+using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
@@ -9,11 +11,11 @@ namespace Shockky.Shockwave.Chunks
         public StyledTextChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            int headerLength = input.ReadBigEndian<int>();
+            Remnants.Enqueue(input.ReadBigEndian<int>());
             int textLength = input.ReadBigEndian<int>();
-            int footerLength = input.ReadBigEndian<int>();
+            Remnants.Enqueue(input.ReadBigEndian<int>());
 
-            Text = input.ReadString(textLength);
+            Text = Encoding.UTF8.GetString(input.ReadBytes(textLength)); //TODO:
 
             short formattingCount = input.ReadBigEndian<short>();
             for (int i = 0; i < formattingCount; i++)
