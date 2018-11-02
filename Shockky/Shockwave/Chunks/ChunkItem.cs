@@ -100,8 +100,8 @@ namespace Shockky.Shockwave.Chunks
                     return new StyledTextChunk(input, header);
                 case ChunkKind.FXmp:
                     return new FontMapChunk(input, header);
-                //case ChunkKind.XTRl:
-                //    return new RequiredComponentLinkageChunk(input, header);
+                case ChunkKind.XTRl:
+                    return new XtraListChunk(input, header);
 
                 //case ChunkKind.PUBL:
                 //    return new PublishSettingsChunk(input, header);
