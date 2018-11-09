@@ -1,6 +1,4 @@
-﻿using System;
-
-using Shockky.IO;
+﻿using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks.Cast
 {
@@ -10,7 +8,7 @@ namespace Shockky.Shockwave.Chunks.Cast
         public int Slot { get; set; }
 
         public string Name { get; set; }
-        public ChunkKind Kind { get; set; }
+        public ChunkKind Kind => Name.ToChunkKind();
 
         public CastEntry(ShockwaveReader input)
         {
@@ -18,7 +16,6 @@ namespace Shockky.Shockwave.Chunks.Cast
             Slot = input.ReadInt32();
 
 	        Name = input.ReadReversedString(4);
-            Kind = Name.ToChunkKind();
         }
 
         public override int GetBodySize()

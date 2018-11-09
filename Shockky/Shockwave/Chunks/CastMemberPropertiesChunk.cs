@@ -2,27 +2,42 @@
 using System.Drawing;
 
 using Shockky.IO;
+using Shockky.Shockwave.Chunks.Cast;
 
 namespace Shockky.Shockwave.Chunks
 {
-    public class CastMemberPropetiesChunk : ChunkItem
+    public class CastMemberPropertiesChunk : ChunkItem
     {
         public CastType Type { get; set; }
 
-        public CastMemberPropetiesChunk(ShockwaveReader input, ChunkHeader header)
+        public CommonMemberProperties Common { get; set; }
+
+        public CastMemberPropertiesChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
             Type = (CastType)input.ReadBigEndian<int>();
             int commonCastDataLength = input.ReadBigEndian<int>();
             int dataLength = input.ReadBigEndian<int>();
-            
-            byte[] commonCastData = input.ReadBytes(commonCastDataLength); //TODO:
+
+            long commonDataStart = input.Position;
+
+            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadBigEndian<int>());
+
+            Common = new CommonMemberProperties(input);
+
+            ushort fileSizeWhatTheF;
+            byte bitmapFlags;
+            byte depth;
 
             switch (Type)
             {
                 case CastType.OLE:
                 case CastType.Bitmap:
-                    ushort fileSizeWhatTheF = input.ReadBigEndian<ushort>();
+                    fileSizeWhatTheF = input.ReadBigEndian<ushort>(); //4 if depth not intact
                     Rectangle bitmpaRect = input.ReadRect();
                     byte alphaThreshold = input.ReadByte();
                     //OLE?
@@ -30,8 +45,18 @@ namespace Shockky.Shockwave.Chunks
                     short x1 = input.ReadBigEndian<short>();
                     short y1 = input.ReadBigEndian<short>();
 
-                    byte bitmapFlags = input.ReadByte();
-                    byte depth = input.ReadByte();
+                    bitmapFlags = input.ReadByte();
+
+                    //Rest of this depends on fileSizeWhatTheF?
+                    bool IsDataAvailable() => (Header.Offset + Header.Length > input.Position);
+
+                    if (!IsDataAvailable()) break;
+
+                    depth = input.ReadByte();
+
+                    if (!IsDataAvailable()) break;
+
+                    int palette = input.ReadBigEndian<int>(); //??
                     break;
                 case CastType.Shape:
                     short shapeType = input.ReadBigEndian<short>();
@@ -86,6 +111,9 @@ namespace Shockky.Shockwave.Chunks
                     Remnants.Enqueue(input.ReadBytes(dataLength));
                     break;
             }
+
+            long dataLeft = Header.Offset + Header.Length - input.Position;
+            byte[] restOfData = input.ReadBytes((int)dataLeft);
         }
 
         public override int GetBodySize()
