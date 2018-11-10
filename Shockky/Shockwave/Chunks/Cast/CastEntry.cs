@@ -4,16 +4,16 @@ namespace Shockky.Shockwave.Chunks.Cast
 {
     public class CastEntry : ShockwaveItem
     {
-        public int FileSlot { get; set; }
-        public int Slot { get; set; }
+        public int Id { get; set; }
+        public int OwnerId { get; set; }
 
         public string Name { get; set; }
         public ChunkKind Kind => Name.ToChunkKind();
 
         public CastEntry(ShockwaveReader input)
         {
-            FileSlot = input.ReadInt32();
-            Slot = input.ReadInt32();
+            Id = input.ReadInt32();
+            OwnerId = input.ReadInt32();
 
 	        Name = input.ReadReversedString(4);
         }
@@ -29,8 +29,8 @@ namespace Shockky.Shockwave.Chunks.Cast
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.Write(FileSlot);
-            output.Write(Slot);
+            output.Write(Id);
+            output.Write(OwnerId);
             output.WriteReversedString(Name);
         }
     }
