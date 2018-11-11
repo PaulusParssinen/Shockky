@@ -83,5 +83,10 @@ namespace Shockky.IO
 
             BaseStream.Write(data);
         }
+
+        public new void Write7BitEncodedInt(int value)
+        {
+            base.Write7BitEncodedInt(value); //TODO: THIS IS WRONG VAR-INT WRITING METHOD
+        }
     }
 }
