@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.IO.Compression;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Shockky.IO
 {
@@ -29,9 +29,7 @@ namespace Shockky.IO
                     throw new NotSupportedException("Don't look back");
 
                 byte[] buffer = new byte[count];
-                int read = Read(buffer);
-
-                _position += read;
+                _position += Read(buffer);
             }
         }
         public long Length => BaseStream.Length;
@@ -52,7 +50,7 @@ namespace Shockky.IO
         public ShockwaveReader(Stream input, Encoding encoding, bool leaveOpen)
             : base(input, encoding, leaveOpen)
         { }
-
+        
         public T ReadBigEndian<T>()
             where T : struct
         {
@@ -102,6 +100,7 @@ namespace Shockky.IO
 
             return new string(characters);
         }
+
         public Rectangle ReadRect()
         {
             short top = ReadBigEndian<short>();

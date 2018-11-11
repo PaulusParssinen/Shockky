@@ -4,6 +4,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 
 using Shockky.Shockwave;
+using System.Drawing;
 
 namespace Shockky.IO
 {
@@ -63,6 +64,14 @@ namespace Shockky.IO
             Write(chars);
         }
 
+        public void Write(Rectangle rect)
+        {
+            WriteBigEndian((short)rect.Top);
+            WriteBigEndian((short)rect.Left);
+            WriteBigEndian((short)rect.Bottom);
+            WriteBigEndian((short)rect.Right);
+        }
+
         public void WriteBigEndian<T>(T value)
             where T : struct
         {
@@ -73,11 +82,6 @@ namespace Shockky.IO
             data.Reverse();
 
             BaseStream.Write(data);
-        }
-
-        public new void Write7BitEncodedInt(int value)
-        {
-            base.Write7BitEncodedInt(value);
         }
     }
 }
