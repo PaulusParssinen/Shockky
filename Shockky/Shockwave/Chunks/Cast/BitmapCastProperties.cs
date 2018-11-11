@@ -15,7 +15,7 @@ namespace Shockky.Shockwave.Chunks.Cast
         public Point RegistrationPoint { get; set; }
 
         public BitmapCastFlags Flags { get; set; }
-        public byte BitDepth { get; set; }
+        public byte BitDepth { get; set; } = 1;
         public int Palette { get; set; }
 
         public BitmapCastProperties(CastMemberPropertiesChunk chunk, ShockwaveReader input)
