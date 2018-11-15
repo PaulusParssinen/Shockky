@@ -10,7 +10,7 @@ namespace Shockky.Shockwave.Chunks
         public ChunkHeader Header { get; set; }
 
         public int Offset { get; set; }
-        public short Padding { get; set; }
+        public ChunkEntryFlags Flags { get; set; }
         public short Unknown { get; set; }
         public int Link { get; set; }
 
@@ -24,7 +24,7 @@ namespace Shockky.Shockwave.Chunks
             Header.Id = id;
 
             Offset = input.ReadInt32();
-            Padding = input.ReadInt16();
+            Flags = (ChunkEntryFlags)input.ReadInt16();
             Unknown = input.ReadInt16();
             Link = input.ReadInt32();
         }
@@ -45,7 +45,7 @@ namespace Shockky.Shockwave.Chunks
             Header.WriteTo(output);
 
             output.Write(Offset);
-            output.Write(Padding);
+            output.Write((short)Flags);
             output.Write(Unknown);
             output.Write(Link);
         }

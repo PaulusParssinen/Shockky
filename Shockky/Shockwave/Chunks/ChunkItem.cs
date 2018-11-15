@@ -111,6 +111,11 @@ namespace Shockky.Shockwave.Chunks
                 //case ChunkKind.GRID:
                 //    return new GridChunk(input, header);
 
+                case ChunkKind.snd:
+                    return new SoundDataChunk(input, header);
+                case ChunkKind.BITD:
+                    return new BitmapChunk(input, header);
+
                 default:
                     Debug.WriteLine("Unknown section | " + header.Name);
                     return new UnknownChunk(input, header);
