@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 
 using Shockky.IO;
@@ -10,16 +9,13 @@ namespace Shockky.Shockwave.Chunks
     {
         public List<string> Names { get; set; }
 
-        public int Length { get; set; }
-        public int Length2 { get; set; }
-
         public NameTableChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
             Remnants.Enqueue(input.ReadBigEndian<int>());
             Remnants.Enqueue(input.ReadBigEndian<int>());
-            Length = input.ReadBigEndian<int>();
-            Length2 = input.ReadBigEndian<int>();
+            input.ReadBigEndian<int>();
+            input.ReadBigEndian<int>();
 
             short nameOffset = input.ReadBigEndian<short>();
             
@@ -34,16 +30,22 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            throw new NotImplementedException();
-            output.Write((int)Remnants.Dequeue());
-            output.Write((int)Remnants.Dequeue());
-            output.Write(Length);
-            output.Write(Length2);
+            const short NAME_OFFSET = 20;
+            int namesLength = Names?.Sum(n => sizeof(byte) + n.Length) ?? 0;
+
+            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.WriteBigEndian(namesLength);
+            output.WriteBigEndian(namesLength);
+            output.WriteBigEndian(NAME_OFFSET);
+            output.WriteBigEndian(Names.Count);
+
+            foreach (string name in Names)
+                output.Write(name);
         }
 
         public override int GetBodySize()
         {
-            throw new NotImplementedException();
             int size = 0;
             size += sizeof(int);
             size += sizeof(int);
