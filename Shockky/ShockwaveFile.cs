@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 
 using Shockky.IO;
@@ -11,9 +12,13 @@ namespace Shockky
     {
         private readonly ShockwaveReader _input;
 
-        public List<ChunkItem> Chunks { get; set; }
+        public List<ChunkItem> Chunks { get; }
 
+        public DirectorVersion Version { get; set; }
         public FileMetadataChunk Metadata { get; set; }
+
+        public ChunkItem this[int id]
+            => Chunks?.FirstOrDefault(chunk => chunk.Header.Id == id);
 
         public ShockwaveFile()
         {
@@ -42,69 +47,54 @@ namespace Shockky
             if (Metadata.Codec == CodecKind.FGDM ||
                 Metadata.Codec == CodecKind.FGDC)
             {
-                if (ReadChunk() is FileVersionChunk version)
+                if (ChunkItem.Read(_input) is FileVersionChunk version &&
+                    ChunkItem.Read(_input) is FileCompressionTypesChunk fcdr &&
+                    ChunkItem.Read(_input) is AfterburnerMapChunk afterburnerMap &&
+                    ChunkItem.Read(_input) is FGEIChunk fgei)
                 {
-                    if (ReadChunk() is FileCompressionTypesChunk fcdr)
+                    void HandleChunks(IEnumerable<ChunkItem> chunks)
                     {
-                        if (ReadChunk() is AfterburnerMapChunk afterburnerMap)
+                        foreach (var chunk in chunks)
                         {
-                            if (ReadChunk() is FGEIChunk fgei)
-                            {
-                                Chunks = new List<ChunkItem>(afterburnerMap.Entries.Count);
-
-                                void HandleChunks(IEnumerable<ChunkItem> chunks)
-                                {
-                                    foreach (var chunk in chunks)
-                                    {
-                                        callback?.Invoke(chunk);
-                                        Chunks.Add(chunk);
-                                    }
-                                }
-
-                                var ilsChunk = fgei.ReadInitialLoadSegment(afterburnerMap.Entries[0]);
-
-                                HandleChunks(fgei.ReadChunks(afterburnerMap.Entries));
-                                HandleChunks(ilsChunk.ReadChunks(afterburnerMap.Entries));
-                            }
+                            callback?.Invoke(chunk);
+                            Chunks.Add(chunk);
                         }
                     }
+
+                    var ilsChunk = fgei.ReadInitialLoadSegment(afterburnerMap.Entries[0]);
+
+                    HandleChunks(fgei.ReadChunks(afterburnerMap.Entries));
+                    HandleChunks(ilsChunk.ReadChunks(afterburnerMap.Entries));
                 }
             }
             else if (Metadata.Codec == CodecKind.MV93)
             {
-                var imapChunk = ReadChunk() as InitialMapChunk;
-
-                if (imapChunk == null)
-                    throw new InvalidCastException("I did not see this coming..");
+                var imapChunk = ChunkItem.Read(_input) as InitialMapChunk;
+                Version = imapChunk.Version;
 
                 foreach (int offset in imapChunk.MemoryMapOffsets)
                 {
                     _input.Position = offset;
-                    if (ReadChunk() is MemoryMapChunk mmapChunk)
+                    if (ChunkItem.Read(_input) is MemoryMapChunk mmapChunk)
                     {
                         foreach (var entry in mmapChunk.Entries)
                         {
-                            if (entry.Header.Kind == ChunkKind.free ||
-                                entry.Header.Kind == ChunkKind.junk)
+                            if (entry.Flags.HasFlag(ChunkEntryFlags.Ignore))
                             {
-                                Chunks.Add(new UnknownChunk(_input, entry.Header)); //TODO: eww
+                                Chunks.Add(new UnknownChunk(_input, entry.Header)); //TODO:
                                 continue;
                             }
                             _input.Position = entry.Offset;
-                            var chunk = ReadChunk();
+
+                            var chunk = ChunkItem.Read(_input);
+                            chunk.Header.Id = entry.Header.Id;
 
                             callback?.Invoke(chunk);
                             Chunks.Add(chunk);
                         }
                     }
-                    else throw new Exception("what");
                 }
             }
-        }
-
-        private ChunkItem ReadChunk()
-        {
-            return ChunkItem.Read(_input, new ChunkHeader(_input));
         }
 
         public void Assemble()

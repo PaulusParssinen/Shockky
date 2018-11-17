@@ -1,19 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-using Shockky.IO;
+﻿using Shockky.IO;
 
 namespace Shockky.Shockwave.Chunks
 {
     public class MemoryMapChunk : ChunkItem
     {
-        public List<ChunkEntry> Entries { get; set; }
+        private const short ENTRY_SIZE = 20;
 
-        public int JunkPtr { get; set; }
-        public int FreePtr { get; set; }
+        public ChunkEntry[] Entries { get; set; }
 
-        public int ChunkCountMax { get; } //TODO: Calculate these
-        public int ChunksUsed { get; } //TODO: Calculate these
+        public int LastJunkId { get; set; }
+        public int LastFreeId { get; set; }
 
         public ChunkEntry this[int index] 
             => Entries[index];
@@ -22,35 +18,35 @@ namespace Shockky.Shockwave.Chunks
             : base(header)
         {
             Remnants.Enqueue(input.ReadInt16());
-            Remnants.Enqueue(input.ReadInt16());
+            input.ReadInt16();
 
-            ChunkCountMax = input.ReadInt32();
-            ChunksUsed = input.ReadInt32();
+            int entryCountMax = input.ReadInt32();
+            int entryCount = input.ReadInt32();
 
-            JunkPtr = input.ReadInt32();
+            LastJunkId = input.ReadInt32();
             Remnants.Enqueue(input.ReadInt32());
-            FreePtr = input.ReadInt32();
+            LastFreeId = input.ReadInt32();
 
-            Entries = new List<ChunkEntry>(ChunksUsed);
-
-            for (int i = 0; i < ChunksUsed; i++)
+            Entries = new ChunkEntry[entryCount];
+            for (int i = 0; i < Entries.Length; i++)
             {
-                Entries.Add(new ChunkEntry(input, i));
+                var entry = new ChunkEntry(input);
+                entry.Header.Id = i;
+
+                Entries[i] = entry;
             }
         }
-
-        //TODO: Adjust indexes method or somethign
         
         public override void WriteBodyTo(ShockwaveWriter output)
         {
             output.Write((short)Remnants.Dequeue());
-            output.Write((short)Remnants.Dequeue());
-            output.Write(ChunkCountMax);
-            output.Write(ChunksUsed);
-            output.Write(JunkPtr);
+            output.Write(ENTRY_SIZE);
+            output.Write(Entries.Length); //TODO: I GUESS
+            output.Write(Entries.Length);
+            output.Write(LastJunkId);
             output.Write((int)Remnants.Dequeue());
-            output.Write(FreePtr);
-            for (int i = 0; i < Entries.Count; i++)
+            output.Write(LastFreeId);
+            for (int i = 0; i < Entries.Length; i++)
             {
                 output.Write(Entries[i]);
             }
@@ -66,7 +62,7 @@ namespace Shockky.Shockwave.Chunks
             size += sizeof(int);
             size += sizeof(int);
             size += sizeof(int);
-            size += Entries.Sum(e => e.GetBodySize());
+            size += Entries.Length * ENTRY_SIZE;
             return size;
         }
     }
