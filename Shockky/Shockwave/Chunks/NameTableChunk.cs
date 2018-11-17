@@ -38,7 +38,7 @@ namespace Shockky.Shockwave.Chunks
             output.WriteBigEndian(namesLength);
             output.WriteBigEndian(namesLength);
             output.WriteBigEndian(NAME_OFFSET);
-            output.WriteBigEndian(Names.Count);
+            output.WriteBigEndian((short)Names.Count);
 
             foreach (string name in Names)
                 output.Write(name);
