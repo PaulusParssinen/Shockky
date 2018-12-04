@@ -7,7 +7,7 @@ namespace Shockky.Shockwave.Chunks
         public byte[] Data { get; set; }
 
         protected BinaryDataChunk(ShockwaveReader input, ChunkHeader header) 
-            : base(input)
+            : base(header)
         {
             Data = input.ReadBytes((int)header.Length);
         }

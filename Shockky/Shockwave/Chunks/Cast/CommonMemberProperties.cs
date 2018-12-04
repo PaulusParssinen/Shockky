@@ -13,14 +13,14 @@ namespace Shockky.Shockwave.Chunks.Cast
         public string FileName { get; set; }
         public string FileType { get; set; }
 
-        public byte[] XtraGUID { get; set; } //Xtra
+        public Guid XtraGUID { get; set; }
         public string XtraName { get; set; }
 
         public int[] RegistrationPoints { get; set; } //Film and video stuff?
 
         public string ClipboardFormat { get; set; }
 
-        public int CreationDate { get; set; } //Date format, TODO
+        public int CreationDate { get; set; }
         public int ModifiedDate { get; set; }
 
         public string ModifiedBy { get; set; }
@@ -66,10 +66,10 @@ namespace Shockky.Shockwave.Chunks.Cast
                     FileType = input.ReadString(length);
                     break;
                 case 9:
-                    XtraGUID = input.ReadBytes(length);
+                    XtraGUID = new Guid(input.ReadBytes(length));
                     break;
                 case 10:
-                    XtraName = input.ReadString(length);
+                    XtraName = input.ReadNullString();
                     break;
                 case 12:
                     RegistrationPoints = new int[length / 4];
@@ -79,14 +79,13 @@ namespace Shockky.Shockwave.Chunks.Cast
                     }
                     break;
                 case 16:
-                    var data = input.ReadBytes(length);
-                    //ClipboardFormat = input.ReadString();
+                    ClipboardFormat = input.ReadString(length);
                     break;
                 case 17:
                     CreationDate = input.ReadBigEndian<int>() * 1000;
                     break;
                 case 18:
-                    CreationDate = input.ReadBigEndian<int>() * 1000;
+                    ModifiedDate = input.ReadBigEndian<int>() * 1000;
                     break;
                 case 19:
                     ModifiedBy = input.ReadString(length);
@@ -100,6 +99,7 @@ namespace Shockky.Shockwave.Chunks.Cast
                     ImageCompression = imageFlags[0] >> 4;
                     ImageQuality = imageFlags[1];
                     break;
+                case 7:
                 default:
                     byte[] unknown = input.ReadBytes(length);
                     break;
