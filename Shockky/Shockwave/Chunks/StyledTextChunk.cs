@@ -28,8 +28,7 @@ namespace Shockky.Shockwave.Chunks
                 bool slant = input.ReadBoolean();
                 byte padding = input.ReadByte();
                 short fontsize = input.ReadBigEndian<short>();
-
-                //?
+                
                 short r = input.ReadBigEndian<short>();
                 short g = input.ReadBigEndian<short>();
                 short b = input.ReadBigEndian<short>();

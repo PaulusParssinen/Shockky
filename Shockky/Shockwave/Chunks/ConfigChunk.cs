@@ -13,9 +13,7 @@ namespace Shockky.Shockwave.Chunks
         public ConfigChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Debug.Assert(header.Length == 100, "HMMMM");
-
-            short length = input.ReadBigEndian<short>();
+            input.ReadBigEndian<short>();
             Version = (DirectorVersion)input.ReadBigEndian<ushort>();
 
             var rect = input.ReadRect();
@@ -75,6 +73,8 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
+            const short LENGTH = 100;
+
             throw new NotImplementedException();
         }
 

@@ -8,7 +8,7 @@ namespace Shockky.Shockwave.Chunks.Cast
 {
     public class VideoCastProperties : ICastTypeProperties
     {
-        public uint Type { get; set; }
+        public string Type { get; set; }
 
         public bool Streaming { get; set; }
         public bool HasSound { get; set; }
@@ -20,7 +20,7 @@ namespace Shockky.Shockwave.Chunks.Cast
 
         public VideoCastProperties(ShockwaveReader input)
         {
-            Type = input.ReadBigEndian<uint>();
+            Type = input.ReadString((int)input.ReadBigEndian<uint>());
             input.Position += 10;
 
             byte videoFlags = input.ReadByte();
@@ -55,7 +55,7 @@ namespace Shockky.Shockwave.Chunks.Cast
         public void WriteTo(ShockwaveWriter output)
         {
             throw new NotImplementedException(nameof(VideoCastProperties));
-            output.WriteBigEndian(Type);
+            //output.WriteBigEndian(Type);
         }
     }
 }

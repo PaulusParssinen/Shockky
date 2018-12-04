@@ -4,17 +4,17 @@ namespace Shockky.Shockwave.Chunks
 {
     public class ScriptContextSection : ShockwaveItem
     {
-        public int Unknown0 { get; set; }
-        public int SectionId { get; set; }
-        public bool Used { get; set; }
+        public int Unknown { get; set; }
+        public int Id { get; set; }
+        public short Flags { get; set; }
         public short Link { get; set; }
 
         public ScriptContextSection(ShockwaveReader input)
         {
-            Unknown0 = input.ReadBigEndian<int>();
-            SectionId = input.ReadBigEndian<int>();
-            Used = (input.ReadBigEndian<short>() == 4);
-            Link = input.ReadBigEndian<short>(); //TODO: If not used, link to next unused !?
+            Unknown = input.ReadBigEndian<int>();
+            Id = input.ReadBigEndian<int>();
+            Flags = input.ReadBigEndian<short>(); // 4=Used
+            Link = input.ReadBigEndian<short>();
         }
 
         public override int GetBodySize()
@@ -29,9 +29,9 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian(Unknown0);
-            output.WriteBigEndian(SectionId);
-            output.WriteBigEndian((short)(Used ? 4 : 0)); // TODO:
+            output.WriteBigEndian(Unknown);
+            output.WriteBigEndian(Id);
+            output.WriteBigEndian(Flags);
             output.WriteBigEndian(Link);
         }
     }

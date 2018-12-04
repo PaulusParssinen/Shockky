@@ -1,6 +1,4 @@
-﻿using System;
-
-using Shockky.IO;
+﻿using Shockky.IO;
 using Shockky.Shockwave.Chunks.Cast;
 
 namespace Shockky.Shockwave.Chunks
@@ -40,14 +38,13 @@ namespace Shockky.Shockwave.Chunks
                     return new ShapeCastProperties(input);
                 case CastType.DigitalVideo:
                 case CastType.Movie:
-                case CastType.Xtra:
                     return new VideoCastProperties(input);
                 case CastType.Button:
                 case CastType.Text:
                     return new TextCastProperties(input);
                 case CastType.Script:
                     return new ScriptCastProperties(input);
-
+                    
                 default:
                     return new UnknownCastProperties(input, dataLength);
             }

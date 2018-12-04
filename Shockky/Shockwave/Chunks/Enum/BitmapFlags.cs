@@ -3,7 +3,7 @@
 namespace Shockky.Shockwave.Chunks.Enum
 {
     [Flags]
-    public enum BitmapCastFlags : byte
+    public enum BitmapFlags : byte
     {
         None,
         Dither                  = 1 << 0,

@@ -8,8 +8,6 @@ namespace Shockky.Shockwave.Chunks
     public class ScriptChunk : ChunkItem
     {
         public LingoValuePool Pool { get; }
-        
-        public int TotalLength { get; set; }
 
         public short HeaderLength { get; set; }
         public short ScriptNumber { get; set; }
@@ -24,8 +22,8 @@ namespace Shockky.Shockwave.Chunks
             Remnants.Enqueue(input.ReadBigEndian<int>());
             Remnants.Enqueue(input.ReadBigEndian<int>());
 
-            TotalLength = input.ReadBigEndian<int>();
-            Remnants.Enqueue(input.ReadBigEndian<int>()); //totalLength2
+            input.ReadBigEndian<int>();
+            input.ReadBigEndian<int>();
 
             HeaderLength = input.ReadBigEndian<short>();
             ScriptNumber = input.ReadBigEndian<short>();
@@ -76,13 +74,15 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
+            const short HEADER_LENGTH = 92;
+
             output.WriteBigEndian((int)Remnants.Dequeue());
             output.WriteBigEndian((int)Remnants.Dequeue());
 
-            output.WriteBigEndian(TotalLength);
-            output.WriteBigEndian(TotalLength);
+            output.WriteBigEndian(HEADER_LENGTH + Pool.GetBodySize());
+            output.WriteBigEndian(HEADER_LENGTH + Pool.GetBodySize());
 
-            output.WriteBigEndian(HeaderLength);
+            output.WriteBigEndian(HEADER_LENGTH);
             output.WriteBigEndian(ScriptNumber);
 
             output.WriteBigEndian((short)Remnants.Dequeue());

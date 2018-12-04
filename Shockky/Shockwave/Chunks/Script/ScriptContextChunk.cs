@@ -7,28 +7,30 @@ namespace Shockky.Shockwave.Chunks
 {
     public class ScriptContextChunk : ChunkItem
     {
+        private const short SECTION_SIZE = 12;
+
         public List<ScriptContextSection> Sections { get; }
 
-        public short SectionSize { get; }
-        public int NameTableSectionIndex { get; set; }
+        public int NameListChunkId { get; set; }
 
         public ScriptContextChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
             Remnants.Enqueue(input.ReadBigEndian<int>());
             Remnants.Enqueue(input.ReadBigEndian<int>());
+
             int entryCount = input.ReadBigEndian<int>();
-            Remnants.Enqueue(input.ReadBigEndian<int>()); //entryCount2
+            input.ReadBigEndian<int>();
             
             short entryOffset = input.ReadBigEndian<short>();
-            SectionSize = input.ReadBigEndian<short>();
+            short entrySize = input.ReadBigEndian<short>();
 
             Remnants.Enqueue(input.ReadBigEndian<int>()); //0
 
             int fileType = input.ReadBigEndian<int>(); // TODO: Enum in future
             Remnants.Enqueue(input.ReadBigEndian<int>());
 
-            NameTableSectionIndex = input.ReadBigEndian<int>();
+            NameListChunkId = input.ReadBigEndian<int>();
 
             short validCount = input.ReadBigEndian<short>();
             byte[] flags = input.ReadBytes(2);
@@ -45,6 +47,8 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
+            
+
             throw new NotImplementedException();
             output.WriteBigEndian((int)Remnants.Dequeue());
             output.WriteBigEndian((int)Remnants.Dequeue());
@@ -69,7 +73,7 @@ namespace Shockky.Shockwave.Chunks
             size += sizeof(short);
             size += 2;
             size += sizeof(short);
-            size += Sections.Count * SectionSize;
+            size += Sections.Count * SECTION_SIZE;
             return size;
         }
     }

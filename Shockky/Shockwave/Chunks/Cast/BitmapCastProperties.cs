@@ -14,7 +14,7 @@ namespace Shockky.Shockwave.Chunks.Cast
         public byte AlphaThreshold { get; set; }
         public Point RegistrationPoint { get; set; }
 
-        public BitmapCastFlags Flags { get; set; }
+        public BitmapFlags Flags { get; set; }
         public byte BitDepth { get; set; } = 1;
         public int Palette { get; set; }
 
@@ -23,7 +23,7 @@ namespace Shockky.Shockwave.Chunks.Cast
             bool IsDataAvailable()
                 => (chunk.Header.Offset + chunk.Header.Length > input.Position);
 
-            TotalWidth = input.ReadBigEndian<short>() & 0x7FFF;
+            TotalWidth = input.ReadBigEndian<short>() & 0x7FFF; //PixelsPerRow
 
             Rectangle = input.ReadRect();
             AlphaThreshold = input.ReadByte();
@@ -34,19 +34,19 @@ namespace Shockky.Shockwave.Chunks.Cast
             short regY = input.ReadBigEndian<short>();
             RegistrationPoint = new Point(regX, regY);
             
-            Flags = (BitmapCastFlags)input.ReadByte();
+            Flags = (BitmapFlags)input.ReadByte();
             
             if (!IsDataAvailable()) return;
             BitDepth = input.ReadByte();
 
             if (!IsDataAvailable()) return;
-            Palette = input.ReadBigEndian<int>();
+            Palette = input.ReadBigEndian<int>();// & 0x7FFF;
         }
         
         public int GetBodySize()
         {
             int size = 0;
-            size += 2;
+            size += sizeof(short);
             size += sizeof(short) * 4;
             size += sizeof(byte);
             size += 7;
