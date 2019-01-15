@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
-using System;
+using System.Linq;
+using System.Text;
 
 using Shockky.IO;
-using System.Linq;
 
 namespace Shockky.Shockwave.Chunks
 {
     public class WVLabelChunk : ChunkItem
     {
-        public Dictionary<int, string> Labels { get; set; }
+        public Dictionary<short, string> Labels { get; set; }
 
-        public WVLabelChunk(ShockwaveReader input, ChunkHeader header) 
+        public WVLabelChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            (short frame, int offset)[] offsetMap = new (short frame, int offset)[input.ReadBigEndian<short>()];
-            Labels = new Dictionary<int, string>(offsetMap.Length);
+            var offsetMap = new (short frame, int offset)[input.ReadBigEndian<short>()];
+            Labels = new Dictionary<short, string>(offsetMap.Length);
 
             for (int i = 0; i < offsetMap.Length; i++)
             {
@@ -23,17 +23,16 @@ namespace Shockky.Shockwave.Chunks
                 offsetMap[i] = (frame, offset);
             }
 
-            Span<char> labelsBuffer = stackalloc char[input.ReadBigEndian<int>()];
-            input.Read(labelsBuffer);
+            string labels = input.ReadString(input.ReadBigEndian<int>());
 
             for (int i = 0; i < offsetMap.Length; i++)
             {
-                bool isLast = (i == offsetMap.Length - 1);
+                var (frame, offset) = offsetMap[i];
 
-                string label = (isLast ? labelsBuffer.Slice(offsetMap[i].offset) :
-                    labelsBuffer.Slice(offsetMap[i].offset, offsetMap[i + 1].offset)).ToString();
-
-                Labels[offsetMap[i].frame] = label;
+                if (i == offsetMap.Length - 1)
+                    Labels[frame] = labels.Substring(offset);
+                else
+                    Labels[frame] = labels.Substring(offset, offsetMap[i + 1].offset);
             }
         }
 
@@ -41,7 +40,7 @@ namespace Shockky.Shockwave.Chunks
         {
             int size = 0;
             size += sizeof(short);
-            size += Labels.Count * (sizeof(short) * 2);
+            size += Labels.Count * (2 * sizeof(short));
             size += sizeof(int);
             size += Labels.Values.Sum(l => l.Length);
             return size;
@@ -49,7 +48,19 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            throw new NotImplementedException();
+            string labels = string.Empty;
+
+            output.WriteBigEndian(Labels.Count);
+            foreach (var entry in Labels)
+            {
+                output.WriteBigEndian(entry.Key);
+                output.WriteBigEndian(labels.Length);
+
+                labels += entry.Value;
+            }
+
+            output.WriteBigEndian(labels.Length);
+            output.Write(Encoding.UTF8.GetBytes(labels));
         }
     }
 }
