@@ -50,41 +50,41 @@ namespace Shockky.Shockwave.Lingo
             LingoHandler ReadHandler() => new LingoHandler(script, input);
             LingoLiteral ReadLiteral() => new LingoLiteral(input);
 
-            short handlerVectorCount = input.ReadBigEndian<short>();
+            HandlerVectors.Capacity = input.ReadBigEndian<short>();
             int handlerVectorOffset = input.ReadBigEndian<int>();
             int handlerVectorFlags = input.ReadInt32();
 
-            short propertiesCount = input.ReadBigEndian<short>();
+            Properties.Capacity = input.ReadBigEndian<short>();
             int propertiesOffset = input.ReadBigEndian<int>();
 
-            short globalsCount = input.ReadBigEndian<short>();
+            Globals.Capacity = input.ReadBigEndian<short>();
             int globalsOffset = input.ReadBigEndian<int>();
 
-            short handlersCount = input.ReadBigEndian<short>();
+            Handlers.Capacity = input.ReadBigEndian<short>();
             int handlersOffset = input.ReadBigEndian<int>();
 
-            short literalsCount = input.ReadBigEndian<short>();
+            Literals.Capacity = input.ReadBigEndian<short>();
             int literalsOffset = input.ReadBigEndian<int>();
 
             int literalsDataCount = input.ReadBigEndian<int>();
             int literalsDataOffset = input.ReadBigEndian<int>();
 
-            input.PopulateVList(propertiesCount, script.Header.Offset + propertiesOffset, Properties, input.ReadBigEndian<short>);
-            input.PopulateVList(globalsCount, script.Header.Offset + globalsOffset, Globals, input.ReadBigEndian<short>);
+            input.PopulateVList(script.Header.Offset + propertiesOffset, Properties, input.ReadBigEndian<short>);
+            input.PopulateVList(script.Header.Offset + globalsOffset, Globals, input.ReadBigEndian<short>);
 
-            input.PopulateVList(handlersCount, script.Header.Offset + handlersOffset, Handlers, ReadHandler);
+            input.PopulateVList(script.Header.Offset + handlersOffset, Handlers, ReadHandler);
             foreach(var handler in Handlers)
             {
                 handler.Populate(input, script.Header.Offset);
             }
             
-            input.PopulateVList(literalsCount, script.Header.Offset + literalsOffset, Literals, ReadLiteral);
+            input.PopulateVList(script.Header.Offset + literalsOffset, Literals, ReadLiteral);
             /*foreach (var literal in Literals)
             { 
                 literal.ReadValue(input, script.Header.Offset + literalsDataOffset);
             }*/
 
-            input.PopulateVList(handlerVectorCount, script.Header.Offset + handlerVectorOffset, HandlerVectors, input.ReadBigEndian<short>, 
+            input.PopulateVList(script.Header.Offset + handlerVectorOffset, HandlerVectors, input.ReadBigEndian<short>, 
                 forceLengthCheck: false);
         }
 

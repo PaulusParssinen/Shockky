@@ -183,17 +183,16 @@ namespace Shockky.IO
         }
         #endregion
 
-        public void PopulateVList<T>(int length, long offset,
+        public void PopulateVList<T>(long offset,
             List<T> list, Func<T> reader, bool forceLengthCheck = true)
         {
-            if (forceLengthCheck && length == 0) return;
+            if (forceLengthCheck && list.Capacity == 0) return;
 
             Position = offset;
 
-            list.Capacity = length;
             for (int i = 0; i < list.Capacity; i++)
             {
-                var value = reader();
+                T value = reader();
                 list.Add(value);
             }
         }

@@ -16,7 +16,7 @@ namespace Shockky.Shockwave.Lingo
         public LingoHandlerBody(LingoHandler handler, ShockwaveReader input)
             : this(handler)
         {
-            StackHeight = input.ReadBigEndian<int>();
+            Code = new byte[input.ReadBigEndian<int>()];
         }
 
         public LingoCode ParseCode() => new LingoCode(this);
