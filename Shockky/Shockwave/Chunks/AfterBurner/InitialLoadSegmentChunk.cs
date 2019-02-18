@@ -26,7 +26,7 @@ namespace Shockky.Shockwave.Chunks
 
                 int id = _input.Read7BitEncodedInt();
 
-                var entry = entries.FirstOrDefault(e => e.Id == id);
+                AfterBurnerMapEntry entry = entries.FirstOrDefault(e => e.Header.Id == id);
                 if (entry == null) break; //TODO:
 
                 entry.Header.Offset = _input.Position;

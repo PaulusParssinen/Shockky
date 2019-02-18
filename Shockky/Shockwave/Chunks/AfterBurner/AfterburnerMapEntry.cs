@@ -10,7 +10,6 @@ namespace Shockky.Shockwave.Chunks
     {
         public ChunkHeader Header { get; set; }
 
-        public int Id { get; set; }
         public int Offset { get; set; }
         public int CompressedLength { get; set; }
         public int DecompressedLength { get; set; }
@@ -20,7 +19,7 @@ namespace Shockky.Shockwave.Chunks
 
         public AfterBurnerMapEntry(ShockwaveReader input)
         {
-            Id = input.Read7BitEncodedInt();
+            int id = input.Read7BitEncodedInt();
             Offset = input.Read7BitEncodedInt();
             CompressedLength = input.Read7BitEncodedInt();
             DecompressedLength = input.Read7BitEncodedInt();
@@ -28,7 +27,7 @@ namespace Shockky.Shockwave.Chunks
 
             Header = new ChunkHeader(input.ReadReversedString(4))
             {
-                Id = Id,
+                Id = id,
                 Length = DecompressedLength
             };
         }
@@ -40,7 +39,7 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.Write7BitEncodedInt(Id);
+            output.Write7BitEncodedInt(Header.Id);
             output.Write7BitEncodedInt(Offset);
             output.Write7BitEncodedInt(CompressedLength);
             output.Write7BitEncodedInt(DecompressedLength);

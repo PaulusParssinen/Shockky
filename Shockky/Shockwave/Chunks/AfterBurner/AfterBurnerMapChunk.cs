@@ -11,13 +11,13 @@ namespace Shockky.Shockwave.Chunks
         public AfterburnerMapChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadBytes(3)); //TODO: Wthell
-            var decompressedInput = WrapDecompressor(input);    
+            Remnants.Enqueue(input.ReadBytes(3));
+            var decompressedInput = WrapDecompressor(input);
             Remnants.Enqueue(decompressedInput.Read7BitEncodedInt());
             Remnants.Enqueue(decompressedInput.Read7BitEncodedInt());
 
             Entries = new List<AfterBurnerMapEntry>(decompressedInput.Read7BitEncodedInt());
-            for(int i = 0; i < Entries.Capacity; i++)
+            for (int i = 0; i < Entries.Capacity; i++)
             {
                 Entries.Add(new AfterBurnerMapEntry(decompressedInput));
             }

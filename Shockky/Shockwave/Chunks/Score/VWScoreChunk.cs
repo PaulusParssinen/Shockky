@@ -16,13 +16,13 @@ namespace Shockky.Shockwave.Chunks
             int totalLength = input.ReadBigEndian<int>();
             int headerType = input.ReadBigEndian<int>(); //-3
 
-            int spritePropertiesOffsetThingy = input.ReadBigEndian<int>(); //12
+            int spritePropertiesOffsetThingy = input.ReadBigEndian<int>();
             int[] spritePropertyOffsets = new int[input.ReadBigEndian<int>() + 1];
 
-            int notationOffset = input.ReadBigEndian<int>() * 4 + 12 + spritePropertiesOffsetThingy; //w-what, apparently confirmed with IDA
+            int notationOffset = input.ReadBigEndian<int>() * 4 + 12 + spritePropertiesOffsetThingy;
             int lastSpritePropertyOffset = input.ReadBigEndian<int>();
 
-            for(int i  = 0; i < spritePropertyOffsets.Length; i++)
+            for (int i  = 0; i < spritePropertyOffsets.Length; i++)
             {
                 spritePropertyOffsets[i] = input.ReadBigEndian<int>();
             }
@@ -40,7 +40,7 @@ namespace Shockky.Shockwave.Chunks
             short lastChannelMax = input.ReadBigEndian<short>(); //1006
             short lastChannel = input.ReadBigEndian<short>();
 
-            for(int i = 0; i < Frames.Length; i++)
+            for (int i = 0; i < Frames.Length; i++)
             {
                 Frames[i] = new Frame(input);
             }
@@ -52,14 +52,13 @@ namespace Shockky.Shockwave.Chunks
             }
 
             SpriteProperties[] spriteProperties = new SpriteProperties[spritePropertyOffsetIndices.Length];
-            for(int i = 0; i < spritePropertyOffsetIndices.Length; i++)
+            for (int i = 0; i < spritePropertyOffsetIndices.Length; i++)
             {
                 int spritePropertyOffset = spritePropertyOffsets[spritePropertyOffsetIndices[i]];
 
                 input.Position = Header.Offset + notationOffset + spritePropertyOffset;
                 spriteProperties[i] = new SpriteProperties(input);
             }
-
         }
 
         public override int GetBodySize()
