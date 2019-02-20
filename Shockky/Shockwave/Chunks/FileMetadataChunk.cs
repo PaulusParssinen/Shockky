@@ -4,10 +4,18 @@ namespace Shockky.Shockwave.Chunks
 {
     public class FileMetadataChunk : ChunkItem
     {
-        public long FileLength => Header.Length;
+        private long _fileLength;
+        public long FileLength
+        {
+            set { Header.Length = _fileLength = value; }
+            get { return _fileLength = Header.Length; }
+        }
 
         public CodecKind Codec { get; set; }
 
+        public FileMetadataChunk()
+            : base(ChunkKind.RIFX)
+        { }
         public FileMetadataChunk(ShockwaveReader input)
             : base(new ChunkHeader(input))
         {
@@ -19,15 +27,11 @@ namespace Shockky.Shockwave.Chunks
             Codec = input.ReadReversedString(4).ToCodec();
         }
 
-        public override int GetBodySize()
-        {
-            int size = 0;
-            size += 4;
-            return size;
-        }
+        public override int GetBodySize() => (int)FileLength;
+
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian(Codec);
+            output.WriteReversedString(Codec.ToString());
         }
     }
 }

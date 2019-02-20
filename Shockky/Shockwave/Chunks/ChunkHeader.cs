@@ -25,8 +25,7 @@ namespace Shockky.Shockwave.Chunks
         }
 
         public int Id { get; set; }
-
-        public string Name { get; set; }
+        
         public ChunkKind Kind { get; set; }
 
         public long Offset { get; set; }
@@ -38,9 +37,7 @@ namespace Shockky.Shockwave.Chunks
         }
         public ChunkHeader(string name)
             : this(name.ToChunkKind())
-        {
-            Name = name;
-        }
+        { }
         public ChunkHeader(ShockwaveReader input)
             : this(input.ReadReversedString(4))
         {
@@ -59,7 +56,7 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.WriteReversedString(Name);
+            output.WriteReversedString(Kind.ToFourCC());
             output.Write(Length);
         }
     }

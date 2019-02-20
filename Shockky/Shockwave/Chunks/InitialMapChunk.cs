@@ -4,10 +4,13 @@ namespace Shockky.Shockwave.Chunks
 {
     public class InitialMapChunk : ChunkItem
     {
-        public int[] MemoryMapOffsets { get; }
+        public int[] MemoryMapOffsets { get; set; }
 
         public DirectorVersion Version { get; set; }
 
+        public InitialMapChunk()
+            : base(ChunkKind.imap)
+        { }
         public InitialMapChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

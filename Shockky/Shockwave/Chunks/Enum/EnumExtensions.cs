@@ -2,6 +2,13 @@
 {
     public static class EnumExtensions
     {
+        public static string ToFourCC(this ChunkKind chunkKind)
+        {
+            return chunkKind.ToString()
+                .Replace("Star", "*")
+                .PadRight(4);
+        }
+
         public static ChunkKind ToChunkKind(this string chunkName)
         {
             if (System.Enum.TryParse(chunkName.Replace("*", "Star").Replace(" ", string.Empty), out ChunkKind chunkKind))

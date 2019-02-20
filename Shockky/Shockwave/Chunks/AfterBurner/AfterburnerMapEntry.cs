@@ -45,7 +45,7 @@ namespace Shockky.Shockwave.Chunks
             output.Write7BitEncodedInt(DecompressedLength);
             output.Write7BitEncodedInt((int)CompressionType);
 
-            output.WriteReversedString(Header.Name);
+            output.WriteReversedString(Header.Kind.ToFourCC());
         }
     }
 }

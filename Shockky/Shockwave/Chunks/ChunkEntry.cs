@@ -14,10 +14,13 @@ namespace Shockky.Shockwave.Chunks
         public short Unknown { get; set; }
         public int Link { get; set; }
 
-        public ChunkEntry(ShockwaveReader input)
+        public ChunkEntry(ChunkHeader header)
         {
-            Header = new ChunkHeader(input);
-
+            Header = header;
+        }
+        public ChunkEntry(ShockwaveReader input)
+            : this(new ChunkHeader(input))
+        {
             Offset = input.ReadInt32();
             Flags = (ChunkEntryFlags)input.ReadInt16();
             Unknown = input.ReadInt16();

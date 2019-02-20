@@ -13,6 +13,9 @@ namespace Shockky.Shockwave.Chunks
 
         public Queue<object> Remnants { get; set; }
 
+        protected ChunkItem(ChunkKind kind)
+            : this(new ChunkHeader(kind))
+        { }
         protected ChunkItem(ShockwaveReader input)
             : this(new ChunkHeader(input))
         { }
@@ -121,7 +124,7 @@ namespace Shockky.Shockwave.Chunks
                     return new BitmapChunk(input, header);
 
                 default:
-                    Debug.WriteLine("Unknown section | " + header.Name);
+                    Debug.WriteLine("Unknown section | " + header.Kind.ToFourCC());
                     return new UnknownChunk(input, header);
             }
         }

@@ -4,7 +4,7 @@ namespace Shockky.Shockwave.Chunks
 {
     public class MemoryMapChunk : ChunkItem
     {
-        private const short ENTRY_SIZE = 20;
+        public const short ENTRY_SIZE = 20;
 
         public ChunkEntry[] Entries { get; set; }
 
@@ -13,7 +13,10 @@ namespace Shockky.Shockwave.Chunks
 
         public ChunkEntry this[int index] 
             => Entries[index];
-        
+
+        public MemoryMapChunk()
+            : base(ChunkKind.mmap)
+        { }
         public MemoryMapChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
