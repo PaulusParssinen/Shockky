@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 
 using Shockky.IO;
 
@@ -7,45 +8,55 @@ namespace Shockky.Shockwave.Chunks
     public class StyledTextChunk : ChunkItem
     {
         public string Text { get; set; }
+        public TextFormat[] Formattings { get; set; }
 
         public StyledTextChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            input.ReadBigEndian<int>();
             int textLength = input.ReadBigEndian<int>();
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            int endLen = input.ReadBigEndian<int>();
+
+            Debug.Assert(endLen == 22);
 
             Text = Encoding.UTF8.GetString(input.ReadBytes(textLength)); //TODO:
 
-            short formattingCount = input.ReadBigEndian<short>();
-            for (int i = 0; i < formattingCount; i++)
+            Formattings = new TextFormat[input.ReadBigEndian<short>()];
+            for (int i = 0; i < Formattings.Length; i++)
             {
-                int offset = input.ReadBigEndian<int>();
-                short height = input.ReadBigEndian<short>();
-                short ascent = input.ReadBigEndian<short>();
-
-                short fontId = input.ReadBigEndian<short>();
-                bool slant = input.ReadBoolean();
-                byte padding = input.ReadByte();
-                short fontsize = input.ReadBigEndian<short>();
-                
-                short r = input.ReadBigEndian<short>();
-                short g = input.ReadBigEndian<short>();
-                short b = input.ReadBigEndian<short>();
+                Formattings[i] = new TextFormat(input);
             }
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            throw new System.NotImplementedException();
+            const int TEXT_OFFSET = 12; //I guess
+            const int REST_DATA_LEN = 22; //I guess(?)
+
+            output.WriteBigEndian(TEXT_OFFSET);
+            output.WriteBigEndian(Text.Length);
+            output.WriteBigEndian(REST_DATA_LEN);
+
+            output.Write(Text.ToCharArray());
+
+            output.WriteBigEndian((short)(Formattings?.Length ?? 0));
+            for (int i = 0; i < Formattings?.Length; i++)
+            {
+                Formattings[i].WriteTo(output);
+            }
         }
 
         public override int GetBodySize()
         {
+            const int TEXT_FORMAT_SIZE = 20;
+
             int size = 0;
             size += sizeof(int);
             size += sizeof(int);
             size += sizeof(int);
+            size += Text.Length;
+            size += sizeof(short);
+            size += Formattings?.Length ?? 0 * TEXT_FORMAT_SIZE;
             return size;
         }
     }
