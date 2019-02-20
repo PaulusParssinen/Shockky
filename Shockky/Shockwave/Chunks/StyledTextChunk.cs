@@ -15,9 +15,7 @@ namespace Shockky.Shockwave.Chunks
         {
             input.ReadBigEndian<int>();
             int textLength = input.ReadBigEndian<int>();
-            int endLen = input.ReadBigEndian<int>();
-
-            Debug.Assert(endLen == 22);
+            input.ReadBigEndian<int>();
 
             Text = Encoding.UTF8.GetString(input.ReadBytes(textLength)); //TODO:
 
@@ -31,11 +29,11 @@ namespace Shockky.Shockwave.Chunks
         public override void WriteBodyTo(ShockwaveWriter output)
         {
             const int TEXT_OFFSET = 12; //I guess
-            const int REST_DATA_LEN = 22; //I guess(?)
+            const int TEXT_FORMAT_SIZE = 20;
 
             output.WriteBigEndian(TEXT_OFFSET);
             output.WriteBigEndian(Text.Length);
-            output.WriteBigEndian(REST_DATA_LEN);
+            output.WriteBigEndian(sizeof(short) + (Formattings.Length * TEXT_FORMAT_SIZE));
 
             output.Write(Text.ToCharArray());
 
