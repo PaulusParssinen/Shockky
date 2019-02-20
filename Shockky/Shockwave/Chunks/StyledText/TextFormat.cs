@@ -26,9 +26,9 @@ namespace Shockky.Shockwave.Chunks
             Padding = input.ReadByte();
             FontSize = input.ReadBigEndian<short>();
 
-            short r = input.ReadBigEndian<short>();
-            short g = input.ReadBigEndian<short>();
-            short b = input.ReadBigEndian<short>();
+            byte r = input.ReadBytes(2)[0];
+            byte g = input.ReadBytes(2)[0];
+            byte b = input.ReadBytes(2)[0];
             Color = Color.FromArgb(r, g, b);
         }
 
