@@ -12,6 +12,7 @@ namespace Shockky.Shockwave.Chunks.Cast
 
         public Rectangle Rectangle { get; set; }
         public byte AlphaThreshold { get; set; }
+        public byte[] OLE { get; }
         public Point RegistrationPoint { get; set; }
 
         public BitmapFlags Flags { get; set; }
@@ -23,12 +24,11 @@ namespace Shockky.Shockwave.Chunks.Cast
             bool IsDataAvailable()
                 => (chunk.Header.Offset + chunk.Header.Length > input.Position);
 
-            TotalWidth = input.ReadBigEndian<short>() & 0x7FFF; //PixelsPerRow
+            TotalWidth = input.ReadBigEndian<ushort>() & 0x7FFF; //TODO: Research more
 
             Rectangle = input.ReadRect();
             AlphaThreshold = input.ReadByte();
-
-            input.Position += 7; //OLE
+            OLE = input.ReadBytes(7); //TODO:
 
             short regX = input.ReadBigEndian<short>();
             short regY = input.ReadBigEndian<short>();
@@ -54,7 +54,7 @@ namespace Shockky.Shockwave.Chunks.Cast
             size += sizeof(short);
             size += sizeof(byte);
 
-            if (BitDepth != 0)
+            if (BitDepth != 1)
                 size += sizeof(byte);
             if (Palette != 0)
                 size += sizeof(int);
@@ -63,14 +63,22 @@ namespace Shockky.Shockwave.Chunks.Cast
 
         public void WriteTo(ShockwaveWriter output)
         {
-            throw new NotImplementedException(nameof(BitmapCastProperties));
+            output.WriteBigEndian((ushort)TotalWidth | 0x8000);
+
             output.Write(Rectangle);
             output.Write(AlphaThreshold);
+            output.Write(OLE);
 
             output.WriteBigEndian((short)RegistrationPoint.X);
             output.WriteBigEndian((short)RegistrationPoint.Y);
 
             output.Write((byte)Flags);
+
+            if (BitDepth == 1) return;
+            output.Write(BitDepth);
+
+            if (Palette != 0) return;
+            output.WriteBigEndian(Palette);
         }
     }
 }
