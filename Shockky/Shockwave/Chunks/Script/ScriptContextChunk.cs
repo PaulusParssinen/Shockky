@@ -11,6 +11,7 @@ namespace Shockky.Shockwave.Chunks
 
         public List<ScriptContextSection> Sections { get; }
 
+        public int Type { get; set; }
         public int NameListChunkId { get; set; }
 
         public ScriptContextChunk(ShockwaveReader input, ChunkHeader header)
@@ -22,19 +23,18 @@ namespace Shockky.Shockwave.Chunks
             int entryCount = input.ReadBigEndian<int>();
             input.ReadBigEndian<int>();
             
-            short entryOffset = input.ReadBigEndian<short>();
-            short entrySize = input.ReadBigEndian<short>();
+            short entryOffset = input.ReadBigEndian<short>(); //TODO: Research
+            input.ReadBigEndian<short>();
 
             Remnants.Enqueue(input.ReadBigEndian<int>()); //0
-
-            int fileType = input.ReadBigEndian<int>(); // TODO: Enum in future
+            Type = input.ReadBigEndian<int>(); //TODO: Enum
             Remnants.Enqueue(input.ReadBigEndian<int>());
 
             NameListChunkId = input.ReadBigEndian<int>();
 
-            short validCount = input.ReadBigEndian<short>();
-            byte[] flags = input.ReadBytes(2);
-            short freePointer = input.ReadBigEndian<short>();
+            Remnants.Enqueue(input.ReadBigEndian<short>()); //validCount
+            Remnants.Enqueue(input.ReadBytes(2)); //flags, short?
+            Remnants.Enqueue(input.ReadBigEndian<short>()); //freePtr
 
             input.Position = Header.Offset + entryOffset;
 
@@ -47,14 +47,30 @@ namespace Shockky.Shockwave.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            
+            const short ENTRY_OFFSET = 48;
 
-            throw new NotImplementedException();
             output.WriteBigEndian((int)Remnants.Dequeue());
             output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian(Sections.Count);
+            output.WriteBigEndian(Sections?.Count ?? 0); //TODO:
+            output.WriteBigEndian(Sections?.Count ?? 0); //TODO:
+
+            output.WriteBigEndian(ENTRY_OFFSET);
+            output.WriteBigEndian(SECTION_SIZE);
+
+            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.WriteBigEndian(Type);
             output.WriteBigEndian((int)Remnants.Dequeue());
 
+            output.WriteBigEndian(NameListChunkId);
+
+            output.WriteBigEndian((short)Remnants.Dequeue());
+            output.Write((byte[])Remnants.Dequeue());
+            output.WriteBigEndian((short)Remnants.Dequeue());
+
+            foreach (ScriptContextSection section in Sections)
+            {
+                section.WriteTo(output);
+            }
         }
 
         public override int GetBodySize()
