@@ -15,28 +15,26 @@ namespace Shockky.Shockwave.Chunks
             for (int i = 0; i < Colors.Length; i++)
             {
                 //Oh god help me
-                byte[] r = input.ReadBytes(2);
-                byte[] g = input.ReadBytes(2);
-                byte[] b = input.ReadBytes(2);
-
-                /*
-                int r = input.ReadBigEndian<ushort>() & 0x7F;
-                int g = input.ReadBigEndian<ushort>() & 0x7F;
-                int b = input.ReadBigEndian<ushort>() & 0x7F;
-                */
-                Colors[i] = Color.FromArgb(r[0], g[0], b[0]);
+                byte r = input.ReadBytes(2)[0];
+                byte g = input.ReadBytes(2)[0];
+                byte b = input.ReadBytes(2)[0];
+                
+                Colors[i] = Color.FromArgb(r, g, b);
             }
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            throw new System.NotImplementedException();
-
-            foreach(var color in Colors)
+            foreach (Color color in Colors)
             {
-                output.Write((short)color.R);
-                output.Write((short)color.G);
-                output.Write((short)color.B);
+                output.Write(color.R);
+                output.Write(color.R);
+
+                output.Write(color.G);
+                output.Write(color.G);
+
+                output.Write(color.B);
+                output.Write(color.B);
             }
         }
 
