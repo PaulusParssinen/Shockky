@@ -1,10 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using System.Runtime.InteropServices;
-
-using Shockky.Shockwave;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace Shockky.IO
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 
 using Shockky.IO;
-using Shockky.Shockwave.Chunks;
+using Shockky.Chunks;
 
 namespace Shockky
 {
@@ -44,6 +44,12 @@ namespace Shockky
 
         public void Disassemble(Action<ChunkItem> callback = null)
         {
+            void HandleChunk(ChunkItem chunk)
+            {
+                callback?.Invoke(chunk);
+                Chunks.Add(chunk);
+            }
+
             if (Metadata.Codec == CodecKind.FGDM ||
                 Metadata.Codec == CodecKind.FGDC)
             {
@@ -52,19 +58,10 @@ namespace Shockky
                     ChunkItem.Read(_input) is AfterburnerMapChunk afterburnerMap &&
                     ChunkItem.Read(_input) is FGEIChunk fgei)
                 {
-                    void HandleChunks(IEnumerable<ChunkItem> chunks)
-                    {
-                        foreach (var chunk in chunks)
-                        {
-                            callback?.Invoke(chunk);
-                            Chunks.Add(chunk);
-                        }
-                    }
-
                     var ilsChunk = fgei.ReadInitialLoadSegment(afterburnerMap.Entries[0]);
 
-                    HandleChunks(fgei.ReadChunks(afterburnerMap.Entries));
-                    HandleChunks(ilsChunk.ReadChunks(afterburnerMap.Entries));
+                    fgei.ReadChunks(afterburnerMap.Entries, HandleChunk);
+                    ilsChunk.ReadChunks(afterburnerMap.Entries, HandleChunk);
                 }
             }
             else if (Metadata.Codec == CodecKind.MV93)
@@ -77,27 +74,25 @@ namespace Shockky
                     _input.Position = offset;
                     if (ChunkItem.Read(_input) is MemoryMapChunk mmapChunk)
                     {
-                        foreach (var entry in mmapChunk.Entries)
+                        foreach (ChunkEntry entry in mmapChunk.Entries)
                         {
                             if (entry.Flags.HasFlag(ChunkEntryFlags.Ignore))
                             {
-                                Chunks.Add(new UnknownChunk(_input, entry.Header)); //TODO:
+                                HandleChunk(new UnknownChunk(_input, entry.Header)); //TODO:
                                 continue;
                             }
                             _input.Position = entry.Offset;
 
-                            var chunk = ChunkItem.Read(_input);
+                            ChunkItem chunk = ChunkItem.Read(_input);
                             chunk.Header.Id = entry.Header.Id;
-
-                            callback?.Invoke(chunk);
-                            Chunks.Add(chunk);
+                            HandleChunk(chunk);
                         }
                     }
                 }
             }
         }
 
-        public void Assemble()
+        public void Assemble(ShockwaveWriter output)
         {
             throw new NotImplementedException();
         }
