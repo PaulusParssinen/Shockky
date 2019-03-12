@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 
 using Shockky.IO;
 using Shockky.Chunks.Enum;
@@ -11,7 +10,8 @@ namespace Shockky.Chunks.Cast
         public ShapeType Type { get; set; }
         public Rectangle Rectangle { get; set; }
         public short Pattern { get; set; }
-
+        public byte ForegroundColor { get; set; }
+        public byte BackgroundColor { get; set; }
         public bool IsFilled { get; set; }
         public int LineSize { get; set; }
         public int LineDirection { get; set; }
@@ -22,11 +22,11 @@ namespace Shockky.Chunks.Cast
             Rectangle = input.ReadRect();
 
             Pattern = input.ReadBigEndian<short>();
-            input.Position += 2;
-            byte flags = input.ReadByte();
-            IsFilled = (flags == 1); //TODO:
+            ForegroundColor = input.ReadByte();
+            BackgroundColor = input.ReadByte();
+            IsFilled = input.ReadBoolean(); //TODO:
             LineSize = input.ReadByte(); //-1
-            LineDirection = input.ReadByte(); // -5
+            LineDirection = input.ReadByte(); //-5
         }
 
         public int GetBodySize()
@@ -35,8 +35,9 @@ namespace Shockky.Chunks.Cast
             size += sizeof(short);
             size += sizeof(short) * 4;
             size += sizeof(short);
-            size += 2;
             size += sizeof(byte);
+            size += sizeof(byte);
+            size += sizeof(bool);
             size += sizeof(byte);
             size += sizeof(byte);
             return size;
@@ -44,7 +45,16 @@ namespace Shockky.Chunks.Cast
 
         public void WriteTo(ShockwaveWriter output)
         {
-            throw new NotImplementedException(nameof(ShapeCastProperties));
+            output.WriteBigEndian((short)Type);
+            output.Write(Rectangle);
+
+            output.WriteBigEndian(Pattern);
+            output.Write(ForegroundColor);
+            output.Write(BackgroundColor);
+
+            output.Write(IsFilled);
+            output.Write(LineSize);
+            output.Write(LineDirection);
         }
     }
 }
