@@ -1,5 +1,4 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 
 using Shockky.IO;
 using Shockky.Chunks.Enum;
@@ -19,10 +18,12 @@ namespace Shockky.Chunks.Cast
         public byte BitDepth { get; set; } = 1;
         public int Palette { get; set; }
 
+        public bool IsSystemPalette => (Palette < 0);
+
         public BitmapCastProperties(CastMemberPropertiesChunk chunk, ShockwaveReader input)
         {
             bool IsDataAvailable()
-                => (chunk.Header.Offset + chunk.Header.Length > input.Position);
+                => (input.Position < chunk.Header.Offset + chunk.Header.Length);
 
             TotalWidth = input.ReadBigEndian<ushort>() & 0x7FFF; //TODO: Research more
 
@@ -40,7 +41,11 @@ namespace Shockky.Chunks.Cast
             BitDepth = input.ReadByte();
 
             if (!IsDataAvailable()) return;
-            Palette = input.ReadBigEndian<int>();// & 0x7FFF;
+            Palette = input.ReadBigEndian<int>();
+
+            //TODO: PaletteRef or something
+            if (!IsSystemPalette)
+                Palette &= 0x7FFF;
         }
         
         public int GetBodySize()
@@ -78,6 +83,7 @@ namespace Shockky.Chunks.Cast
             output.Write(BitDepth);
 
             if (Palette != 0) return;
+            if (!IsSystemPalette) Palette |= 0x8000;
             output.WriteBigEndian(Palette);
         }
     }
