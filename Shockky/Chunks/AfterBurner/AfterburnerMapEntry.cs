@@ -5,7 +5,7 @@ using Shockky.IO;
 
 namespace Shockky.Chunks
 {
-    [DebuggerDisplay("[{Header.Name}] Id: {Id}, Offset: {Offset}")]
+    [DebuggerDisplay("[{Header.Kind}] Id: {Header.Id} Offset: {Offset}")]
     public class AfterBurnerMapEntry : ShockwaveItem
     {
         public ChunkHeader Header { get; set; }

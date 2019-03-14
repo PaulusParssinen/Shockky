@@ -1,26 +1,19 @@
 ﻿using Shockky.IO;
-using System.Collections.Generic;
 
 namespace Shockky.Chunks
 {
     public class CastAssociationTableChunk : ChunkItem
     {
-        public int[] Members { get; }
+        public int[] Members { get; set; }
 
         public CastAssociationTableChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            var members = new List<int>((int)header.Length / sizeof(int));
-            
-            for (int i = 0; i < members.Capacity; i++)
+            Members = new int[(int)header.Length / sizeof(int)];
+            for (int i = 0; i < Members.Length; i++)
             {
-                int id = input.ReadBigEndian<int>();
-
-                if (id != 0)
-                    members.Add(id);
+                Members[i] = input.ReadBigEndian<int>();
             }
-
-            Members = members.ToArray();
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
