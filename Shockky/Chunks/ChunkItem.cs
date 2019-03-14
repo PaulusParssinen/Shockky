@@ -5,7 +5,7 @@ using Shockky.IO;
 
 namespace Shockky.Chunks
 {
-    [DebuggerDisplay("{Kind}")]
+    [DebuggerDisplay("[{Header.Id}] {Kind}")]
     public abstract class ChunkItem : ShockwaveItem
     {
         public ChunkKind Kind => Header.Kind;
@@ -80,10 +80,10 @@ namespace Shockky.Chunks
                 case ChunkKind.VWFI:
                     return new FileInfoChunk(input, header);
 
-                case ChunkKind.LctX:
-                    return new ScriptContextChunk(input, header);
-                case ChunkKind.Lscr:
-                    return new ScriptChunk(input, header);
+                //case ChunkKind.LctX:
+                //    return new ScriptContextChunk(input, header);
+                //case ChunkKind.Lscr:
+                //    return new ScriptChunk(input, header);
                 case ChunkKind.Lnam:
                     return new NameTableChunk(input, header);
 

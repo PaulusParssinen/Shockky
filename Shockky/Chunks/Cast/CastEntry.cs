@@ -1,21 +1,21 @@
-﻿using Shockky.IO;
+﻿using System.Diagnostics;
+
+using Shockky.IO;
 
 namespace Shockky.Chunks.Cast
 {
+    [DebuggerDisplay("[{Id}] {Kind}")]
     public class CastEntry : ShockwaveItem
     {
         public int Id { get; set; }
         public int OwnerId { get; set; }
-
-        public string Name { get; set; }
-        public ChunkKind Kind => Name.ToChunkKind();
+        public ChunkKind Kind { get; set; }
 
         public CastEntry(ShockwaveReader input)
         {
             Id = input.ReadInt32();
             OwnerId = input.ReadInt32();
-
-	        Name = input.ReadReversedString(4);
+            Kind = input.ReadReversedString(4).ToChunkKind();
         }
 
         public override int GetBodySize()
@@ -31,7 +31,7 @@ namespace Shockky.Chunks.Cast
         {
             output.Write(Id);
             output.Write(OwnerId);
-            output.WriteReversedString(Name);
+            output.WriteReversedString(Kind.ToFourCC());
         }
     }
 }

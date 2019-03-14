@@ -18,7 +18,7 @@ namespace Shockky.Chunks.Cast
         public byte BitDepth { get; set; } = 1;
         public int Palette { get; set; }
 
-        public bool IsSystemPalette => (Palette < 0);
+        public bool IsSystemPalette => ((Palette & (1 << 15)) != 0);
 
         public BitmapCastProperties(CastMemberPropertiesChunk chunk, ShockwaveReader input)
         {

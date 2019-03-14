@@ -111,12 +111,6 @@ namespace Shockky.IO
         }
 
         #region Manual position tracking
-        public override int Read()
-        {
-            int read = base.Read();
-            _position += read;
-            return read;
-        }
         public override int Read(Span<char> buffer)
         {
             int read = base.Read(buffer);
@@ -152,7 +146,7 @@ namespace Shockky.IO
         }
         public override char ReadChar()
         {
-            _position += sizeof(char);
+            _position += sizeof(byte);
             return base.ReadChar();
         }
         public override char[] ReadChars(int count)
