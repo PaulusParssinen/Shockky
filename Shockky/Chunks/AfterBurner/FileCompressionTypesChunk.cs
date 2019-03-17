@@ -1,12 +1,10 @@
 ﻿using System;
-
 using Shockky.IO;
 
 namespace Shockky.Chunks
 {
     public class FileCompressionTypesChunk : ChunkItem
     {
-        //TODO: Unreliable
         public short CompressionTypeId { get; set; }
         public int ImageQuality { get; set; }
         public short ImageTypes { get; set; }
@@ -25,7 +23,9 @@ namespace Shockky.Chunks
             DirTypes = decompressedInput.ReadBigEndian<short>();
             CompressionLevel= decompressedInput.ReadBigEndian<int>();
             Speed = decompressedInput.ReadBigEndian<int>();
-            Name = decompressedInput.ReadNullString();
+
+            if (CompressionTypeId == 256)
+                Name = decompressedInput.ReadNullString();
         }
 
         public override int GetBodySize()
@@ -41,7 +41,9 @@ namespace Shockky.Chunks
             output.WriteBigEndian(DirTypes);
             output.WriteBigEndian(CompressionLevel);
             output.WriteBigEndian(Speed);
-            output.WriteNullString(Name);
+
+            if (CompressionTypeId == 256)
+                output.WriteNullString(Name);
         }
     }
 }
