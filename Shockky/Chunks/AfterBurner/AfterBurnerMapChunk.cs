@@ -11,7 +11,9 @@ namespace Shockky.Chunks
         public AfterburnerMapChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadBytes(3));
+            input.ReadByte();
+            Remnants.Enqueue(input.Read7BitEncodedInt());
+
             var decompressedInput = WrapDecompressor(input);
             Remnants.Enqueue(decompressedInput.Read7BitEncodedInt());
             Remnants.Enqueue(decompressedInput.Read7BitEncodedInt());
@@ -25,7 +27,8 @@ namespace Shockky.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.Write((byte[])Remnants.Dequeue());
+            output.Write((byte)0);
+            output.Write7BitEncodedInt((int)Remnants.Dequeue());
             //TODO: Wrap dat compressor
             output.Write7BitEncodedInt((int)Remnants.Dequeue());
             output.Write7BitEncodedInt((int)Remnants.Dequeue());
@@ -41,7 +44,7 @@ namespace Shockky.Chunks
         {
             throw new System.NotImplementedException();
             int size = 0;
-            size += 3;
+            size += sizeof(byte);
             //TODO:
             return size;
         }
