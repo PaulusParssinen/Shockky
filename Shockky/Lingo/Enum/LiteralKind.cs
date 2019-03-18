@@ -4,6 +4,7 @@
     {
         String = 1,
         Integer = 4,
-        Float = 9
+        Float = 9,
+        MaybeCompiledJavascript = 11
     }
 }

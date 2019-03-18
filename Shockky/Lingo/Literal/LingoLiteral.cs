@@ -30,9 +30,19 @@ namespace Shockky.Lingo
 
                 int length = input.ReadBigEndian<int>();
 
-                if (Kind == LiteralKind.String)
-                    Value = input.ReadString(length - 1);
-                else Value = input.ReadBigEndian<long>();
+                switch (Kind)
+                {
+                    case LiteralKind.String:
+                        Value = input.ReadString(length - 1);
+                        input.ReadByte();
+                        break;
+                    case LiteralKind.Float:
+                        Value = input.ReadBigEndian<long>();
+                        break;
+                    case LiteralKind.MaybeCompiledJavascript:
+                        Value = input.ReadBytes(length);
+                        break;
+                }
             }
             else Value = Offset;
         }

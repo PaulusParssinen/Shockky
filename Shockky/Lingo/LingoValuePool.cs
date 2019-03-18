@@ -68,7 +68,7 @@ namespace Shockky.Lingo
             Literals.Capacity = input.ReadBigEndian<short>();
             int literalsOffset = input.ReadBigEndian<int>();
 
-            int literalDataCount = input.ReadBigEndian<int>();
+            int literalDataLength = input.ReadBigEndian<int>();
             int literalDataOffset = input.ReadBigEndian<int>();
 
             input.PopulateVList(script.Header.Offset + propertiesOffset, Properties, input.ReadBigEndian<short>);
@@ -79,10 +79,13 @@ namespace Shockky.Lingo
             {
                 handler.Populate(input, script.Header.Offset);
             }
-            
+
             input.PopulateVList(script.Header.Offset + literalsOffset, Literals, ReadLiteral);
             foreach (var literal in Literals)
-            { 
+            {
+                if (script.Header.Offset + literalDataOffset < input.Position)
+                    continue;
+
                 literal.ReadValue(input, script.Header.Offset + literalDataOffset);
             }
 
@@ -92,7 +95,7 @@ namespace Shockky.Lingo
 
         public string GetName(int index)
         {
-            return NameTableChunk?.Names[index] ?? throw new Exception("u wot");
+            return NameTableChunk?.Names[index];
         }
 
         public int AddName(string name, bool recycle = true)
@@ -168,7 +171,9 @@ namespace Shockky.Lingo
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            const int HANDLER_SIZE = 46; //TODO: You know what, I might really switch to the constants lengths afterall
+            const int HANDLER_SIZE = 46;
+            const int LITERAL_SIZE = 8; //TODO: You know what, I might really switch to the constants lengths afterall
+
             int entriesOffset = Script.GetHeaderSize() + Script.GetBodySize();
 
             output.WriteBigEndian((short)HandlerVectors.Capacity);
