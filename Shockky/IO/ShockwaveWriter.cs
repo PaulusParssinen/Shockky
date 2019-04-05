@@ -48,20 +48,6 @@ namespace Shockky.IO
         {
             item.WriteTo(this);
         }
-
-        public void WriteNullString(string value)
-        {
-            Write(value.ToCharArray());
-            Write('\0');
-        }
-
-        public void WriteReversedString(string value)
-        {
-            char[] chars = value.ToCharArray();
-            Array.Reverse(chars);
-            Write(chars);
-        }
-
         public void Write(Rectangle rect)
         {
             WriteBigEndian((short)rect.Top);
@@ -69,7 +55,30 @@ namespace Shockky.IO
             WriteBigEndian((short)rect.Bottom);
             WriteBigEndian((short)rect.Right);
         }
+        public void Write(Color color)
+        {
+            Write(color.R);
+            Write(color.R);
 
+            Write(color.G);
+            Write(color.G);
+
+            Write(color.B);
+            Write(color.B);
+        }
+
+        public void WriteNullString(string value)
+        {
+            Write(value.ToCharArray());
+            Write('\0');
+        }
+        public void WriteReversedString(string value)
+        {
+            char[] chars = value.ToCharArray();
+            Array.Reverse(chars);
+            Write(chars);
+        }
+        
         public void WriteBigEndian<T>(T value)
             where T : struct
         {

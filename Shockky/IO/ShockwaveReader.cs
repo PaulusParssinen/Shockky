@@ -57,11 +57,9 @@ namespace Shockky.IO
             int size = Marshal.SizeOf<T>();
             Span<byte> buffer = stackalloc byte[size];
 
-            int read = BaseStream.Read(buffer);
+            _position += BaseStream.Read(buffer);
+
             buffer.Reverse();
-
-            _position += read;
-
             return MemoryMarshal.Read<T>(buffer);
         }
 
@@ -99,6 +97,17 @@ namespace Shockky.IO
             Array.Reverse(characters);
 
             return new string(characters);
+        }
+
+        public Color ReadColor()
+        {
+            byte r = ReadByte();
+            ReadByte();
+            byte g = ReadByte();
+            ReadByte();
+            byte b = ReadByte();
+            ReadByte();
+            return Color.FromArgb(r, g, b);
         }
 
         public Rectangle ReadRect()

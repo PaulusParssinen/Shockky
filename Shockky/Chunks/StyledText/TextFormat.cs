@@ -13,7 +13,6 @@ namespace Shockky.Chunks
         public bool Slant { get; set; }
         public byte Padding { get; set; }
         public short FontSize { get; set; }
-
         public Color Color { get; set; }
 
         public TextFormat(ShockwaveReader input)
@@ -25,11 +24,7 @@ namespace Shockky.Chunks
             Slant = input.ReadBoolean();
             Padding = input.ReadByte();
             FontSize = input.ReadBigEndian<short>();
-
-            byte r = input.ReadBytes(2)[0];
-            byte g = input.ReadBytes(2)[0];
-            byte b = input.ReadBytes(2)[0];
-            Color = Color.FromArgb(r, g, b);
+            Color = input.ReadColor();
         }
 
         public override int GetBodySize()
@@ -57,10 +52,7 @@ namespace Shockky.Chunks
             output.Write(Slant);
             output.Write(Padding);
             output.WriteBigEndian(FontSize);
-
-            output.WriteBigEndian((short)Color.R);
-            output.WriteBigEndian((short)Color.G);
-            output.WriteBigEndian((short)Color.B);
+            output.Write(Color);
         }
     }
 }

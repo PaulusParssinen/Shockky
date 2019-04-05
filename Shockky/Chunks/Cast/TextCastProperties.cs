@@ -9,9 +9,9 @@ namespace Shockky.Chunks.Cast
     public class TextCastProperties : ICastTypeProperties
     {
         public TextAlignment Alignment { get; set; }
-        public Rectangle Rectangle { get; set; }
-
+        public Color BackgroundColor { get; set; }
         public short Font { get; set; }
+        public Rectangle Rectangle { get; set; }
         public short LineHeight { get; set; }
         public short ButtonType { get; set; }
 
@@ -20,14 +20,13 @@ namespace Shockky.Chunks.Cast
             input.Position += 4;
 
             Alignment = (TextAlignment)input.ReadBigEndian<short>();
-            byte[] bgColor = input.ReadBytes(6);
+            BackgroundColor = input.ReadColor();
 
             Font = input.ReadBigEndian<short>();
             Rectangle = input.ReadRect();
             LineHeight = input.ReadBigEndian<short>();
 
             input.Position += 4;
-
             ButtonType = input.ReadBigEndian<short>();
         }
 
@@ -36,7 +35,7 @@ namespace Shockky.Chunks.Cast
             int size = 0;
             size += 4;
             size += sizeof(short);
-            size += 3;
+            size += 6;
             size += sizeof(short);
             size += sizeof(short) * 4;
             size += sizeof(short);
@@ -49,6 +48,7 @@ namespace Shockky.Chunks.Cast
         {
             throw new NotImplementedException(nameof(TextCastProperties));
             output.WriteBigEndian((short)Alignment);
+            output.Write(BackgroundColor);
 
             output.WriteBigEndian(Font);
             output.Write(Rectangle);
