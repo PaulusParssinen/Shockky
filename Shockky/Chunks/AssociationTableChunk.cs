@@ -8,21 +8,18 @@ namespace Shockky.Chunks
     public class AssociationTableChunk : ChunkItem
     {
         private const short ENTRY_SIZE = 12;
-
-        public int TotalCount { get; set; }
-        public int AssignedCount { get; set; }
-
+        
         public List<CastEntry> CastEntries { get; set; }
+        public int AssignedCount { get; set; }
 
         public AssociationTableChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
             input.ReadInt16();
             input.ReadInt16();
-            int totalCount = input.ReadInt32();
+            CastEntries = new List<CastEntry>(input.ReadInt32());
             AssignedCount = input.ReadInt32();
-
-            CastEntries = new List<CastEntry>(totalCount);
+            
             for (int i = 0; i < CastEntries.Capacity; i++)
             {
                 CastEntries.Add(new CastEntry(input));
@@ -37,9 +34,9 @@ namespace Shockky.Chunks
             output.Write(ENTRY_SIZE);
             output.Write(CastEntries?.Count ?? 0);
             output.Write(CastEntries?.Count ?? 0);
-            foreach (var entry in CastEntries)
+            foreach (CastEntry entry in CastEntries)
             {
-                output.Write(entry);
+                entry.WriteTo(output);
             }
         }
 
@@ -50,7 +47,7 @@ namespace Shockky.Chunks
             size += sizeof(short);
             size += sizeof(int);
             size += sizeof(int);
-            size += TotalCount * ENTRY_SIZE;
+            size += CastEntries.Count * ENTRY_SIZE;
             return size;
         }
     }

@@ -54,7 +54,7 @@ namespace Shockky
                 Metadata.Codec == CodecKind.FGDC)
             {
                 if (ChunkItem.Read(_input) is FileVersionChunk version &&
-                    ChunkItem.Read(_input) is FileCompressionTypesChunk fcdr &&
+                    ChunkItem.Read(_input) is FileCompressionTypesChunk compressionTypes &&
                     ChunkItem.Read(_input) is AfterburnerMapChunk afterburnerMap &&
                     ChunkItem.Read(_input) is FGEIChunk fgei)
                 {

@@ -1,4 +1,5 @@
-﻿using Shockky.IO;
+﻿using System;
+using Shockky.IO;
 
 namespace Shockky.Lingo
 {
@@ -23,9 +24,7 @@ namespace Shockky.Lingo
 
         public override int GetBodySize() => Code.Length;
 
-        public override void WriteTo(ShockwaveWriter output)
-        {
-            output.WriteBigEndian(Code?.Length ?? 0);
-        }
+        public override void WriteTo(ShockwaveWriter output) 
+            => throw new NotImplementedException();
     }
 }

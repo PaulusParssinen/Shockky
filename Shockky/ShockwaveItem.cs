@@ -13,11 +13,11 @@ namespace Shockky
 
         public byte[] ToArray()
         {
-            using (var outputMem = new MemoryStream())
-            using (var output = new ShockwaveWriter(outputMem))
+            using (var ms = new MemoryStream())
+            using (var output = new ShockwaveWriter(ms))
             {
                 WriteTo(output);
-                return outputMem.ToArray();
+                return ms.ToArray();
             }
         }
 

@@ -10,7 +10,7 @@ namespace Shockky.Chunks.Cast
         public string FilePath { get; set; }
 
         public short PreloadSettings { get; set; }
-        public short StorageType { get; set; }
+        public short MemberMin { get; set; }
         public short MemberCount { get; set; }
 
         public int Id { get; set; }
@@ -21,7 +21,7 @@ namespace Shockky.Chunks.Cast
             FilePath = input.ReadString();
 
             PreloadSettings = input.ReadBigEndian<short>();
-            StorageType = input.ReadBigEndian<short>();
+            MemberMin = input.ReadBigEndian<short>();
             MemberCount = input.ReadBigEndian<short>();
 
             Id = input.ReadBigEndian<int>();
@@ -43,7 +43,7 @@ namespace Shockky.Chunks.Cast
             output.Write(Name);
             output.Write(FilePath);
             output.WriteBigEndian(PreloadSettings);
-            output.WriteBigEndian(StorageType);
+            output.WriteBigEndian(MemberMin);
             output.WriteBigEndian(MemberCount);
             output.WriteBigEndian(Id);
         }

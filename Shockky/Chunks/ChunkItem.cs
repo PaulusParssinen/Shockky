@@ -80,10 +80,10 @@ namespace Shockky.Chunks
                 case ChunkKind.VWFI:
                     return new FileInfoChunk(input, header);
 
-                //case ChunkKind.LctX:
-                //    return new ScriptContextChunk(input, header);
-                //case ChunkKind.Lscr:
-                //    return new ScriptChunk(input, header);
+                case ChunkKind.LctX:
+                    return new ScriptContextChunk(input, header);
+                case ChunkKind.Lscr:
+                    return new ScriptChunk(input, header);
                 case ChunkKind.Lnam:
                     return new NameTableChunk(input, header);
 
@@ -124,7 +124,7 @@ namespace Shockky.Chunks
                     return new BitmapChunk(input, header);
 
                 default:
-                    Debug.WriteLine("Unknown section | " + header.Kind.ToFourCC());
+                    Debug.WriteLine("Unknown section " + header.Kind.ToFourCC());
                     return new UnknownChunk(input, header);
             }
         }
