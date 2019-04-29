@@ -40,7 +40,6 @@ namespace Shockky.Lingo
             HandlerVectorPosition = input.ReadBigEndian<short>();
 
             Body = new LingoHandlerBody(this, input);
-
             _codeOffset = input.ReadBigEndian<int>();
 
             Arguments.Capacity = input.ReadBigEndian<short>();
@@ -97,7 +96,15 @@ namespace Shockky.Lingo
         {
             output.WriteBigEndian(NameIndex);
             output.WriteBigEndian((short)HandlerVectorPosition);
-            Body.WriteTo(output);
+
+            output.WriteBigEndian(Body.Code.Length);
+            output.WriteBigEndian(0);
+
+            output.WriteBigEndian((short)Arguments.Capacity);
+            output.WriteBigEndian(0);
+
+            output.WriteBigEndian((short)Locals.Capacity);
+            output.WriteBigEndian(0);
         }
     }
 }

@@ -75,18 +75,18 @@ namespace Shockky.Lingo
             input.PopulateVList(script.Header.Offset + globalsOffset, Globals, input.ReadBigEndian<short>);
 
             input.PopulateVList(script.Header.Offset + handlersOffset, Handlers, ReadHandler);
-            foreach (var handler in Handlers)
+            foreach (LingoHandler handler in Handlers)
             {
                 handler.Populate(input, script.Header.Offset);
             }
 
             input.PopulateVList(script.Header.Offset + literalsOffset, Literals, ReadLiteral);
-            foreach (var literal in Literals)
+            foreach (LingoLiteral literal in Literals)
             {
-                if (script.Header.Offset + literalDataOffset < input.Position)
-                    continue;
-
                 literal.ReadValue(input, script.Header.Offset + literalDataOffset);
+
+                if (script.Header.Offset + literalDataOffset + literalDataLength <= input.Position)
+                    break;
             }
 
             input.PopulateVList(script.Header.Offset + handlerVectorOffset, HandlerVectors, input.ReadBigEndian<short>, 

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
 
 using Shockky.IO;
+using Shockky.Lingo.Syntax;
 using Shockky.Lingo.Bytecode;
 using Shockky.Lingo.Bytecode.Instructions;
 
@@ -44,7 +44,7 @@ namespace Shockky.Lingo
         public void LoadInstruction()
         {
             var sharedExits = new Dictionary<long, List<Jumper>>();
-
+            
             using (var input = new ShockwaveReader(_body.Code))
             {
                 while (input.IsDataAvailable)
@@ -83,12 +83,9 @@ namespace Shockky.Lingo
 
                         //Replace input.Position with previousPosition?
                         long exitPosition = (previousPosition + jumper.Offset);
-                        if (exitPosition == input.Length)
-                        {
-                            // Jump exit does not exist at this (non-existent)index, do not look for exit.
-                            continue;
-                        }
-                        else if (exitPosition < input.Length) // Forward jump.
+
+                        if (exitPosition == input.Length) continue;
+                        else if (exitPosition < input.Length)
                         {
                             jumpers = null;
                             if (!sharedExits.TryGetValue(exitPosition, out jumpers))
@@ -98,13 +95,28 @@ namespace Shockky.Lingo
                             }
                             jumpers.Add(jumper);
                         }
-                        else // Backwards jump.
+                        else
                         {
-                            Debug.WriteLine($"What the actual fuck: {exitPosition}/{input.Length}");
+                            Debug.WriteLine($"Let's jump right into it: {exitPosition}/{input.Length}");
                         }
                     }
                 }
             }
+        }
+
+        public void Create()
+        {
+            /*BlockStatement ifBlock = TranslateBlock(block);
+
+            Instruction last = block.Last();
+            if (Jumper.IsValid(last.OP))
+            {
+                BlockStatement elseBlock = TranslateBlock(GetJumpBlock((Jumper)last));
+                //where the first IfTrue should point to.
+            }*/
+
+            var statementBuilder = new StatementBuilder(this);
+            BlockStatement handlerBody = statementBuilder.ConvertBlock(_instructions);
         }
 
         public bool IsBackwardsJump(Jumper jumper)
