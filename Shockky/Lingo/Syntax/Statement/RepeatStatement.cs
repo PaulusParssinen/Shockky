@@ -7,9 +7,10 @@
 
         public RepeatStatement()
         { }
-        public RepeatStatement(Expression condition)
+        public RepeatStatement(Expression condition, BlockStatement body)
         {
-
+            Condition = condition;
+            Body = body;
         }
 
         public override void AcceptVisitor(IAstVisitor visitor)

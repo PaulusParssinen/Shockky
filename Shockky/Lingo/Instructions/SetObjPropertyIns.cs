@@ -1,22 +1,27 @@
 ﻿namespace Shockky.Lingo.Bytecode.Instructions
 {
-    public class SetObjPropertyIns : Instruction
+    public class SetObjPropertyIns : VariableAssignment
     {
+        private int _propertyNameIndex;
+        public int PropertyNameIndex
+        {
+            get => _propertyNameIndex;
+            set
+            {
+                _propertyNameIndex = value;
+                Name = Pool.NameList[value];
+            }
+        }
+
         public SetObjPropertyIns(LingoHandler handler)
             : base(OPCode.SetObjProp, handler)
         { }
         public SetObjPropertyIns(LingoHandler handler, int propertyNameIndex)
             : this(handler)
         {
-            Value = propertyNameIndex;
+            PropertyNameIndex = propertyNameIndex;
         }
 
-        public override int GetPopCount() => 1; //or2
-
-        /*   public override void Translate()
-           {
-               var value = Handler.Expressions.Pop();
-               var obj = Handler.Expressions.Pop();
-           }*/
+        public override int GetPopCount() => 2;
     }
 }

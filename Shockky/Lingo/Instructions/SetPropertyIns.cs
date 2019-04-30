@@ -1,9 +1,17 @@
 ﻿namespace Shockky.Lingo.Bytecode.Instructions
 {
-    public class SetPropertyIns : Instruction
+    public class SetPropertyIns : VariableAssignment
     {
-        public int NameIndex => Value;
-        public string Name => Pool.NameList[Pool.Properties[NameIndex]];
+        private int _propertNameIndex;
+        public int PropertyNameIndex
+        {
+            get => _propertNameIndex;
+            set
+            {
+                _propertNameIndex = value;
+                Name = Pool.NameList[value];
+            }
+        }
 
         public SetPropertyIns(LingoHandler handler)
             : base(OPCode.SetProperty, handler)
@@ -11,9 +19,7 @@
         public SetPropertyIns(LingoHandler handler, int propertyNameIndex)
             : this(handler)
         {
-            Value = propertyNameIndex;
+            PropertyNameIndex = propertyNameIndex;
         }
-
-        public override int GetPopCount() => 1;
     }
 }

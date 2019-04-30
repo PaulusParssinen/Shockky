@@ -1,17 +1,27 @@
 ﻿namespace Shockky.Lingo.Bytecode.Instructions
 {
-    public class CallObjectIns : Instruction
+    public class CallObjectIns : Call
     {
-        public int HandlerNameIndex => Value;
-        public string HandlerName => Pool.NameList[HandlerNameIndex];
+        private int _functionNameIndex;
+        public int FunctionNameIndex
+        {
+            get => _functionNameIndex;
+            set
+            {
+                _functionNameIndex = value;
+                TargetFunction = Pool.NameList[value];
+            }
+        }
 
         public CallObjectIns(LingoHandler handler)
             : base(OPCode.CallObj, handler)
-        { }
-        public CallObjectIns(LingoHandler handler, int handlerNameIndex)
-            : base(OPCode.CallObj, handler)
         {
-            Value = handlerNameIndex;
+            IsObjectCall = true;
+        }
+        public CallObjectIns(LingoHandler handler, int handlerNameIndex)
+            : this(handler)
+        {
+            FunctionNameIndex = handlerNameIndex;
         }
     }
 }

@@ -13,6 +13,9 @@
             }
         }
 
+        public bool IsMovieReference { get; protected set; }
+        public bool IsObjectReference { get; protected set; }
+
         protected VariableReference(OPCode op, LingoHandler handler)
             : base(op, handler)
         { }

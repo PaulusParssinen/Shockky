@@ -3,6 +3,8 @@
     public abstract class InstructionVisitor
     {
         protected abstract void Default(Instruction ins);
+
+        public virtual void VisitReturnInstruction(ReturnIns @return) => Default(@return);
         
         public virtual void VisitCallInstruction(Call call) => Default(call);
         public virtual void VisitUnaryInstruction(Unary unary) => Default(unary);
@@ -20,6 +22,8 @@
     {
         protected abstract void Default(Instruction ins, TContext context);
 
+        public virtual void VisitReturnInstruction(ReturnIns @return, TContext context) => Default(@return, context);
+
         public virtual void VisitCallInstruction(Call call, TContext context) => Default(call, context);
         public virtual void VisitUnaryInstruction(Unary unary, TContext context) => Default(unary, context);
         public virtual void VisitNewListInstruction(NewListIns newList, TContext context) => Default(newList, context);
@@ -35,6 +39,8 @@
     public abstract class InstructionVisitor<TContext, T>
     {
         protected abstract T Default(Instruction ins, TContext context);
+
+        public virtual T VisitReturnInstruction(ReturnIns @return, TContext context) => Default(@return, context);
 
         public virtual T VisitCallInstruction(Call call, TContext context) => Default(call, context);
         public virtual T VisitUnaryInstruction(Unary unary, TContext context) => Default(unary, context);

@@ -4,13 +4,18 @@ using System.Collections.Generic;
 
 using Shockky.Lingo.Bytecode;
 using Shockky.Lingo.Bytecode.Instructions;
+using System.Linq;
 
 namespace Shockky.Lingo.Syntax
 {
     public class StatementBuilder : InstructionVisitor<Stack<Expression>, Statement>
     {
         private readonly ExpressionBuilder _expressionBuilder;
+
         private readonly Dictionary<Jumper, Instruction[]> _jumpBlocks;
+        private readonly Dictionary<Jumper, BlockStatement> _jumpBlockStatements;
+
+        private readonly Dictionary<IfTrueIns, Instruction[]> _elseBlocks;
 
         public StatementBuilder(LingoCode code)
         {
@@ -21,6 +26,12 @@ namespace Shockky.Lingo.Syntax
             {
                 _jumpBlocks.Add(jumper, code.GetJumpBlock(jumper));
             }
+            /*
+            foreach (Jumper jumper in code.JumpExits.Keys)
+            {
+                _jumpBlockStatements.Add(jumper, ConvertBlock(code.GetJumpBlock(jumper)));
+            }
+            */
         }
 
         public BlockStatement ConvertBlock(IEnumerable<Instruction> instructions)
@@ -41,15 +52,23 @@ namespace Shockky.Lingo.Syntax
         public CallExpression CreateCall(Call call, Stack<Expression> expressionStack)
         {
             Expression expression = expressionStack.Pop();
+            
+            if (!(expression is ArgumentListExpression) && 
+                !(expression is ListExpression list))
+                throw new Exception();
 
-            if (!(expression is ArgumentListExpression) &&
-                !(expression is ListExpression)) throw new InvalidOperationException("illegal");
+            IList<Expression> arguments = ((IArgumentList)expression).Items;
+            Expression targetExpression = new IdentifierExpression(call.TargetFunction);
 
-            return new CallExpression
+            if (call.IsObjectCall)
             {
-                Target = call.TargetFunction,
-                Arguments = (IEnumerable<Expression>)expression
-            };
+                Expression targetObj = arguments[0];
+                arguments.RemoveAt(0);
+
+                targetExpression = new MemberReferenceExpression(targetObj, (IdentifierExpression)targetExpression);
+            }
+
+            return new CallExpression(targetExpression, arguments);
         }
 
         public override Statement VisitCallInstruction(Call call, Stack<Expression> expressionStack)
@@ -60,11 +79,18 @@ namespace Shockky.Lingo.Syntax
         public override Statement VisitVariableAssignmentInstruction(VariableAssignment variableAssignment, Stack<Expression> expressionStack)
         {
             Expression initializer = expressionStack.Pop();
+            Expression targetExpression = new IdentifierExpression(variableAssignment.Name);
+
+            if (variableAssignment.IsObjectReference)
+            {
+                Expression objectExpression = expressionStack.Pop();
+                targetExpression = new MemberReferenceExpression(objectExpression, (IdentifierExpression)targetExpression);
+            }
 
             return new AssignmentStatement
             {
-                Name = variableAssignment.Name,
-                InitializerExpression = initializer
+                Target = targetExpression,
+                Initializer = initializer
             };
         }
         
@@ -72,6 +98,11 @@ namespace Shockky.Lingo.Syntax
         {
             throw new NotImplementedException(nameof(VisitIfTrueInstruction));
             return default;
+        }
+
+        public override Statement VisitReturnInstruction(ReturnIns @return, Stack<Expression> context)
+        {
+            return new ExitStatement();
         }
 
         protected override Statement Default(Instruction instruction, Stack<Expression> expressionStack)

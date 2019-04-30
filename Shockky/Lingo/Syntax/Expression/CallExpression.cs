@@ -4,12 +4,11 @@ namespace Shockky.Lingo.Syntax
 {
     public class CallExpression : Expression
     {
-        public string Target { get; set; }
-        public IEnumerable<Expression> Arguments { get; set; }
+        public Expression Target { get; set; }
+        public IList<Expression> Arguments { get; set; }
 
-        public CallExpression()
-        { }
-        public CallExpression(string target, IEnumerable<Expression> arguments)
+        public CallExpression() { }
+        public CallExpression(Expression target, IList<Expression> arguments)
         {
             Target = target;
             Arguments = arguments;

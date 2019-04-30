@@ -4,7 +4,9 @@
     {
         public PushZeroIns()
             : base(OPCode.PushInt0)
-        { }
+        {
+            Value = 0;
+        }
 
         public override void Execute(LingoMachine machine)
         {

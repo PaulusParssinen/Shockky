@@ -2,15 +2,14 @@
 {
     public class AssignmentStatement : Statement
     {
-        public Expression InitializerExpression { get; set; }
-
-        public string Name { get; set; }
+        public Expression Target { get; set; }
+        public Expression Initializer { get; set; }
 
         public AssignmentStatement() { }
-        public AssignmentStatement(string name, Expression initializerExpression)
+        public AssignmentStatement(Expression targetExpression, Expression initializerExpression)
         {
-            Name = name;
-            InitializerExpression = initializerExpression;
+            Target = targetExpression;
+            Initializer = initializerExpression;
         }
 
         public override void AcceptVisitor(IAstVisitor visitor)

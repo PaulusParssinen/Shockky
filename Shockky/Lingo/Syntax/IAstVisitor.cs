@@ -3,7 +3,9 @@
     public interface IAstVisitor
     {
         void VisitSyntaxTree(SyntaxTree syntaxTree);
-        
+
+        void VisitExitStatement(ExitStatement exitStatement);
+
         void VisitIfStatement(IfStatement ifStatement);
         void VisitBlockStatement(BlockStatement blockStatement);
         void VisitSwitchStatement(SwitchStatement switchStatement);
@@ -18,5 +20,8 @@
         void VisitArgumentListExpression(ArgumentListExpression argumentListExpression);
         void VisitUnaryOperatorExpression(UnaryOperatorExpression unaryOperatorExpression);
         void VisitBinaryOperatorExpression(BinaryOperatorExpression binaryOperatorExpression);
+
+        void VisitMovieReferenceExpression(MovieReferenceExpression movieReferenceExpression);
+        void VisitMemberReferenceExpression(MemberReferenceExpression memberReferenceExpression);
     }
 }

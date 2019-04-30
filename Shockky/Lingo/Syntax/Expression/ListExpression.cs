@@ -1,16 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Shockky.Lingo.Syntax
 {
-    public class ListExpression : Expression, IEnumerable<Expression>
+    public class ListExpression : Expression, IArgumentList
     {
-        public IEnumerable<Expression> Items { get; set; }
+        public IList<Expression> Items { get; set; }
         public bool IsWrapped { get; set; }
 
-        public ListExpression()
-        { }
-        public ListExpression(IEnumerable<Expression> items)
+        public ListExpression() { }
+        public ListExpression(IList<Expression> items)
         {
             Items = items;
         }
@@ -19,8 +17,5 @@ namespace Shockky.Lingo.Syntax
         {
             visitor.VisitListExpression(this);
         }
-
-        public IEnumerator<Expression> GetEnumerator() => Items.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

@@ -13,6 +13,8 @@
             }
         }
 
+        public bool IsObjectCall { get; protected set; }
+
         protected Call(OPCode op)
             : base(op)
         { }

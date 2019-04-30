@@ -1,9 +1,17 @@
 ﻿namespace Shockky.Lingo.Bytecode.Instructions
 {
-    public class GetPropertyIns : Instruction
+    public class GetPropertyIns : VariableReference
     {
-        public int NameIndex => Value;
-        public string Name => Pool.NameList[NameIndex];
+        private int _propertyNameIndex;
+        public int PropertyNameIndex
+        {
+            get => _propertyNameIndex;
+            set
+            {
+                _propertyNameIndex = value;
+                Name = Pool.NameList[value];
+            }
+        }
 
         public GetPropertyIns(LingoHandler handler)
             : base(OPCode.GetProperty, handler)
@@ -11,9 +19,7 @@
         public GetPropertyIns(LingoHandler handler, int propertyNameIndex)
             : this(handler)
         {
-            Value = propertyNameIndex;
+            PropertyNameIndex = propertyNameIndex;
         }
-
-        public override int GetPushCount() => 1;
     }
 }

@@ -18,29 +18,42 @@ namespace Shockky.Lingo.Syntax
 
         public override void VisitNewListInstruction(NewListIns newList, Stack<Expression> expressionStack)
         {
-            Expression[] items = new Expression[newList.ItemCount];
-            for (int i = 0; i < items.Length; i++)
+            List<Expression> items = new List<Expression>(newList.ItemCount);
+            for (int i = 0; i < items.Capacity; i++)
             {
-                items[i] = expressionStack.Pop();
+                items.Add(expressionStack.Pop());
             }
 
             if (newList.IsArgumentList)
                 expressionStack.Push(new ArgumentListExpression(items));
             else expressionStack.Push(new ListExpression(items));
         }
-
         public override void VisitWrapListInstrution(WrapListIns wrapList, Stack<Expression> expressionStack)
         {
             if (!(expressionStack.Pop() is ListExpression listExpression))
                 throw new Exception(nameof(VisitWrapListInstrution));
-
+            
             listExpression.IsWrapped = true;
             expressionStack.Push(listExpression);
         }
 
         public override void VisitVariableReferenceInstruction(VariableReference variableReference, Stack<Expression> expressionStack)
         {
-            expressionStack.Push(new IdentifierExpression(variableReference.Name));
+            Expression referenceExpression = new IdentifierExpression(variableReference.Name);
+
+            if (variableReference.IsMovieReference)
+            {
+                expressionStack.Pop(); //TODO:
+                referenceExpression = new MovieReferenceExpression(referenceExpression);
+            }
+
+            if (variableReference.IsObjectReference)
+            {
+                Expression objectExpression = expressionStack.Pop();
+                referenceExpression = new MemberReferenceExpression(objectExpression, (IdentifierExpression)referenceExpression);
+            }
+
+            expressionStack.Push(referenceExpression);
         }
         public override void VisitPrimitiveInstruction(Primitive primitive, Stack<Expression> expressionStack)
         {
@@ -53,8 +66,7 @@ namespace Shockky.Lingo.Syntax
 
             if (expression is ListExpression)
                 expressionStack.Push(_statementBuilder.CreateCall(call, expressionStack));
-
-            Default(call, expressionStack);
+            else Default(call, expressionStack);
         }
 
         public override void VisitComputationInstruction(Computation computation, Stack<Expression> expressionStack)
@@ -67,7 +79,7 @@ namespace Shockky.Lingo.Syntax
 
         protected override void Default(Instruction instruction, Stack<Expression> expressionStack)
         {
-            _ = instruction.AcceptVisitor(_statementBuilder, expressionStack);
+            instruction.AcceptVisitor(_statementBuilder, expressionStack);
         }
     }
 }
