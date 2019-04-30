@@ -32,7 +32,7 @@ namespace Shockky.Chunks
                 if (i == offsetMap.Length - 1)
                     Labels[frame] = labels.Substring(offset);
                 else
-                    Labels[frame] = labels.Substring(offset, offsetMap[i + 1].offset);
+                    Labels[frame] = labels.Substring(offset, offsetMap[i + 1].offset - offset);
             }
         }
 
