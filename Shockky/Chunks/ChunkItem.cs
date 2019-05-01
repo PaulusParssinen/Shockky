@@ -92,16 +92,17 @@ namespace Shockky.Chunks
                 case ChunkKind.CASt:
                     return new CastMemberPropertiesChunk(input, header);
                     
-                //case ChunkKind.Cinf:
+                case ChunkKind.MCsL:
+                    return new MovieCastListChunk(input, header);
+                
+                    //case ChunkKind.Cinf:
                 //    return new CastInfoChunk(input, header);
-                //case ChunkKind.SCRF:
-                //    return new ScoreReferenceChunk(input, header);
+                case ChunkKind.SCRF:
+                    return new ScoreReferenceChunk(input, header);
                 case ChunkKind.Sord:
                     return new SortOrderChunk(input, header);
                 case ChunkKind.CLUT:
                     return new PaletteChunk(input, header);
-                case ChunkKind.MCsL:
-                    return new MovieCastListChunk(input, header);
                 case ChunkKind.STXT:
                     return new StyledTextChunk(input, header);
 
