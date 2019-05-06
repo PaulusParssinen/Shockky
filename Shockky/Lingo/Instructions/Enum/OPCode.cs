@@ -1,4 +1,4 @@
-﻿namespace Shockky.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Lingo.Instructions
 {
     public enum OPCode
     {
@@ -76,7 +76,9 @@
         CallObj,
         PushInt2 = 0x6e,
         PushInt3,
-        Op_70 = 0x70,
+        GetSpecial, //TODO:
+        PushFloat,
+        Op_72,
         Op_7d = 0x7d
     }
 }

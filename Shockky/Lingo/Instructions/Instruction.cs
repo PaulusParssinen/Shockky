@@ -2,9 +2,8 @@
 using System.Diagnostics;
 
 using Shockky.IO;
-using Shockky.Lingo.Bytecode.Instructions;
 
-namespace Shockky.Lingo.Bytecode
+namespace Shockky.Lingo.Instructions
 {
     public abstract class Instruction : ShockwaveItem, ICloneable
     {
@@ -139,16 +138,16 @@ namespace Shockky.Lingo.Bytecode
                     break;
                 case OPCode.CastString:
                     return new CastStringIns();
-                case OPCode.StartObject:
+                case OPCode.StartObject: //PushScopeIns
                     return new StartObjectIns();
-                case OPCode.StopObject:
+                case OPCode.StopObject: //PopScopeIns
                     return new StopObjectIns();
                 case OPCode.WrapList:
                     return new WrapListIns();
                 case OPCode.NewPropList:
                     return new NewPropListIns();
                 case OPCode.Swap:
-                    break;
+                    return new SwapIns();
 
                 //Multi 
 
@@ -224,9 +223,19 @@ namespace Shockky.Lingo.Bytecode
                 case OPCode.PushInt2:
                 case OPCode.PushInt3:
                     return new PushIntIns(handler, operandValue);
+                case OPCode.GetSpecial:
+                    string specialField = handler.Script.Pool.GetName(operandValue);
+                    break;
+                case OPCode.PushFloat:
+                    return new PushFloat(handler, operandValue);
+                case OPCode.Op_72:
+                    //Operand points to names prefixed by "_", is this again some special movie property get? 
+                    //TODO: inspect stack at this OP. 
+                    string _prefixed = handler.Script.Pool.GetName(operandValue); //Occurred values: _movie, _global, _system
+                    break;
             }
 
-            Debug.WriteLine($"{ogOp:X2} {(op > 0x40 ? operandValue.ToString() : string.Empty)}");
+            //Debug.WriteLine($"{ogOp:X2}|{Enum.GetName(typeof(OPCode), (OPCode)op)} {(op > 0x40 ? operandValue.ToString() : string.Empty)}");
             return null;
         }
 
