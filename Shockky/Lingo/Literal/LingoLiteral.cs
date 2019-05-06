@@ -1,10 +1,11 @@
 ﻿using Shockky.IO;
+using System;
 
 namespace Shockky.Lingo
 {
-    public class LingoLiteral : ShockwaveItem
+    public class LingoLiteral : ShockwaveItem, IEquatable<LingoLiteral>
     {
-        protected override string DebuggerDisplay => $"Offset: {Offset} | Value: {Value ?? "NULL"}";
+        protected override string DebuggerDisplay => $"Offset: {Offset} | [{Enum.GetName(typeof(LiteralKind), Kind)}] {Value ?? "NULL"}";
 
         public LiteralKind Kind { get; set; }
         public long Offset { get; set; }
@@ -39,15 +40,13 @@ namespace Shockky.Lingo
                     case LiteralKind.Float:
                         Value = input.ReadBigEndian<long>();
                         break;
-                    case LiteralKind.MaybeCompiledJavascript:
+                    case LiteralKind.CompiledJavascript:
                         Value = input.ReadBytes(length);
                         break;
                 }
             }
             else Value = Offset;
         }
-
-        //TODO: Could create static Create method
 
         public override int GetBodySize()
         {
@@ -62,5 +61,8 @@ namespace Shockky.Lingo
             output.WriteBigEndian((int)Kind);
             output.WriteBigEndian(Offset);
         }
+
+        public bool Equals(LingoLiteral literal)
+            => (literal.Kind == Kind && literal.Value == Value); 
     }
 }

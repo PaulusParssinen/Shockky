@@ -105,38 +105,35 @@ namespace Shockky.Lingo
 
         public int AddLiteral(object value, bool recycle = true)
         {
-            LiteralKind type;
+            LiteralKind kind;
 
-            switch (Type.GetTypeCode(value.GetType()))
+            switch (Type.GetTypeCode(value?.GetType() ?? null))
             {
                 case TypeCode.Int32:
                 case TypeCode.UInt32:
-                    type = LiteralKind.Integer;
+                    kind = LiteralKind.Integer;
                     break;
                 case TypeCode.String:
-                    type = LiteralKind.String;
+                    kind = LiteralKind.String;
+                    break;
+                case TypeCode.Int64:
+                case TypeCode.UInt64:
+                    kind = LiteralKind.Float;
+                    break;
+                case TypeCode.Empty:
+                    kind = LiteralKind.Unknown;
                     break;
                 default: return -1;
             }
 
-            return AddLiteral(type, value, recycle);
-        }
-        public int AddLiteral(LiteralKind kind, object value, bool recycle = true)
-        {
-            int index = (recycle ? Literals.FindIndex(i => i.Kind == kind && i.Value == value) : -1);
-            if (index == -1)
-            {
-                Literals.Add(new LingoLiteral(kind, value));
-                index = (Literals.Count - 1);
-            }
-            return index;
+            return AddConstant(Literals, new LingoLiteral(kind, value), recycle);;
         }
         
         //TODO: implement ConstantKind?
 
         protected virtual int AddConstant<T>(List<T> constants, T value, bool recycle)
         {
-            int index = (recycle ? constants.IndexOf(value, 1) : -1);
+            int index = (recycle ? constants.IndexOf(value) : -1);
             if (index == -1)
             {
                 constants.Add(value);
