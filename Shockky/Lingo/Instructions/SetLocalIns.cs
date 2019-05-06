@@ -1,4 +1,4 @@
-﻿namespace Shockky.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Lingo.Instructions
 {
     public class SetLocalIns : VariableAssignment
     {

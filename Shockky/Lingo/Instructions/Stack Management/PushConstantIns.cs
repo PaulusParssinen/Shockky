@@ -1,4 +1,4 @@
-﻿namespace Shockky.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Lingo.Instructions
 {
     public class PushConstantIns : Primitive
     {
@@ -9,7 +9,7 @@
             set
             {
                 _valueIndex = value;
-                base.Value = Pool.Literals[value].Value;
+                Value = Pool.Literals[value].Value;
             }
         }
 

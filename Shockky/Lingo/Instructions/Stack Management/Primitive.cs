@@ -2,7 +2,7 @@
 
 using Shockky.IO;
 
-namespace Shockky.Lingo.Bytecode.Instructions
+namespace Shockky.Lingo.Instructions
 {
     public abstract class Primitive : Instruction
     {
@@ -45,10 +45,10 @@ namespace Shockky.Lingo.Bytecode.Instructions
                 case OPCode.PushInt0:
                 case OPCode.PushInt:
                 case OPCode.PushInt2:
+                case OPCode.PushFloat:
                 case OPCode.PushConstant:
-                //case OPCode.PushSymbol: //TODO <--
+                //case OPCode.PushSymbol: //TODO:
                     return true;
-
                 default:
                     return false;
             }

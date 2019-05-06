@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Shockky.Lingo.Bytecode.Instructions
+namespace Shockky.Lingo.Instructions
 {
     public class StartObjectIns : Instruction
     {

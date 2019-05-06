@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Shockky.Lingo.Bytecode.Instructions
+namespace Shockky.Lingo.Instructions
 {
     public class GetIns : Instruction
     {

@@ -1,4 +1,4 @@
-﻿namespace Shockky.Lingo.Bytecode.Instructions
+﻿namespace Shockky.Lingo.Instructions
 {
     public class PushSymbolIns : Instruction
     {
@@ -40,5 +40,18 @@
         }
 
         public override int GetPushCount() => 1;
+
+        public override void AcceptVisitor(InstructionVisitor visitor)
+        {
+            visitor.VisitSymbolInstruction(this);
+        }
+        public override void AcceptVisitor<TContext>(InstructionVisitor<TContext> visitor, TContext context)
+        {
+            visitor.VisitSymbolInstruction(this, context);
+        }
+        public override T AcceptVisitor<TContext, T>(InstructionVisitor<TContext, T> visitor, TContext context)
+        {
+            return visitor.VisitSymbolInstruction(this, context);
+        }
     }
 }
