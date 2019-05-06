@@ -4,8 +4,7 @@ using System.Collections.Generic;
 
 using Shockky.IO;
 using Shockky.Lingo.Syntax;
-using Shockky.Lingo.Bytecode;
-using Shockky.Lingo.Bytecode.Instructions;
+using Shockky.Lingo.Instructions;
 
 namespace Shockky.Lingo
 {
@@ -54,9 +53,8 @@ namespace Shockky.Lingo
 
                     _instructions.Add(instruction);
 
-#if DEBUG
                     if (instruction == null) continue;
-#endif
+
                     _indices.Add(instruction, _indices.Count);
                     
                     if (!_opGroups.TryGetValue(instruction.OP, out List<Instruction> instructions))

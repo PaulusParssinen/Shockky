@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
 
-using Shockky.Lingo.Bytecode;
-using Shockky.Lingo.Bytecode.Instructions;
+using Shockky.Lingo.Instructions;
 
 namespace Shockky.Lingo.Syntax
 {
@@ -58,6 +56,10 @@ namespace Shockky.Lingo.Syntax
         public override void VisitPrimitiveInstruction(Primitive primitive, Stack<Expression> expressionStack)
         {
             expressionStack.Push(new PrimitiveExpression(primitive.Value));
+        }
+        public override void VisitSymbolInstruction(PushSymbolIns symbol, Stack<Expression> expressionStack)
+        {
+            expressionStack.Push(new SymbolExpression(symbol.Name));
         }
 
         public override void VisitCallInstruction(Call call, Stack<Expression> expressionStack)

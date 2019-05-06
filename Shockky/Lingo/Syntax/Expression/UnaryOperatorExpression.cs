@@ -1,4 +1,4 @@
-﻿using Shockky.Lingo.Bytecode.Instructions;
+﻿using Shockky.Lingo.Instructions;
 
 namespace Shockky.Lingo.Syntax
 {

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
 
-using Shockky.Lingo.Bytecode;
-using Shockky.Lingo.Bytecode.Instructions;
-using System.Linq;
+using Shockky.Lingo.Instructions;
 
 namespace Shockky.Lingo.Syntax
 {
@@ -94,13 +91,13 @@ namespace Shockky.Lingo.Syntax
             };
         }
         
-        public override Statement VisitIfTrueInstruction(IfTrueIns ifTrue, Stack<Expression> context)
+        public override Statement VisitIfTrueInstruction(IfTrueIns ifTrue, Stack<Expression> expressionStack)
         {
             throw new NotImplementedException(nameof(VisitIfTrueInstruction));
             return default;
         }
 
-        public override Statement VisitReturnInstruction(ReturnIns @return, Stack<Expression> context)
+        public override Statement VisitReturnInstruction(ReturnIns @return, Stack<Expression> expressionStack)
         {
             return new ExitStatement();
         }
