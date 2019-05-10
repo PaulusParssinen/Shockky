@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 using Shockky.Lingo.Instructions;
@@ -9,37 +10,47 @@ namespace Shockky.Lingo.Syntax
     {
         private readonly ExpressionBuilder _expressionBuilder;
 
-        private readonly Dictionary<Jumper, Instruction[]> _jumpBlocks;
-        private readonly Dictionary<Jumper, BlockStatement> _jumpBlockStatements;
-
+        private readonly Dictionary<IfTrueIns, List<Instruction>> _ifTrueBlocks;
         private readonly Dictionary<IfTrueIns, Instruction[]> _elseBlocks;
 
         public StatementBuilder(LingoCode code)
         {
             _expressionBuilder = new ExpressionBuilder(this);
 
-            _jumpBlocks = new Dictionary<Jumper, Instruction[]>(code.JumpExits.Count);
+            _ifTrueBlocks = new Dictionary<IfTrueIns, List<Instruction>>(code.JumpExits.Count);
+            _elseBlocks = new Dictionary<IfTrueIns, Instruction[]>(code.JumpExits.Count);
+
             foreach (Jumper jumper in code.JumpExits.Keys)
             {
-                _jumpBlocks.Add(jumper, code.GetJumpBlock(jumper));
+                if (jumper.OP != OPCode.IfTrue) continue;
+
+                var block = new List<Instruction>(code.GetJumpBlock(jumper));
+                if (block.Last() is Jumper jump)
+                {
+                    block.Remove(jump);
+                    _elseBlocks.Add((IfTrueIns)jumper, code.GetJumpBlock(jump));
+                }
+
+                _ifTrueBlocks.Add((IfTrueIns)jumper, block);
             }
-            /*
-            foreach (Jumper jumper in code.JumpExits.Keys)
-            {
-                _jumpBlockStatements.Add(jumper, ConvertBlock(code.GetJumpBlock(jumper)));
-            }
-            */
         }
 
         public BlockStatement ConvertBlock(IEnumerable<Instruction> instructions)
         {
             var statements = new List<Statement>();
             var stack = new Stack<Expression>();
-            
+
             foreach (var instruction in instructions)
-            { 
-                Statement stmt = instruction?.AcceptVisitor(this, stack);
-                if(stmt != null)
+            {
+                if (instruction == null)
+                {
+                    Console.WriteLine($"Unimplemented instruction! Stack: {stack.Count}");
+                    continue;
+                }
+
+                Statement stmt = instruction.AcceptVisitor(this, stack);
+
+                if (stmt != null)
                     statements.Add(stmt);
             }
 
@@ -50,11 +61,10 @@ namespace Shockky.Lingo.Syntax
         {
             Expression expression = expressionStack.Pop();
             
-            if (!(expression is ArgumentListExpression) && 
-                !(expression is ListExpression list))
+            if (!(expression is IArgumentList argumentList))
                 throw new Exception();
 
-            IList<Expression> arguments = ((IArgumentList)expression).Items;
+            IList<Expression> arguments = argumentList.Items;
             Expression targetExpression = new IdentifierExpression(call.TargetFunction);
 
             if (call.IsObjectCall)
@@ -70,7 +80,15 @@ namespace Shockky.Lingo.Syntax
 
         public override Statement VisitCallInstruction(Call call, Stack<Expression> expressionStack)
         {
-            return new ExpressionStatement(CreateCall(call, expressionStack));
+            Expression expression = expressionStack.Peek();
+
+            CallExpression callExpression = CreateCall(call, expressionStack);
+            if (expression is ListExpression)
+            {
+                expressionStack.Push(callExpression);
+                return default;
+            }
+            return new ExpressionStatement(callExpression);
         }
 
         public override Statement VisitVariableAssignmentInstruction(VariableAssignment variableAssignment, Stack<Expression> expressionStack)
@@ -93,8 +111,19 @@ namespace Shockky.Lingo.Syntax
         
         public override Statement VisitIfTrueInstruction(IfTrueIns ifTrue, Stack<Expression> expressionStack)
         {
-            throw new NotImplementedException(nameof(VisitIfTrueInstruction));
-            return default;
+            if (!_ifTrueBlocks.TryGetValue(ifTrue, out var trueBlock))
+                throw new Exception();
+
+            var ifStatement = new IfStatement
+            {
+                Condition = expressionStack.Pop(), //TODO: Validate more <^v
+                IfBlock = ConvertBlock(trueBlock)
+            };
+
+            if (_elseBlocks.TryGetValue(ifTrue, out var elseBlock))
+                ifStatement.ElseBlock = ConvertBlock(elseBlock);
+
+            return ifStatement;
         }
 
         public override Statement VisitReturnInstruction(ReturnIns @return, Stack<Expression> expressionStack)

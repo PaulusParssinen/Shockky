@@ -62,19 +62,10 @@ namespace Shockky.Lingo.Syntax
             expressionStack.Push(new SymbolExpression(symbol.Name));
         }
 
-        public override void VisitCallInstruction(Call call, Stack<Expression> expressionStack)
-        {
-            Expression expression = expressionStack.Peek();
-
-            if (expression is ListExpression)
-                expressionStack.Push(_statementBuilder.CreateCall(call, expressionStack));
-            else Default(call, expressionStack);
-        }
-
         public override void VisitComputationInstruction(Computation computation, Stack<Expression> expressionStack)
         {
-            Expression lhs = expressionStack.Pop();
             Expression rhs = expressionStack.Pop();
+            Expression lhs = expressionStack.Pop();
 
             expressionStack.Push(new BinaryOperatorExpression(lhs, computation.Kind, rhs));
         }
