@@ -126,7 +126,7 @@ namespace Shockky.Lingo
                 default: return -1;
             }
 
-            return AddConstant(Literals, new LingoLiteral(kind, value), recycle);;
+            return AddConstant(Literals, new LingoLiteral(kind, value), recycle);
         }
         
         //TODO: implement ConstantKind?
