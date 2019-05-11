@@ -17,6 +17,14 @@
         {
             visitor.VisitUnaryInstruction(this);
         }
+        public override void AcceptVisitor<TContext>(InstructionVisitor<TContext> visitor, TContext context)
+        {
+            visitor.VisitUnaryInstruction(this, context);
+        }
+        public override T AcceptVisitor<TContext, T>(InstructionVisitor<TContext, T> visitor, TContext context)
+        {
+            return visitor.VisitUnaryInstruction(this, context);
+        }
 
         public static bool IsValid(OPCode op)
         {

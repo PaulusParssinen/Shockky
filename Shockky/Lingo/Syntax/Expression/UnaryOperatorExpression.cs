@@ -4,12 +4,13 @@ namespace Shockky.Lingo.Syntax
 {
     public class UnaryOperatorExpression : Expression
     {
-        public UnaryOperatorKind Kind { get; set; }
+        public UnaryOperatorKind OperatorKind { get; set; }
         public Expression Expression { get; set; }
 
-        public UnaryOperatorExpression(UnaryOperatorKind kind, Expression expression)
+        public UnaryOperatorExpression() { }
+        public UnaryOperatorExpression(UnaryOperatorKind opKind, Expression expression)
         {
-            Kind = kind;
+            OperatorKind = opKind;
             Expression = expression;
         }
 

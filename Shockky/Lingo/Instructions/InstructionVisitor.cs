@@ -17,6 +17,7 @@
         public virtual void VisitIfTrueInstruction(IfTrueIns ifTrue) => Default(ifTrue);
         public virtual void VisitSymbolInstruction(PushSymbolIns symbol) => Default(symbol);
         public virtual void VisitWrapListInstrution(WrapListIns wrapList) => Default(wrapList);
+        public virtual void VisitNewPropertyListInstruction(NewPropListIns newPropList) => Default(newPropList);
     }
 
     public abstract class InstructionVisitor<TContext>
@@ -36,6 +37,7 @@
         public virtual void VisitIfTrueInstruction(IfTrueIns ifTrue, TContext context) => Default(ifTrue, context);
         public virtual void VisitSymbolInstruction(PushSymbolIns symbol, TContext context) => Default(symbol, context);
         public virtual void VisitWrapListInstrution(WrapListIns wrapList, TContext context) => Default(wrapList, context);
+        public virtual void VisitNewPropertyListInstruction(NewPropListIns newPropList, TContext context) => Default(newPropList, context);
     }
 
     public abstract class InstructionVisitor<TContext, T>
@@ -55,5 +57,6 @@
         public virtual T VisitIfTrueInstruction(IfTrueIns ifTrue, TContext context) => Default(ifTrue, context);
         public virtual T VisitSymbolInstruction(PushSymbolIns symbol, TContext context) => Default(symbol, context);
         public virtual T VisitWrapListInstrution(WrapListIns wrapList, TContext context) => Default(wrapList, context);
+        public virtual T VisitNewPropertyListInstruction(NewPropListIns newPropList, TContext context) => Default(newPropList, context);
     }
 }

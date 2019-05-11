@@ -21,6 +21,7 @@ namespace Shockky.Lingo.Syntax
             {
                 items.Add(expressionStack.Pop());
             }
+            items.Reverse();
 
             if (newList.IsArgumentList)
                 expressionStack.Push(new ArgumentListExpression(items));
@@ -33,6 +34,22 @@ namespace Shockky.Lingo.Syntax
             
             listExpression.IsWrapped = true;
             expressionStack.Push(listExpression);
+        }
+
+        public override void VisitNewPropertyListInstruction(NewPropListIns newPropList, Stack<Expression> expressionStack)
+        {
+            if (!(expressionStack.Pop() is ListExpression listExpression))
+                throw new Exception(nameof(VisitNewPropertyListInstruction));
+
+            if (listExpression.Items.Count % 2 != 0)
+                throw new InvalidOperationException($"Preceding listExpression has to be in property-value pairs");
+
+            var properties = new Dictionary<Expression, Expression>(listExpression.Items.Count / 2);
+            for (int i = 0; i < listExpression.Items.Count; i += 2)
+            {
+                properties.Add(listExpression.Items[i], listExpression.Items[i+1]);
+            }
+            expressionStack.Push(new PropertyListExpression(properties));
         }
 
         public override void VisitVariableReferenceInstruction(VariableReference variableReference, Stack<Expression> expressionStack)
@@ -62,6 +79,11 @@ namespace Shockky.Lingo.Syntax
             expressionStack.Push(new SymbolExpression(symbol.Name));
         }
 
+        public override void VisitUnaryInstruction(Unary unary, Stack<Expression> expressionStack)
+        {
+            Expression expression = expressionStack.Pop();
+            expressionStack.Push(new UnaryOperatorExpression(unary.Kind, expression));
+        }
         public override void VisitComputationInstruction(Computation computation, Stack<Expression> expressionStack)
         {
             Expression rhs = expressionStack.Pop();
