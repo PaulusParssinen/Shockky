@@ -13,6 +13,10 @@
         {
             visitor.VisitVariableAssignmentInstruction(this);
         }
+        public override void AcceptVisitor<TContext>(InstructionVisitor<TContext> visitor, TContext context)
+        {
+            visitor.VisitVariableAssignmentInstruction(this, context);
+        }
         public override T AcceptVisitor<TContext, T>(InstructionVisitor<TContext, T> visitor, TContext context)
         {
             return visitor.VisitVariableAssignmentInstruction(this, context);

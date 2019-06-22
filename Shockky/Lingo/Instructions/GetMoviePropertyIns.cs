@@ -1,46 +1,32 @@
-﻿using Shockky.IO;
-
-namespace Shockky.Lingo.Instructions
+﻿namespace Shockky.Lingo.Instructions
 {
-    public class GetMoviePropertyIns : Instruction
+    public class GetMoviePropertyIns : VariableReference
     {
-        private string _name;
-        public string Name
+        private int _valueIndex;
+        public int ValueIndex
         {
-            get => _name;
+            get => _valueIndex;
             set
             {
-                _name = value;
-                _nameIndex = Pool.AddName(value);
-            }
-        }
-
-        private int _nameIndex;
-        public int NameIndex
-        {
-            get => _nameIndex;
-            set
-            {
-                base.Value = value;
-                _nameIndex = value;
-                _name = Pool.NameList[value];
+                _valueIndex = value;
+                Name = Pool.NameList[value];
             }
         }
 
         public GetMoviePropertyIns(LingoHandler handler)
             : base(OPCode.GetMovieProp, handler)
-        { }
+        {
+            IsMoviePropertyReference = true;
+        }
         public GetMoviePropertyIns(LingoHandler handler, int propertyNameIndex)
             : this(handler)
         {
-            NameIndex = propertyNameIndex;
+            ValueIndex = propertyNameIndex;
         }
         public GetMoviePropertyIns(LingoHandler handler, string moviePropertyName)
             : this(handler)
         {
             Name = moviePropertyName;
         }
-
-        public override int GetPopCount() => 1;
     }
 }
