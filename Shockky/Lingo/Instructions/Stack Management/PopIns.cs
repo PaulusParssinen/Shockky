@@ -19,5 +19,18 @@
                 machine.Values.Pop();
             }
         }
+
+        public override void AcceptVisitor(InstructionVisitor visitor)
+        {
+            visitor.VisitPopInstruction(this);
+        }
+        public override void AcceptVisitor<TContext>(InstructionVisitor<TContext> visitor, TContext context)
+        {
+            visitor.VisitPopInstruction(this, context);
+        }
+        public override T AcceptVisitor<TContext, T>(InstructionVisitor<TContext, T> visitor, TContext context)
+        {
+            return visitor.VisitPopInstruction(this, context);
+        }
     }
 }

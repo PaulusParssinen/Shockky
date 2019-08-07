@@ -92,6 +92,15 @@ namespace Shockky.Lingo.Syntax
             expressionStack.Push(new BinaryOperatorExpression(lhs, computation.Kind, rhs));
         }
 
+        public override void VisitPopInstruction(PopIns pop, Stack<Expression> expressionStack)
+        {
+            expressionStack.Pop();
+        }
+        public override void VisitDuplicateInstruction(DupIns pop, Stack<Expression> expressionStack)
+        {
+            expressionStack.Push(expressionStack.Peek());
+        }
+
         protected override void Default(Instruction instruction, Stack<Expression> expressionStack)
         {
             instruction.AcceptVisitor(_statementBuilder, expressionStack);

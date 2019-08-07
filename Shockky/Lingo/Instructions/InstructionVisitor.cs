@@ -18,6 +18,9 @@
         public virtual void VisitSymbolInstruction(PushSymbolIns symbol) => Default(symbol);
         public virtual void VisitWrapListInstrution(WrapListIns wrapList) => Default(wrapList);
         public virtual void VisitNewPropertyListInstruction(NewPropListIns newPropList) => Default(newPropList);
+
+        public virtual void VisitPopInstruction(PopIns pop) => Default(pop);
+        public virtual void VisitDuplicateInstruction(DupIns dup) => Default(dup);
     }
 
     public abstract class InstructionVisitor<TContext>
@@ -38,6 +41,9 @@
         public virtual void VisitSymbolInstruction(PushSymbolIns symbol, TContext context) => Default(symbol, context);
         public virtual void VisitWrapListInstrution(WrapListIns wrapList, TContext context) => Default(wrapList, context);
         public virtual void VisitNewPropertyListInstruction(NewPropListIns newPropList, TContext context) => Default(newPropList, context);
+
+        public virtual void VisitPopInstruction(PopIns pop, TContext context) => Default(pop, context);
+        public virtual void VisitDuplicateInstruction(DupIns dup, TContext context) => Default(dup, context);
     }
 
     public abstract class InstructionVisitor<TContext, T>
@@ -58,5 +64,8 @@
         public virtual T VisitSymbolInstruction(PushSymbolIns symbol, TContext context) => Default(symbol, context);
         public virtual T VisitWrapListInstrution(WrapListIns wrapList, TContext context) => Default(wrapList, context);
         public virtual T VisitNewPropertyListInstruction(NewPropListIns newPropList, TContext context) => Default(newPropList, context);
+
+        public virtual T VisitPopInstruction(PopIns pop, TContext context) => Default(pop, context);
+        public virtual T VisitDuplicateInstruction(DupIns dup, TContext context) => Default(dup, context);
     }
 }
