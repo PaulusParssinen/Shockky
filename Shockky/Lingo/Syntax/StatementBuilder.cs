@@ -8,52 +8,65 @@ namespace Shockky.Lingo.Syntax
 {
     public class StatementBuilder : InstructionVisitor<Stack<Expression>, Statement>
     {
+        private readonly LingoCode _code;
         private readonly ExpressionBuilder _expressionBuilder;
 
-        private readonly Dictionary<IfTrueIns, List<Instruction>> _ifTrueBlocks;
-        private readonly Dictionary<IfTrueIns, Instruction[]> _elseBlocks;
+        private readonly Dictionary<IfTrueIns, BlockStatement> _ifTrueBlocks;
+        private readonly Dictionary<IfTrueIns, BlockStatement> _elseBlocks;
+
+        private int _intendation = 0;
 
         public StatementBuilder(LingoCode code)
         {
+            _code = code;
             _expressionBuilder = new ExpressionBuilder(this);
 
-            _ifTrueBlocks = new Dictionary<IfTrueIns, List<Instruction>>(code.JumpExits.Count);
-            _elseBlocks = new Dictionary<IfTrueIns, Instruction[]>(code.JumpExits.Count);
-
-            foreach (Jumper jumper in code.JumpExits.Keys)
-            {
-                if (jumper.OP != OPCode.IfTrue) continue;
-
-                var block = new List<Instruction>(code.GetJumpBlock(jumper));
-                if (block.Last() is Jumper jump)
-                {
-                    block.Remove(jump);
-                    _elseBlocks.Add((IfTrueIns)jumper, code.GetJumpBlock(jump));
-                }
-
-                _ifTrueBlocks.Add((IfTrueIns)jumper, block);
-            }
+            _ifTrueBlocks = new Dictionary<IfTrueIns, BlockStatement>(code.JumpExits.Count);
+            _elseBlocks = new Dictionary<IfTrueIns, BlockStatement>(code.JumpExits.Count);
         }
 
-        public BlockStatement ConvertBlock(IEnumerable<Instruction> instructions)
+        public BlockStatement ConvertBlock(Instruction[] instructions, Stack<Expression> stack, out int consumed)
         {
             var statements = new List<Statement>();
-            var stack = new Stack<Expression>();
-
-            foreach (var instruction in instructions)
+            for (consumed = 0; consumed < instructions.Length; consumed++)
             {
+                Instruction instruction = instructions[consumed];
+
+                Console.WriteLine(new string('\t', _intendation) + $"[{consumed}/{instructions.Length}] {instruction.OP}");
+
                 if (instruction == null)
                 {
                     Console.WriteLine($"Unimplemented instruction! Stack: {stack.Count}");
                     continue;
                 }
 
+                if (instruction is IfTrueIns ifTrue)
+                {
+                    var block = new List<Instruction>(_code.GetJumpBlock(ifTrue));
+                    Console.WriteLine(new string('\t', ++_intendation) + $"# Entering conditional block. Stack: {stack.Count}");
+
+                    _ifTrueBlocks.Add(ifTrue, ConvertBlock(block.ToArray(), stack, out int ifConsumed));
+                    consumed += ifConsumed;
+                    Console.WriteLine(new string('\t', --_intendation) + $"# Block exit. Stack: {stack.Count}");
+
+                    if (block.Last() is Jumper jump)
+                    {
+                        block.Remove(jump);
+                        var elseBlock = _code.GetJumpBlock(jump);
+
+                        Console.WriteLine(new string('\t', _intendation++) + $"# Has else block. Entering.. Stack: {stack.Count}");
+
+                        _elseBlocks.Add(ifTrue, ConvertBlock(elseBlock, stack, out int elseConsumed));
+                        consumed += elseConsumed;
+
+                        Console.WriteLine(new string('\t', --_intendation) + $"# Block exit. Stack: {stack.Count}");
+                    }
+                }
                 Statement stmt = instruction.AcceptVisitor(this, stack);
 
                 if (stmt != null)
                     statements.Add(stmt);
             }
-
             return new BlockStatement(statements);
         }
 
@@ -117,11 +130,11 @@ namespace Shockky.Lingo.Syntax
             var ifStatement = new IfStatement
             {
                 Condition = expressionStack.Pop(), //TODO: Validate more <^v
-                IfBlock = ConvertBlock(trueBlock)
+                IfBlock = trueBlock
             };
 
             if (_elseBlocks.TryGetValue(ifTrue, out var elseBlock))
-                ifStatement.ElseBlock = ConvertBlock(elseBlock);
+                ifStatement.ElseBlock = elseBlock;
 
             return ifStatement;
         }

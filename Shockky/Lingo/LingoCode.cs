@@ -79,24 +79,19 @@ namespace Shockky.Lingo
                         var jumper = (Jumper)instruction;
                         if (jumper.Offset == 0) continue;
 
-                        //Replace input.Position with previousPosition?
-                        long exitPosition = (previousPosition + jumper.Offset);
-
+                        long exitPosition = previousPosition + jumper.Offset;
                         if (exitPosition == input.Length) continue;
-                        else if (exitPosition < input.Length)
+
+                        if (instruction.OP == OPCode.EndRepeat)
+                            exitPosition = previousPosition - jumper.Offset;
+
+                        jumpers = null;
+                        if (!sharedExits.TryGetValue(exitPosition, out jumpers))
                         {
-                            jumpers = null;
-                            if (!sharedExits.TryGetValue(exitPosition, out jumpers))
-                            {
-                                jumpers = new List<Jumper>();
-                                sharedExits.Add(exitPosition, jumpers);
-                            }
-                            jumpers.Add(jumper);
+                            jumpers = new List<Jumper>();
+                            sharedExits.Add(exitPosition, jumpers);
                         }
-                        else
-                        {
-                            Debug.WriteLine($"Let's jump right into it: {exitPosition}/{input.Length}");
-                        }
+                        jumpers.Add(jumper);
                     }
                 }
             }
@@ -104,17 +99,10 @@ namespace Shockky.Lingo
 
         public void Create()
         {
-            /*BlockStatement ifBlock = TranslateBlock(block);
-
-            Instruction last = block.Last();
-            if (Jumper.IsValid(last.OP))
-            {
-                BlockStatement elseBlock = TranslateBlock(GetJumpBlock((Jumper)last));
-                //where the first IfTrue should point to.
-            }*/
-
             var statementBuilder = new StatementBuilder(this);
-            BlockStatement handlerBody = statementBuilder.ConvertBlock(_instructions);
+            Stack<Expression> stack = new Stack<Expression>();
+
+            BlockStatement handlerBody = statementBuilder.ConvertBlock(_instructions.ToArray(), stack, out int consumed);
         }
 
         public bool IsBackwardsJump(Jumper jumper)
