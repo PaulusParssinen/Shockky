@@ -35,10 +35,14 @@ namespace Shockky.Lingo.Instructions
             if (Value > byte.MaxValue)
                 op += 0x40;
 
+            if (Value > short.MaxValue)
+                op += 0x40;
+
             output.Write(op);
 
-            if (op > 0x80) output.WriteBigEndian((short)Value);
-            else if(op > 0x40) output.Write((byte)Value);
+            if (op > 0xC0) output.WriteBigEndian(Value);
+            else if (op > 0x80) output.WriteBigEndian((short)Value);
+            else if (op > 0x40) output.Write((byte)Value);
         }
 
         public virtual void Execute(LingoMachine machine)
@@ -46,15 +50,15 @@ namespace Shockky.Lingo.Instructions
 
         public virtual void AcceptVisitor(InstructionVisitor visitor)
         {
-            Console.WriteLine($"{OP} not implemented visitor");
+            Console.WriteLine($"{OP} has not implemented InstructionVisitor");
         }
         public virtual void AcceptVisitor<TContext>(InstructionVisitor<TContext> visitor, TContext context)
         {
-            Console.WriteLine($"{OP} not implemented visitor");
+            Console.WriteLine($"{OP} has not implemented InstructionVisitor");
         }
         public virtual T AcceptVisitor<TContext, T>(InstructionVisitor<TContext, T> visitor, TContext context)
         {
-            Console.WriteLine($"{OP} not implemented visitor");
+            Console.WriteLine($"{OP} has not implemented InstructionVisitor");
             return default;
         }
 
