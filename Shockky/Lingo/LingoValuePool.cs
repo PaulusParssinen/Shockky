@@ -105,26 +105,14 @@ namespace Shockky.Lingo
 
         public int AddLiteral(object value, bool recycle = true)
         {
-            LiteralKind kind;
-
-            switch (Type.GetTypeCode(value?.GetType() ?? null))
+            LiteralKind kind = Type.GetTypeCode(value?.GetType() ?? null) switch
             {
-                case TypeCode.Int32:
-                case TypeCode.UInt32:
-                    kind = LiteralKind.Integer;
-                    break;
-                case TypeCode.String:
-                    kind = LiteralKind.String;
-                    break;
-                case TypeCode.Int64:
-                case TypeCode.UInt64:
-                    kind = LiteralKind.Float;
-                    break;
-                case TypeCode.Empty:
-                    kind = LiteralKind.Unknown;
-                    break;
-                default: return -1;
-            }
+                TypeCode.String => LiteralKind.String,
+                TypeCode.Int32 => LiteralKind.Integer,
+                TypeCode.Int64 => LiteralKind.Float,
+
+                _ => throw new ArgumentException()
+            };
 
             return AddConstant(Literals, new LingoLiteral(kind, value), recycle);
         }

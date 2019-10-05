@@ -12,6 +12,11 @@ namespace Shockky.Lingo.Instructions
         {
             Value = BitConverter.Int32BitsToSingle(value);
         }
+        public PushFloat(LingoHandler handler, float value)
+            : this(handler)
+        {
+            Value = value;
+        }
 
         protected override int SetValue(object value)
             => BitConverter.SingleToInt32Bits((float)Value);

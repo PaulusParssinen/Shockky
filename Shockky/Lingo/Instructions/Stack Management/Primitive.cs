@@ -17,10 +17,11 @@ namespace Shockky.Lingo.Instructions
             }
         }
 
-        public Primitive(OPCode op)
+        protected Primitive(OPCode op)
             : base(op)
         { }
-        public Primitive(OPCode op, LingoHandler handler)
+
+        protected Primitive(OPCode op, LingoHandler handler)
             : base(op, handler)
         { }
 
@@ -55,33 +56,19 @@ namespace Shockky.Lingo.Instructions
         }
         public static Primitive Create(LingoHandler handler, object value)
         {
-            var typeCode = Type.GetTypeCode(value.GetType());
-            switch (typeCode)
+            return Type.GetTypeCode(value.GetType()) switch
             {
-                case TypeCode.Byte:
-                    return new PushIntIns(handler, (byte)value);
-                case TypeCode.Int16:
-                case TypeCode.UInt16:
-                    return new PushIntIns(handler, (short)value);
+                TypeCode.Byte => new PushIntIns(handler, (byte)value),
+                TypeCode.Int16 => new PushIntIns(handler, (short)value),
+                TypeCode.Int32 => new PushConstantIns(handler, (int)value),
+                TypeCode.Int64 => new PushFloat(handler, (float)value),
 
-                case TypeCode.UInt32:
-                case TypeCode.Int32:
-                    return new PushConstantIns(handler, (int)value);
-                    
-
-                //case TypeCode.Double:
-                //    return new PushConstantIns(abc, (double)value);
-
-                case TypeCode.String:
-                    return new PushConstantIns(handler, (string)value);
-
-
-               // case TypeCode.Empty:
-               //     return new PushNullIns();
-
-                default:
-                    return null;
-            }
+                TypeCode.String => new PushConstantIns(handler, (string)value),
+                //case TypeCode.Double => return new PushConstantIns(abc, (double)value),
+               
+                // case TypeCode.Empty => new PushNullIns(),
+                _ => null
+            };
         }
 
         public override void AcceptVisitor(InstructionVisitor visitor)

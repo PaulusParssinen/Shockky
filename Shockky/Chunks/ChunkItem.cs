@@ -47,87 +47,54 @@ namespace Shockky.Chunks
         }
         public static ChunkItem Read(ShockwaveReader input, ChunkHeader header)
         {
-            switch (header.Kind)
+            return header.Kind switch
             {
-                case ChunkKind.Fver:
-                    return new FileVersionChunk(input, header);
-                case ChunkKind.Fcdr:
-                    return new FileCompressionTypesChunk(input, header);
-                case ChunkKind.ABMP:
-                    return new AfterburnerMapChunk(input, header);
-                case ChunkKind.FGEI:
-                    return new FGEIChunk(input, header);
-                case ChunkKind.ILS:
-                    return new InitialLoadSegmentChunk(input, header);
-                    
-                case ChunkKind.RIFX:
-                    return new FileMetadataChunk(input, header);
-                case ChunkKind.imap:
-                    return new InitialMapChunk(input, header);
-                case ChunkKind.mmap:
-                    return new MemoryMapChunk(input, header);
-                case ChunkKind.KEYStar:
-                    return new AssociationTableChunk(input, header);
+                ChunkKind.Fver => new FileVersionChunk(input, header),
+                ChunkKind.Fcdr => new FileCompressionTypesChunk(input, header),
+                ChunkKind.ABMP => new AfterburnerMapChunk(input, header),
+                ChunkKind.FGEI => new FGEIChunk(input, header),
+                ChunkKind.ILS => new InitialLoadSegmentChunk(input, header),
 
-                case ChunkKind.VWCF:
-                case ChunkKind.DRCF:
-                    return new ConfigChunk(input, header);
+                ChunkKind.RIFX => new FileMetadataChunk(input, header),
+                ChunkKind.imap => new InitialMapChunk(input, header),
+                ChunkKind.mmap => new MemoryMapChunk(input, header),
+                ChunkKind.KEYStar => new AssociationTableChunk(input, header),
 
-                //case ChunkKind.VWSC:
-                //    return new VWScoreChunk(input, header);
-                case ChunkKind.VWLB:
-                    return new WVLabelChunk(input, header);
-                case ChunkKind.VWFI:
-                    return new FileInfoChunk(input, header);
+                ChunkKind.VWCF => new ConfigChunk(input, header),
+                ChunkKind.DRCF => new ConfigChunk(input, header),
 
-                case ChunkKind.LctX:
-                    return new ScriptContextChunk(input, header);
-                case ChunkKind.Lscr:
-                    return new ScriptChunk(input, header);
-                case ChunkKind.Lnam:
-                    return new NameTableChunk(input, header);
+                //ChunkKind.VWSC => new VWScoreChunk(input, header),
+                ChunkKind.VWLB => new WVLabelChunk(input, header),
+                ChunkKind.VWFI => new FileInfoChunk(input, header),
 
-                case ChunkKind.CASStar:
-                    return new CastAssociationTableChunk(input, header);
-                case ChunkKind.CASt:
-                    return new CastMemberPropertiesChunk(input, header);
-                    
-                case ChunkKind.MCsL:
-                    return new MovieCastListChunk(input, header);
-                
-                    //case ChunkKind.Cinf:
-                //    return new CastInfoChunk(input, header);
-                case ChunkKind.SCRF:
-                    return new ScoreReferenceChunk(input, header);
-                case ChunkKind.Sord:
-                    return new SortOrderChunk(input, header);
-                case ChunkKind.CLUT:
-                    return new PaletteChunk(input, header);
-                case ChunkKind.STXT:
-                    return new StyledTextChunk(input, header);
+                ChunkKind.LctX => new ScriptContextChunk(input, header),
+                ChunkKind.Lscr => new ScriptChunk(input, header),
+                ChunkKind.Lnam => new NameTableChunk(input, header),
 
-                //case ChunkKind.Fmap:
-                //    return new CastFontMapChunk(input, header);
-                case ChunkKind.FXmp:
-                    return new FontMapChunk(input, header);
-                    
-                case ChunkKind.XTRl:
-                    return new XtraListChunk(input, header);
+                ChunkKind.CASStar => new CastAssociationTableChunk(input, header),
+                ChunkKind.CASt => new CastMemberPropertiesChunk(input, header),
 
-                //case ChunkKind.PUBL:
-                //    return new PublishSettingsChunk(input, header);
-                //case ChunkKind.GRID:
-                //    return new GridChunk(input, header);
+                ChunkKind.MCsL => new MovieCastListChunk(input, header),
 
-                case ChunkKind.snd:
-                    return new SoundDataChunk(input, header);
-                case ChunkKind.BITD:
-                    return new BitmapChunk(input, header);
+                //ChunkKind.Cinf => new CastInfoChunk(input, header),
+                ChunkKind.SCRF => new ScoreReferenceChunk(input, header),
+                ChunkKind.Sord => new SortOrderChunk(input, header),
+                ChunkKind.CLUT => new PaletteChunk(input, header),
+                ChunkKind.STXT => new StyledTextChunk(input, header),
 
-                default:
-                    Debug.WriteLine("Unknown section " + header.Kind.ToFourCC());
-                    return new UnknownChunk(input, header);
-            }
+                //case ChunkKind.Fmap => new CastFontMapChunk(input, header),
+                ChunkKind.FXmp => new FontMapChunk(input, header),
+
+                ChunkKind.XTRl => new XtraListChunk(input, header),
+
+                //case ChunkKind.PUBL => new PublishSettingsChunk(input, header),
+                //case ChunkKind.GRID => new GridChunk(input, header),
+
+                ChunkKind.snd => new SoundDataChunk(input, header),
+                ChunkKind.BITD => new BitmapChunk(input, header),
+
+                _ => new UnknownChunk(input, header),
+            };
         }
     }
 }

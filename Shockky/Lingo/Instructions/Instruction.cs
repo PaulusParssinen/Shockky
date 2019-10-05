@@ -8,7 +8,7 @@ namespace Shockky.Lingo.Instructions
     public abstract class Instruction : ShockwaveItem, ICloneable
     {
         protected override string DebuggerDisplay 
-            => OP.ToString() + ((byte)OP > 0x40 ? " " + Value : string.Empty); //Operand for debugging purposes, gonna be removed later
+            => OP.ToString() + ((byte)OP > 0x40 ? " " + Value : string.Empty); //Operand for debugging purposes, to be removed
 
         public OPCode OP { get; }
         public virtual int Value { protected get; set; }
@@ -84,163 +84,96 @@ namespace Shockky.Lingo.Instructions
                 else operandValue = input.ReadByte();
             }
 
-            switch ((OPCode)op)
+            //Debug.WriteLine($"{ogOp:X2}|{Enum.GetName(typeof(OPCode), (OPCode)op)} {(op > 0x40 ? operandValue.ToString() : string.Empty)}");
+
+            return (OPCode)op switch
             {
-                case OPCode.Return:
-                    return new ReturnIns();
-                case OPCode.PushInt0:
-                    return new PushZeroIns();
+                OPCode.Return => new ReturnIns(),
+                OPCode.PushInt0 => new PushZeroIns(),
 
                 #region Arithmetic
-                case OPCode.Multiple:
-                    return new MultipleIns();
-                case OPCode.Add:
-                    return new AddIns();
-                case OPCode.Substract:
-                    return new SubtractIns();
-                case OPCode.Divide:
-                    return new DivideIns();
-                case OPCode.Modulo:
-                    return new ModuloIns();
-                case OPCode.Inverse:
-                    return new InverseIns();
+                OPCode.Multiple => new MultipleIns(),
+                OPCode.Add => new AddIns(),
+                OPCode.Substract => new SubtractIns(),
+                OPCode.Divide => new DivideIns(),
+                OPCode.Modulo => new ModuloIns(),
+                OPCode.Inverse => new InverseIns(),
                 #endregion
 
-                case OPCode.JoinString:
-                    return new JoinStringIns(); 
-                case OPCode.JoinPadString:
-                    return new JoinPadStringIns();
-                case OPCode.LessThan:
-                    return new LessThanIns();
-                case OPCode.LessThanEquals:
-                    return new LessEqualsIns();
-                case OPCode.NotEqual:
-                    return new NotEqualIns();
-                case OPCode.Equals:
-                    return new EqualsIns();
-                case OPCode.GreaterThan:
-                    return new GreaterThanIns();
-                case OPCode.GreaterEquals:
-                    return new GreaterEqualsIns();
-                case OPCode.And:
-                    return new AndIns();
-                case OPCode.Or:
-                    return new OrIns();
-                case OPCode.Not:
-                    return new NotIns();
-                case OPCode.ContainsString:
-                    return new ContainsStringIns();
-                case OPCode.StartsWith:
-                    return new StartsWithIns();
-                case OPCode.SplitString:
-                    return new SplitStringIns();
-                case OPCode.LightString:
-                    break;
-                case OPCode.OnToSprite:
-                    break;
-                case OPCode.IntoSprite:
-                    break;
-                case OPCode.CastString:
-                    return new CastStringIns();
-                case OPCode.StartObject: //PushScopeIns
-                    return new StartObjectIns();
-                case OPCode.StopObject: //PopScopeIns
-                    return new StopObjectIns();
-                case OPCode.WrapList:
-                    return new WrapListIns();
-                case OPCode.NewPropList:
-                    return new NewPropListIns();
-                case OPCode.Swap:
-                    return new SwapIns();
+                OPCode.JoinString => new JoinStringIns(),
+                OPCode.JoinPadString => new JoinPadStringIns(),
+                OPCode.LessThan => new LessThanIns(),
+                OPCode.LessThanEquals => new LessEqualsIns(),
+                OPCode.NotEqual => new NotEqualIns(),
+                OPCode.Equals => new EqualsIns(),
+                OPCode.GreaterThan => new GreaterThanIns(),
+                OPCode.GreaterEquals => new GreaterEqualsIns(),
+                OPCode.And => new AndIns(),
+                OPCode.Or => new OrIns(),
+                OPCode.Not => new NotIns(),
+                OPCode.ContainsString => new ContainsStringIns(),
+                OPCode.StartsWith => new StartsWithIns(),
+                OPCode.SplitString => new SplitStringIns(),
+                //OPCode.LightString:
+                //OPCode.OnToSprite:
+                //OPCode.IntoSprite:
+                OPCode.CastString => new CastStringIns(),
+                OPCode.StartObject => new StartObjectIns(), //PushScopeIns
+                OPCode.StopObject => new StopObjectIns(), //PopScopeIns
+                OPCode.WrapList => new WrapListIns(),
+                OPCode.NewPropList => new NewPropListIns(),
+                OPCode.Swap => new SwapIns(),
 
                 //Multi 
+                OPCode.PushInt => new PushIntIns(handler, operandValue),
+                OPCode.NewArgList => new NewListIns(handler, operandValue, true), //unparanthesized
+                OPCode.NewList => new NewListIns(handler, operandValue, false), //in paranthesized call expression
+                OPCode.PushConstant => new PushConstantIns(handler, operandValue),
+                OPCode.PushSymbol => new PushSymbolIns(handler, operandValue),
+                OPCode.PushObject => new PushObjectIns(handler, operandValue),
+                //OPCode.Op_47:
+                //OPCode.Op_48:
+                OPCode.GetGlobal => new GetGlobalIns(handler, operandValue),
+                OPCode.GetProperty => new GetPropertyIns(handler, operandValue),
+                OPCode.GetParameter => new GetParameterIns(handler, operandValue),
+                OPCode.GetLocal => new GetLocalIns(handler, operandValue),
+                OPCode.SetGlobal => new SetGlobalIns(handler, operandValue),
+                OPCode.SetProperty => new SetPropertyIns(handler, operandValue),
+                OPCode.SetParameter => new SetParameterIns(handler, operandValue),
+                OPCode.SetLocal => new SetLocalIns(handler, operandValue),
+                OPCode.Jump => new JumpIns(handler, operandValue),
+                OPCode.EndRepeat => new EndRepeatIns(handler, operandValue),
+                OPCode.IfTrue => new IfTrueIns(handler, operandValue),
+                OPCode.CallLocal => new CallLocalIns(handler, operandValue),
+                OPCode.CallExternal => new CallExternalIns(handler, operandValue),
+                //OPCode.CallObjOld:
+                //OPCode.Op_59:
+                //OPCode.Op_5a:
+                //OPCode.Op_5b:
+                OPCode.Get => new GetIns(handler, operandValue),
+                OPCode.Set => new SetIns(handler, operandValue),
+                OPCode.GetMovieProp => new GetMoviePropertyIns(handler, operandValue),
+                OPCode.SetMovieProp => new SetMoviePropertryIns(handler, operandValue),
+                OPCode.GetObjProp => new GetObjPropertyIns(handler, operandValue),
+                OPCode.SetObjProp => new SetObjPropertyIns(handler, operandValue),
+                //OPCode.Op_63:
+                OPCode.Dup => new DupIns(operandValue),
+                OPCode.Pop => new PopIns(operandValue),
+                OPCode.GetMovieInfo => new GetMovieInfoIns(handler, operandValue),
+                OPCode.CallObj => new CallObjectIns(handler, operandValue),
+                OPCode.PushInt2 => new PushIntIns(handler, operandValue),
+                OPCode.PushInt3 => new PushIntIns(handler, operandValue),
 
-                case OPCode.PushInt:
-                    return new PushIntIns(handler, operandValue);
-                case OPCode.NewArgList:
-                    return new NewListIns(handler, operandValue, true); //unparanthesized
-                case OPCode.NewList:
-                    return new NewListIns(handler, operandValue, false); //in paranthesized call expression
-                case OPCode.PushConstant:
-                    return new PushConstantIns(handler, operandValue);
-                case OPCode.PushSymbol:
-                    return new PushSymbolIns(handler, operandValue);
-                case OPCode.PushObject:
-                    return new PushObjectIns(handler, operandValue);
-                case OPCode.Op_47:
-                case OPCode.Op_48:
-                    break;
-                case OPCode.GetGlobal:
-                    return new GetGlobalIns(handler, operandValue);
-                case OPCode.GetProperty:
-                    return new GetPropertyIns(handler, operandValue);
-                case OPCode.GetParameter:
-                    return new GetParameterIns(handler, operandValue);
-                case OPCode.GetLocal:
-                    return new GetLocalIns(handler, operandValue);
-                case OPCode.SetGlobal:
-                    return new SetGlobalIns(handler, operandValue);
-                case OPCode.SetProperty:
-                    return new SetPropertyIns(handler, operandValue);
-                case OPCode.SetParameter:
-                    return new SetParameterIns(handler, operandValue);
-                case OPCode.SetLocal:
-                    return new SetLocalIns(handler, operandValue);
-                case OPCode.Jump:
-                    return new JumpIns(handler, operandValue);
-                case OPCode.EndRepeat:
-                    return new EndRepeatIns(handler, operandValue);
-                case OPCode.IfTrue:
-                    return new IfTrueIns(handler, operandValue);
-                case OPCode.CallLocal:
-                    return new CallLocalIns(handler, operandValue);
-                case OPCode.CallExternal:
-                    return new CallExternalIns(handler, operandValue);
-                case OPCode.CallObjOld:
-                    break;
-                case OPCode.Op_59:
-                case OPCode.Op_5a:
-                case OPCode.Op_5b:
-                    break;
-                case OPCode.Get:
-                    return new GetIns(handler, operandValue);
-                case OPCode.Set:
-                    return new SetIns(handler, operandValue);
-                case OPCode.GetMovieProp:
-                    return new GetMoviePropertyIns(handler, operandValue);
-                case OPCode.SetMovieProp:
-                    return new SetMoviePropertryIns(handler, operandValue);
-                case OPCode.GetObjProp:
-                    return new GetObjPropertyIns(handler, operandValue);
-                case OPCode.SetObjProp:
-                    return new SetObjPropertyIns(handler, operandValue);
-                case OPCode.Op_63:
-                    break;
-                case OPCode.Dup:
-                    return new DupIns(operandValue);
-                case OPCode.Pop:
-                    return new PopIns(operandValue);
-                case OPCode.GetMovieInfo:
-                    return new GetMovieInfoIns(handler, operandValue);
-                case OPCode.CallObj:
-                    return new CallObjectIns(handler, operandValue);
-                case OPCode.PushInt2:
-                case OPCode.PushInt3:
-                    return new PushIntIns(handler, operandValue);
-                case OPCode.GetSpecial:
-                    string specialField = handler.Script.Pool.GetName(operandValue);
-                    break;
-                case OPCode.PushFloat:
-                    return new PushFloat(handler, operandValue);
-                case OPCode.Op_72:
-                    //Operand points to names prefixed by "_", is this again some special movie property get? 
-                    //TODO: inspect stack at this OP. 
-                    string _prefixed = handler.Script.Pool.GetName(operandValue); //Occurred values: _movie, _global, _system
-                    break;
-            }
+                //OPCode.GetSpecial:
+                //    string specialField = handler.Script.Pool.GetName(operandValue),
 
-            //Debug.WriteLine($"{ogOp:X2}|{Enum.GetName(typeof(OPCode), (OPCode)op)} {(op > 0x40 ? operandValue.ToString() : string.Empty)}");
-            return null;
+                OPCode.PushFloat => new PushFloat(handler, operandValue),
+                //OPCode.Op_72:
+                //Operand points to names prefixed by "_", is this another special movie property get? 
+                //TODO: inspect stack at this OP. 
+                //string _prefixed = handler.Script.Pool.GetName(operandValue), //Occurred values: _movie, _global, _system
+                _ => null,
+            };
         }
 
         object ICloneable.Clone() => Clone();
