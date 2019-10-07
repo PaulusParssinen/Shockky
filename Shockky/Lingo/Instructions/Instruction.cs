@@ -115,8 +115,8 @@ namespace Shockky.Lingo.Instructions
                 OPCode.StartsWith => new StartsWithIns(),
                 OPCode.SplitString => new SplitStringIns(),
                 //OPCode.LightString:
-                //OPCode.OnToSprite:
-                //OPCode.IntoSprite:
+                OPCode.OntoSprite => new SpriteOntoIns(),
+                OPCode.IntoSprite => new SpriteIntoIns(),
                 OPCode.CastString => new CastStringIns(),
                 OPCode.StartObject => new StartObjectIns(), //PushScopeIns
                 OPCode.StopObject => new StopObjectIns(), //PopScopeIns

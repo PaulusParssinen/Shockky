@@ -2,7 +2,7 @@
 {
     public class NotEqualIns : Computation
     {
-        public NotEqualIns() //<>
+        public NotEqualIns()
             : base(OPCode.NotEqual, BinaryOperatorKind.InEquality)
         { }
 

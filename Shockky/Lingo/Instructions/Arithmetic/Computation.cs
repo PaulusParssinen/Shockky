@@ -64,6 +64,8 @@
                 case OPCode.Or:
                 case OPCode.ContainsString:
                 case OPCode.StartsWith:
+                case OPCode.OntoSprite:
+                case OPCode.IntoSprite:
                     return true;
                 default:
                     return false;
