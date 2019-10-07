@@ -42,7 +42,7 @@ namespace Shockky.Lingo.Syntax
                 throw new Exception(nameof(VisitNewPropertyListInstruction));
 
             if (listExpression.Items.Count % 2 != 0)
-                throw new InvalidOperationException($"Preceding listExpression has to be in property-value pairs");
+                throw new InvalidOperationException("Preceding listExpression has to be in property-value pairs");
 
             var properties = new Dictionary<Expression, Expression>(listExpression.Items.Count / 2);
             for (int i = 0; i < listExpression.Items.Count; i += 2)
@@ -94,7 +94,10 @@ namespace Shockky.Lingo.Syntax
 
         public override void VisitPopInstruction(PopIns pop, Stack<Expression> expressionStack)
         {
-            expressionStack.Pop();
+            for (int i = 0; i < pop.GetPopCount(); i++)
+            {
+                expressionStack.Pop();
+            }
         }
         public override void VisitDuplicateInstruction(DupIns pop, Stack<Expression> expressionStack)
         {

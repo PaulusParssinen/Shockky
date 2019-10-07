@@ -2,19 +2,17 @@
 {
     public class PopIns : Instruction
     {
-        public int PopAmount { get; set; }
-
-        public PopIns(int popAmount)
+        public PopIns(int popCount)
             : base(OPCode.Pop)
         {
-            Value = popAmount;
+            Value = popCount;
         }
 
-        public override int GetPopCount() => PopAmount;
+        public override int GetPopCount() => Value;
 
         public override void Execute(LingoMachine machine)
         {
-            for (int i = 0; i < PopAmount; i++)
+            for (int i = 0; i < GetPopCount(); i++)
             {
                 machine.Values.Pop();
             }
