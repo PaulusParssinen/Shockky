@@ -99,9 +99,9 @@ namespace Shockky.Lingo.Syntax
                 expressionStack.Pop();
             }
         }
-        public override void VisitDuplicateInstruction(DupIns pop, Stack<Expression> expressionStack)
+        public override void VisitDuplicateInstruction(DupIns dup, Stack<Expression> expressionStack)
         {
-            expressionStack.Push(expressionStack.Peek());
+            expressionStack.Push(expressionStack.ToArray()[dup.Slot]);
         }
 
         protected override void Default(Instruction instruction, Stack<Expression> expressionStack)

@@ -2,15 +2,17 @@
 {
     public class DupIns : Instruction
     {
-        public DupIns(int value)
+        public int Slot => Value;
+
+        public DupIns(int slot)
             : base(OPCode.Dup)
         {
-            Value = value; //TODO: No fucking idea what this is
+            Value = slot;
         }
 
         public override void Execute(LingoMachine machine)
         {
-            object value = machine.Values.Peek();
+            object value = machine.Values.ToArray()[Slot];
             machine.Values.Push(value);
         }
 
