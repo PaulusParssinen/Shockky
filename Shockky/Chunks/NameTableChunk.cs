@@ -9,6 +9,9 @@ namespace Shockky.Chunks
     {
         public List<string> Names { get; set; }
 
+        public NameTableChunk()
+            : base(ChunkKind.Lnam)
+        { }
         public NameTableChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

@@ -9,6 +9,9 @@ namespace Shockky.Chunks
         public byte[] What { get; }
         public string Version { get; set; }
 
+        public FileVersionChunk()
+            : base(ChunkKind.Fver)
+        { }
         public FileVersionChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

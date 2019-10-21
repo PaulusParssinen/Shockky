@@ -11,6 +11,8 @@ namespace Shockky.Chunks.Cast
         public int OwnerId { get; set; }
         public ChunkKind Kind { get; set; }
 
+        public CastEntry()
+        { }
         public CastEntry(ShockwaveReader input)
         {
             Id = input.ReadInt32();

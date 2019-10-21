@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System;
 
 using Shockky.IO;
 
@@ -9,11 +8,14 @@ namespace Shockky.Chunks
     {
         private const short SECTION_SIZE = 12;
 
-        public List<ScriptContextSection> Sections { get; }
+        public List<ScriptContextSection> Sections { get; set; }
 
         public int Type { get; set; }
         public int NameListChunkId { get; set; }
 
+        public ScriptContextChunk()
+            : base(ChunkKind.LctX)
+        { }
         public ScriptContextChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

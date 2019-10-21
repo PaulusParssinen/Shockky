@@ -1,16 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
+using System.Collections.Generic;
 
 using Shockky.IO;
 
 namespace Shockky.Chunks
 {
-    public class WVLabelChunk : ChunkItem
+    public class ScoreLabelChunk : ChunkItem
     {
         public Dictionary<short, string> Labels { get; set; }
 
-        public WVLabelChunk(ShockwaveReader input, ChunkHeader header)
+        public ScoreLabelChunk()
+            : base(ChunkKind.VWLB)
+        {
+            Labels = new Dictionary<short, string>();
+        }
+        public ScoreLabelChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
             var offsetMap = new (short frame, int offset)[input.ReadBigEndian<short>()];
@@ -30,9 +35,9 @@ namespace Shockky.Chunks
                 var (frame, offset) = offsetMap[i];
 
                 if (i == offsetMap.Length - 1)
-                    Labels[frame] = labels.Substring(offset);
+                    Labels[frame] = labels[offset..];
                 else
-                    Labels[frame] = labels.Substring(offset, offsetMap[i + 1].offset - offset);
+                    Labels[frame] = labels[offset..offsetMap[i + 1].offset];
             }
         }
 

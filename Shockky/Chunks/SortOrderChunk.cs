@@ -8,6 +8,9 @@ namespace Shockky.Chunks
     {
         public List<int> Entries { get; set; }
 
+        public SortOrderChunk()
+            : base(ChunkKind.Sord)
+        { }
         public SortOrderChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
@@ -50,7 +53,7 @@ namespace Shockky.Chunks
             output.WriteBigEndian((int)Remnants.Dequeue());
             output.WriteBigEndian((int)Remnants.Dequeue());
 
-            for(int i = 0; i < Entries.Count; i++)
+            for (int i = 0; i < Entries.Count; i++)
             {
                 output.WriteBigEndian(Entries[i]);
             }

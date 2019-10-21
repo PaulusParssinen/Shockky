@@ -6,6 +6,9 @@ namespace Shockky.Chunks
     {
         public int[] Members { get; set; }
 
+        public CastAssociationTableChunk()
+            : base(ChunkKind.CASStar)
+        { }
         public CastAssociationTableChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

@@ -15,6 +15,8 @@ namespace Shockky.Chunks
         public short FontSize { get; set; }
         public Color Color { get; set; }
 
+        public TextFormat()
+        { }
         public TextFormat(ShockwaveReader input)
         {
             Offset = input.ReadBigEndian<int>();

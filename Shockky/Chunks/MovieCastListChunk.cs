@@ -12,6 +12,9 @@ namespace Shockky.Chunks
         public int[] Unknowns { get; set; }
         public List<CastListEntry> Entries { get; set; }
 
+        public MovieCastListChunk()
+            : base(ChunkKind.MCsL)
+        { }
         public MovieCastListChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
@@ -25,7 +28,7 @@ namespace Shockky.Chunks
                 Unknowns[i] = input.ReadBigEndian<int>();
             }
 
-            int entryLength = input.ReadBigEndian<int>();
+            input.ReadBigEndian<int>();
             for (int i = 0; i < Entries.Capacity; i++)
             {
                 Entries.Add(new CastListEntry(input));

@@ -64,7 +64,7 @@ namespace Shockky.Chunks
                 ChunkKind.DRCF => new ConfigChunk(input, header),
 
                 //ChunkKind.VWSC => new VWScoreChunk(input, header),
-                ChunkKind.VWLB => new WVLabelChunk(input, header),
+                ChunkKind.VWLB => new ScoreLabelChunk(input, header),
                 ChunkKind.VWFI => new FileInfoChunk(input, header),
 
                 ChunkKind.LctX => new ScriptContextChunk(input, header),
@@ -83,13 +83,13 @@ namespace Shockky.Chunks
                 ChunkKind.STXT => new StyledTextChunk(input, header),
 
                 //case ChunkKind.Fmap => new CastFontMapChunk(input, header),
-                ChunkKind.FXmp => new FontMapChunk(input, header),
 
                 ChunkKind.XTRl => new XtraListChunk(input, header),
 
                 //case ChunkKind.PUBL => new PublishSettingsChunk(input, header),
                 //case ChunkKind.GRID => new GridChunk(input, header),
 
+                ChunkKind.FXmp => new FontMapChunk(input, header),
                 ChunkKind.snd => new SoundDataChunk(input, header),
                 ChunkKind.BITD => new BitmapChunk(input, header),
 

@@ -12,6 +12,9 @@ namespace Shockky.Chunks
         public List<CastEntry> CastEntries { get; set; }
         public int AssignedCount { get; set; }
 
+        public AssociationTableChunk()
+            : base(ChunkKind.KEYStar)
+        { }
         public AssociationTableChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

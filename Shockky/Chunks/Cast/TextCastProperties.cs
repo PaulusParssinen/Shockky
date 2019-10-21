@@ -15,6 +15,8 @@ namespace Shockky.Chunks.Cast
         public short LineHeight { get; set; }
         public short ButtonType { get; set; }
 
+        public TextCastProperties()
+        { }
         public TextCastProperties(ShockwaveReader input)
         {
             input.Position += 4;

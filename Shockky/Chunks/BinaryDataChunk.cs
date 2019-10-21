@@ -6,6 +6,9 @@ namespace Shockky.Chunks
     {
         public byte[] Data { get; set; }
 
+        protected BinaryDataChunk(ChunkKind kind)
+            : base(kind)
+        { }
         protected BinaryDataChunk(ShockwaveReader input, ChunkHeader header) 
             : base(header)
         {

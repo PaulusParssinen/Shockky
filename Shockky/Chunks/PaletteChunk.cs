@@ -8,6 +8,9 @@ namespace Shockky.Chunks
     {
         public Color[] Colors { get; set; }
 
+        public PaletteChunk()
+            : base(ChunkKind.CLUT)
+        { }
         public PaletteChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

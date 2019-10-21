@@ -14,6 +14,9 @@ namespace Shockky.Chunks
 
         public List<LingoHandler> Handlers => Pool.Handlers;
 
+        public ScriptChunk()
+            : base(ChunkKind.Lscr)
+        { }
         public ScriptChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

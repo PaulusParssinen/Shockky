@@ -20,12 +20,14 @@ namespace Shockky.Chunks.Cast
 
         public bool IsSystemPalette => ((Palette & (1 << 15)) != 0);
 
-        public BitmapCastProperties(CastMemberPropertiesChunk chunk, ShockwaveReader input)
+        public BitmapCastProperties()
+        { }
+        public BitmapCastProperties(ChunkHeader header, ShockwaveReader input)
         {
             bool IsDataAvailable()
-                => (input.Position < chunk.Header.Offset + chunk.Header.Length);
+                => input.Position < header.Offset + header.Length;
 
-            TotalWidth = input.ReadBigEndian<ushort>() & 0x7FFF; //TODO: Research more
+            TotalWidth = input.ReadBigEndian<ushort>() & 0x7FFF;
 
             Rectangle = input.ReadRect();
             AlphaThreshold = input.ReadByte();

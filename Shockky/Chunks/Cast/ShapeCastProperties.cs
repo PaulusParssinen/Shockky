@@ -16,6 +16,8 @@ namespace Shockky.Chunks.Cast
         public int LineSize { get; set; }
         public int LineDirection { get; set; }
 
+        public ShapeCastProperties()
+        { }
         public ShapeCastProperties(ShockwaveReader input)
         {
             Type = (ShapeType)input.ReadBigEndian<short>();

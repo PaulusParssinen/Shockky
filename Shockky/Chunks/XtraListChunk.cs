@@ -6,6 +6,9 @@ namespace Shockky.Chunks
 {
     public class XtraListChunk : ChunkItem
     {
+        public XtraListChunk()
+            : base(ChunkKind.XTRl)
+        { }
         public XtraListChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

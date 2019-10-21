@@ -10,6 +10,9 @@ namespace Shockky.Chunks
 
         public CommonMemberProperties Common { get; set; }
 
+        public CastMemberPropertiesChunk()
+            : base(ChunkKind.CASt)
+        { }
         public CastMemberPropertiesChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
@@ -33,7 +36,7 @@ namespace Shockky.Chunks
             {
                 case CastType.Bitmap:
                 case CastType.OLE:
-                    return new BitmapCastProperties(this, input);
+                    return new BitmapCastProperties(Header, input);
                 case CastType.Shape:
                     return new ShapeCastProperties(input);
                 case CastType.DigitalVideo:

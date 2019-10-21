@@ -18,6 +18,8 @@ namespace Shockky.Chunks.Cast
         public byte Framerate { get; set; }
         public Rectangle Rectangle { get; set; }
 
+        public VideoCastProperties()
+        { }
         public VideoCastProperties(ShockwaveReader input)
         {
             Type = input.ReadString((int)input.ReadBigEndian<uint>());

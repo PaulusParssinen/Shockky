@@ -12,6 +12,8 @@ namespace Shockky.Chunks.Score
         public int Channel { get; set; }
         public int SpritePropertiesOffsetsOffset { get; set; }
 
+        public SpriteProperties()
+        { }
         public SpriteProperties(ShockwaveReader input)
         {
             StartFrame = input.ReadBigEndian<int>(); 

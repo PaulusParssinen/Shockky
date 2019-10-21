@@ -8,7 +8,7 @@
         V7 = 0x57E,
         V8 = 0x640,
         V8_5 = 0x708,
-        V9 = 0x73A, //Could also be 8.5 
+        V9 = 0x73A, //Could also be 8.5
         V10 = 0x742,
         V10_1 = 0x744,
         V10_UNK = 0x781,

@@ -1,16 +1,19 @@
-﻿using System.Diagnostics;
-using System;
+﻿using System;
+using System.Diagnostics;
 
-using Shockky.Chunks.Score;
 using Shockky.IO;
+using Shockky.Chunks.Score;
 
 namespace Shockky.Chunks
 {
-    public class VWScoreChunk : ChunkItem
+    public class ScoreChunk : ChunkItem
     {
-        public Frame[] Frames { get; }
+        public Frame[] Frames { get; set; }
 
-        public VWScoreChunk(ShockwaveReader input, ChunkHeader header)
+        public ScoreChunk()
+            : base(ChunkKind.VWSC)
+        { }
+        public ScoreChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
             int totalLength = input.ReadBigEndian<int>();
@@ -65,6 +68,12 @@ namespace Shockky.Chunks
         {
             throw new NotImplementedException();
             int size = 0;
+            size += sizeof(int);
+            size += sizeof(int);
+
+            size += sizeof(int);
+            size += sizeof(int);
+            
             size += sizeof(int);
             size += sizeof(int);
             return size;

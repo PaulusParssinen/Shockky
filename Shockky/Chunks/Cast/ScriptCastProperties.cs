@@ -9,6 +9,8 @@ namespace Shockky.Chunks.Cast
     {
         public short ScriptNumber { get; set; }
 
+        public ScriptCastProperties()
+        { }
         public ScriptCastProperties(ShockwaveReader input)
         {
             ScriptNumber = input.ReadBigEndian<short>();

@@ -19,6 +19,9 @@ namespace Shockky.Chunks
         public int Width { get; set; }
         public int Height { get; set; }
 
+        public BitmapChunk()
+            : base(ChunkKind.BITD)
+        { }
         public BitmapChunk(ShockwaveReader input, ChunkHeader header)
             : base(input, header)
         { }
@@ -36,24 +39,23 @@ namespace Shockky.Chunks
             if (Data.Length == TotalWidth * Height)
                 return;
 
-            using (var ms = new MemoryStream(TotalWidth * Height))
-            using (var output = new ShockwaveWriter(ms))
-            using (var input = new ShockwaveReader(Data))
-            {
-                while (input.IsDataAvailable)
-                {
-                    byte marker = input.ReadByte();
-                    if (marker >= 128)
-                    {
-                        Span<byte> buffer = stackalloc byte[257 - marker];
-                        buffer.Fill(input.ReadByte());
-                        output.Write(buffer);
-                    }
-                    else output.Write(input.ReadBytes(++marker));
-                }
+            using var ms = new MemoryStream(TotalWidth * Height);
+            using var output = new ShockwaveWriter(ms);
+            using var input = new ShockwaveReader(Data);
 
-                Data = ms.ToArray();
+            while (input.IsDataAvailable)
+            {
+                byte marker = input.ReadByte();
+                if (marker >= 128)
+                {
+                    Span<byte> buffer = stackalloc byte[257 - marker];
+                    buffer.Fill(input.ReadByte());
+                    output.Write(buffer);
+                }
+                else output.Write(input.ReadBytes(++marker));
             }
+
+            Data = ms.ToArray();
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
+using System.Collections.Generic;
 
 using Shockky.IO;
 
@@ -13,9 +13,11 @@ namespace Shockky.Chunks
 
         public string CreatedBy { get; set; }
         public string ModifiedBy { get; set; }
-
         public string FilePath { get; set; }
 
+        public FileInfoChunk()
+            : base(ChunkKind.VWFI)
+        { }
         public FileInfoChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)
         {

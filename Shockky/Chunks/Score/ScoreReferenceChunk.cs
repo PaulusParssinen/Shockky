@@ -8,6 +8,9 @@ namespace Shockky.Chunks
     {
         public Dictionary<short, int> Entries { get; }
 
+        public ScoreReferenceChunk()
+            : base(ChunkKind.SCRF)
+        { }
         public ScoreReferenceChunk(ShockwaveReader input, ChunkHeader header) 
             : base(header)
         {

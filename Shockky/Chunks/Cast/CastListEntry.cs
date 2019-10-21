@@ -15,6 +15,8 @@ namespace Shockky.Chunks.Cast
 
         public int Id { get; set; }
 
+        public CastListEntry()
+        { }
         public CastListEntry(ShockwaveReader input)
         {
             Name = input.ReadString();

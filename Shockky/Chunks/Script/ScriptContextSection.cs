@@ -9,6 +9,8 @@ namespace Shockky.Chunks
         public short Flags { get; set; }
         public short Link { get; set; }
 
+        public ScriptContextSection()
+        { }
         public ScriptContextSection(ShockwaveReader input)
         {
             Unknown = input.ReadBigEndian<int>();
