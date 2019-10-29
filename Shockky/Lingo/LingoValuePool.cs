@@ -29,7 +29,7 @@ namespace Shockky.Lingo
         public List<LingoHandler> Handlers { get; }
         public List<LingoLiteral> Literals { get; }
 
-        public int HandlerVectorFlags { get; set; }
+        public HandlerVectorFlags HandlerVectorFlags { get; set; }
 
         public LingoValuePool()
         {
@@ -54,7 +54,7 @@ namespace Shockky.Lingo
 
             HandlerVectors.Capacity = input.ReadBigEndian<short>();
             int handlerVectorOffset = input.ReadBigEndian<int>();
-            HandlerVectorFlags = input.ReadInt32();
+            HandlerVectorFlags = (HandlerVectorFlags)input.ReadInt32();
 
             Properties.Capacity = input.ReadBigEndian<short>();
             int propertiesOffset = input.ReadBigEndian<int>();
