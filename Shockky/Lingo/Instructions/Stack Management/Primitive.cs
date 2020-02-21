@@ -61,7 +61,7 @@ namespace Shockky.Lingo.Instructions
                 TypeCode.Byte => new PushIntIns(handler, (byte)value),
                 TypeCode.Int16 => new PushIntIns(handler, (short)value),
                 TypeCode.Int32 => new PushConstantIns(handler, (int)value),
-                TypeCode.Int64 => new PushFloat(handler, (float)value),
+                TypeCode.Int64 => new PushFloatIns(handler, (float)value),
 
                 TypeCode.String => new PushConstantIns(handler, (string)value),
                 //case TypeCode.Double => return new PushConstantIns(abc, (double)value),

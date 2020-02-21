@@ -161,18 +161,19 @@ namespace Shockky.Lingo.Instructions
                 OPCode.Pop => new PopIns(operandValue),
                 OPCode.GetMovieInfo => new GetMovieInfoIns(handler, operandValue),
                 OPCode.CallObj => new CallObjectIns(handler, operandValue),
+                //OPCode.Op_6d
                 OPCode.PushInt2 => new PushIntIns(handler, operandValue),
                 OPCode.PushInt3 => new PushIntIns(handler, operandValue),
 
-                //OPCode.GetSpecial:
+                //OPCode.GetSpecial => null,
                 //    string specialField = handler.Script.Pool.GetName(operandValue),
 
-                OPCode.PushFloat => new PushFloat(handler, operandValue),
+                OPCode.PushFloat => new PushFloatIns(handler, operandValue),
                 //OPCode.Op_72:
                 //Operand points to names prefixed by "_", is this another special movie property get? 
                 //TODO: inspect stack at this OP. 
                 //string _prefixed = handler.Script.Pool.GetName(operandValue), //Occurred values: _movie, _global, _system
-                _ => null,
+                _ => null//new DummyInstruction((OPCode)op, handler, operandValue),
             };
         }
 

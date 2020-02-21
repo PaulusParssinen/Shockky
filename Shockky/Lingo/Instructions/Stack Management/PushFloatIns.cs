@@ -2,17 +2,17 @@
 
 namespace Shockky.Lingo.Instructions
 {
-    public class PushFloat : Primitive
+    public class PushFloatIns : Primitive
     {
-        public PushFloat(LingoHandler handler)
+        public PushFloatIns(LingoHandler handler)
             : base(OPCode.PushFloat, handler)
         { }
-        public PushFloat(LingoHandler handler, int value)
+        public PushFloatIns(LingoHandler handler, int value)
             : this(handler)
         {
             Value = BitConverter.Int32BitsToSingle(value);
         }
-        public PushFloat(LingoHandler handler, float value)
+        public PushFloatIns(LingoHandler handler, float value)
             : this(handler)
         {
             Value = value;
