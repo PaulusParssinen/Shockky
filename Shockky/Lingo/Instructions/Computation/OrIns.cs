@@ -6,9 +6,6 @@
             : base(OPCode.Or, BinaryOperatorKind.Or)
         { }
 
-        protected override object Execute(dynamic left, dynamic right)
-        {
-            return (left || right);
-        }
+        protected override object Execute(dynamic left, dynamic right) => (left || right);
     }
 }

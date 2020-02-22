@@ -2,10 +2,10 @@
 
 namespace Shockky.Lingo.Instructions
 {
-    public class SpriteIntoIns : Computation
+    public class OntoSpriteIns : Computation
     {
-        public SpriteIntoIns()
-            : base(OPCode.IntoSprite, BinaryOperatorKind.SpriteWithin)
+        public OntoSpriteIns()
+            : base(OPCode.OntoSprite, BinaryOperatorKind.SpriteIntersects)
         { }
 
         protected override object Execute(object left, object right) => throw new NotSupportedException();

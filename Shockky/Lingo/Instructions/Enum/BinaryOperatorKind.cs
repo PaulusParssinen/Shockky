@@ -22,7 +22,13 @@
         Divide,
         Modulo,
 
+        JoinString,
+        JoinPadString,
+
         StartsWith,
         ContainsString,
+
+        SpriteIntersects,
+        SpriteWithin
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Shockky.Lingo.Instructions
 {
-    public enum OPCode
+    public enum OPCode : byte
     {
         Return = 0x01,
         PushInt0 = 0x03,
@@ -23,12 +23,12 @@
         Not,
         ContainsString,
         StartsWith,
-        SplitString,
+        SplitString, //ChunkExpression
         LightString,
-        OnToSprite,
+        OntoSprite,
         IntoSprite,
         CastString,
-        StartObject,
+        StartObject, //tell, startscope
         StopObject,
         WrapList,
         NewPropList,
@@ -60,9 +60,9 @@
         CallLocal,
         CallExternal,
         CallObjOld, //?
-        Op_59,
-        Op_5a,
-        Op_5b,
+        InsertString, //TODO: ChunkExpressions
+        Insert,
+        DeleteString,
         Get,
         Set,
         GetMovieProp = 0x5f,
@@ -74,7 +74,8 @@
         Pop,
         GetMovieInfo,
         CallObj,
-        PushInt2 = 0x6e,
+        Op_6d = 0x6d,
+        PushInt2,
         PushInt3,
         GetSpecial, //TODO:
         PushFloat,
