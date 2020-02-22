@@ -57,67 +57,66 @@ namespace Shockky.Lingo
         
         public void LoadInstruction()
         {
+            var marks = new Dictionary<long, Instruction>();
             var sharedExits = new Dictionary<long, List<Jumper>>();
-            
-            using (var input = new ShockwaveReader(_body.Code))
+
+            using var input = new ShockwaveReader(_body.Code);
+            while (input.IsDataAvailable)
             {
-                while (input.IsDataAvailable)
+                long previousPosition = input.Position;
+                var instruction = Instruction.Create(_body.Handler, input);
+                marks[previousPosition] = instruction;
+
+                _instructions.Add(instruction);
+
+                if (instruction == null) continue;
+
+                _indices.Add(instruction, _indices.Count);
+
+                if (!_opGroups.TryGetValue(instruction.OP, out List<Instruction> instructions))
                 {
-                    long previousPosition = input.Position;
-                    var instruction = Instruction.Create(_body.Handler, input);
+                    instructions = new List<Instruction>();
+                    _opGroups.Add(instruction.OP, instructions);
+                }
+                instructions.Add(instruction);
 
-                    _instructions.Add(instruction);
-
-                    if (instruction == null) continue;
-
-                    _indices.Add(instruction, _indices.Count);
-                    
-                    if (!_opGroups.TryGetValue(instruction.OP, out List<Instruction> instructions))
+                if (sharedExits.TryGetValue(previousPosition, out List<Jumper> jumpers))
+                {
+                    foreach (Jumper jumper in jumpers)
                     {
-                        instructions = new List<Instruction>();
-                        _opGroups.Add(instruction.OP, instructions);
+                        JumpExits.Add(jumper, instruction);
                     }
-                    instructions.Add(instruction);
-                    
-                    if (sharedExits.TryGetValue(previousPosition, out List<Jumper> jumpers))
+                    sharedExits.Remove(previousPosition);
+                }
+
+                if (Jumper.IsValid(instruction.OP))
+                {
+                    var jumper = (Jumper)instruction;
+                    if (jumper.Offset == 0) continue;
+
+                    long exitPosition = previousPosition + jumper.Offset;
+                    if (exitPosition == input.Length) continue;
+
+                    if (instruction.OP == OPCode.EndRepeat)
+                        exitPosition = previousPosition - jumper.Offset;
+
+                    jumpers = null;
+                    if (!sharedExits.TryGetValue(exitPosition, out jumpers))
                     {
-                        // This is an exit position for one, or more jump instructions.
-                        foreach (Jumper jumper in jumpers)
-                        {
-                            JumpExits.Add(jumper, instruction);
-                        }
-                        sharedExits.Remove(previousPosition);
+                        jumpers = new List<Jumper>();
+                        sharedExits.Add(exitPosition, jumpers);
                     }
-
-                    if (Jumper.IsValid(instruction.OP))
-                    {
-                        var jumper = (Jumper)instruction;
-                        if (jumper.Offset == 0) continue;
-
-                        long exitPosition = previousPosition + jumper.Offset;
-                        if (exitPosition == input.Length) continue;
-
-                        if (instruction.OP == OPCode.EndRepeat)
-                            exitPosition = previousPosition - jumper.Offset;
-
-                        jumpers = null;
-                        if (!sharedExits.TryGetValue(exitPosition, out jumpers))
-                        {
-                            jumpers = new List<Jumper>();
-                            sharedExits.Add(exitPosition, jumpers);
-                        }
-                        jumpers.Add(jumper);
-                    }
+                    jumpers.Add(jumper);
                 }
             }
-        }
 
-        public void Create()
-        {
-            var statementBuilder = new StatementBuilder(this);
-            Stack<Expression> stack = new Stack<Expression>();
-
-            BlockStatement handlerBody = statementBuilder.ConvertBlock(_instructions.ToArray(), stack, out int consumed);
+            foreach ((long exitOffset, List<Jumper> jumpers) in sharedExits)
+            {
+                foreach (var jump in jumpers)
+                {
+                    JumpExits.Add(jump, marks[exitOffset]);
+                }
+            }
         }
 
         public bool IsBackwardsJump(Jumper jumper)
