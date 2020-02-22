@@ -1,9 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 
 using Shockky.IO;
-using Shockky.Lingo.Syntax;
 using Shockky.Lingo.Instructions;
 
 namespace Shockky.Lingo
@@ -20,11 +19,27 @@ namespace Shockky.Lingo
 
         public int Count => _instructions.Count;
         public bool IsReadOnly => false;
-
+        
         public Instruction this[int index]
         {
             get => _instructions[index];
             set => _instructions[index] = value;
+        }
+        public Instruction this[Index index]
+        {
+            get => _instructions[index];
+            set => _instructions[index] = value;
+        }
+        public Instruction[] this[Range range]
+        {
+            get
+            {
+                var (start, end) = (range.Start.GetOffset(_instructions.Count), range.End.GetOffset(_instructions.Count));
+                var instructions = new Instruction[end - start];
+
+                CopyTo(start, instructions, 0, instructions.Length);
+                return instructions;
+            }
         }
 
         public LingoCode(LingoHandlerBody body)
@@ -120,23 +135,14 @@ namespace Shockky.Lingo
         }
         public Instruction[] GetJumpBlock(Jumper jumper)
         {
+            if (jumper.OP == OPCode.EndRepeat)
+                throw new InvalidOperationException("Backward jump blocks are not supported.");
+
             int blockStart = (_indices[jumper] + 1);
             int scopeEnd = _indices[JumpExits[jumper]];
 
-            var body = new Instruction[scopeEnd - blockStart];
-            _instructions.CopyTo(blockStart, body, 0, body.Length);
-
-            return body;
+            return this[blockStart..scopeEnd];
         }
-
-        public override int GetBodySize() => _body.Code.Length;
-
-        public override void WriteTo(ShockwaveWriter output)
-        {
-            foreach (var instruction in _instructions)
-                instruction.WriteTo(output);
-        }
-
         public int IndexOf(OPCode op)
         {
             if (_opGroups.ContainsKey(op))
@@ -154,16 +160,7 @@ namespace Shockky.Lingo
             }
             return -1;
         }
-
-        public IEnumerator<Instruction> GetEnumerator()
-        {
-            return _instructions.GetEnumerator();
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
+        
         public void Add(Instruction item)
         {
             _instructions.Add(item);
@@ -172,7 +169,10 @@ namespace Shockky.Lingo
         public void Clear()
         {
             _instructions.Clear();
+            _opGroups.Clear();
             _indices.Clear();
+
+            JumpExits.Clear();
         }
 
         public bool Contains(Instruction item)
@@ -207,5 +207,16 @@ namespace Shockky.Lingo
         {
             _instructions.RemoveAt(index);
         }
+
+        public override int GetBodySize() => _body.Code.Length;
+
+        public override void WriteTo(ShockwaveWriter output)
+        {
+            foreach (var instruction in _instructions)
+                instruction.WriteTo(output);
+        }
+
+        public IEnumerator<Instruction> GetEnumerator() => _instructions.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
