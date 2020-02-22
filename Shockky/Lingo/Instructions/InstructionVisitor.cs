@@ -20,6 +20,7 @@
         public virtual void VisitNewPropertyListInstruction(NewPropListIns newPropList) => Default(newPropList);
 
         public virtual void VisitPopInstruction(PopIns pop) => Default(pop);
+        public virtual void VisitSwapInstruction(SwapIns swap) => Default(swap);
         public virtual void VisitDuplicateInstruction(DupIns dup) => Default(dup);
     }
 
@@ -43,6 +44,7 @@
         public virtual void VisitNewPropertyListInstruction(NewPropListIns newPropList, TContext context) => Default(newPropList, context);
 
         public virtual void VisitPopInstruction(PopIns pop, TContext context) => Default(pop, context);
+        public virtual void VisitSwapInstruction(SwapIns swap, TContext context) => Default(swap, context);
         public virtual void VisitDuplicateInstruction(DupIns dup, TContext context) => Default(dup, context);
     }
 
@@ -66,6 +68,7 @@
         public virtual T VisitNewPropertyListInstruction(NewPropListIns newPropList, TContext context) => Default(newPropList, context);
 
         public virtual T VisitPopInstruction(PopIns pop, TContext context) => Default(pop, context);
+        public virtual T VisitSwapInstruction(SwapIns swap, TContext context) => Default(swap, context);
         public virtual T VisitDuplicateInstruction(DupIns dup, TContext context) => Default(dup, context);
     }
 }
