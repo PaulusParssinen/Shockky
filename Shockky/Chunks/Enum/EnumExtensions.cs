@@ -5,14 +5,16 @@
         public static string ToFourCC(this ChunkKind chunkKind)
         {
             return chunkKind.ToString()
-                .Replace("Star", "*")
+                .Replace("Pointer", "*")
                 .PadRight(4);
         }
 
         public static ChunkKind ToChunkKind(this string chunkName)
         {
-            if (System.Enum.TryParse(chunkName.Replace("*", "Star").Replace(" ", string.Empty), out ChunkKind chunkKind))
+            if (System.Enum.TryParse(chunkName.Replace("*", "Pointer").Replace(" ", string.Empty), out ChunkKind chunkKind))
                 return chunkKind;
+
+            System.Console.WriteLine(chunkName);
             return ChunkKind.Unknown;
         }
 

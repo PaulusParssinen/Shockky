@@ -29,8 +29,8 @@
         MCsL,
         Cinf,
         CASt,
-        CASStar,
-        KEYStar,
+        CASPointer,
+        KEYPointer,
 
         Thum,
 

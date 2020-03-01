@@ -16,7 +16,7 @@ namespace Shockky.Chunks.Cast
         public Guid XtraGUID { get; set; }
         public string XtraName { get; set; }
 
-        public int[] RegistrationPoints { get; set; } //Film and video stuff?
+        public int[] RegistrationPoints { get; set; }
 
         public string ClipboardFormat { get; set; }
 

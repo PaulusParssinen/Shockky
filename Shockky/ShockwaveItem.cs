@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
+using System.Diagnostics;
 
 using Shockky.IO;
 
@@ -13,12 +13,11 @@ namespace Shockky
 
         public byte[] ToArray()
         {
-            using (var ms = new MemoryStream())
-            using (var output = new ShockwaveWriter(ms))
-            {
-                WriteTo(output);
-                return ms.ToArray();
-            }
+            using var ms = new MemoryStream();
+            using var output = new ShockwaveWriter(ms);
+            
+            WriteTo(output);
+            return ms.ToArray();
         }
 
         public abstract int GetBodySize();

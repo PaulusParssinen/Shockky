@@ -13,7 +13,7 @@ namespace Shockky.Chunks
         public int AssignedCount { get; set; }
 
         public AssociationTableChunk()
-            : base(ChunkKind.KEYStar)
+            : base(ChunkKind.KEYPointer)
         { }
         public AssociationTableChunk(ShockwaveReader input, ChunkHeader header)
             : base(header)

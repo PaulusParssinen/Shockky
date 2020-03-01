@@ -15,7 +15,6 @@ namespace Shockky.Chunks
             _input = input;
         }
         
-        //Gotta confirm that the first entry is ILS..
         public InitialLoadSegmentChunk ReadInitialLoadSegment(AfterBurnerMapEntry ilsEntry)
         {
             _input.Position += ilsEntry.Offset;
@@ -31,7 +30,7 @@ namespace Shockky.Chunks
 
                 _input.Position = Header.Offset + entry.Offset;
 
-                var chunkInput = (entry.IsCompressed ?
+                ShockwaveReader chunkInput = (entry.IsCompressed ?
                     _input.WrapDecompressor(entry.CompressedLength) : _input);
 
                 callback?.Invoke(Read(chunkInput, entry.Header));

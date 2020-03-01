@@ -8,7 +8,7 @@ namespace Shockky.Lingo
 
         public LingoMachine(LingoHandler handler)
         {
-            Values = new Stack<object>();
+            Values = new Stack<object>(handler.Body.StackHeight);
         }
     }
 }

@@ -1,11 +1,11 @@
-﻿using Shockky.IO;
-using System;
+﻿using System;
+using Shockky.IO;
 
 namespace Shockky.Lingo
 {
     public class LingoLiteral : ShockwaveItem, IEquatable<LingoLiteral>
     {
-        protected override string DebuggerDisplay => $"Offset: {Offset} | [{Enum.GetName(typeof(LiteralKind), Kind)}] {Value ?? "NULL"}";
+        protected override string DebuggerDisplay => $"[{Kind}] Value: {Value}, Offset: {Offset}";
 
         public LiteralKind Kind { get; set; }
         public long Offset { get; set; }
@@ -30,20 +30,12 @@ namespace Shockky.Lingo
                 input.Position = dataOffset + Offset;
 
                 int length = input.ReadBigEndian<int>();
-
-                switch (Kind)
+                Value = Kind switch
                 {
-                    case LiteralKind.String:
-                        Value = input.ReadString(length - 1);
-                        input.ReadByte();
-                        break;
-                    case LiteralKind.Float:
-                        Value = input.ReadBigEndian<long>();
-                        break;
-                    case LiteralKind.CompiledJavascript:
-                        Value = input.ReadBytes(length);
-                        break;
-                }
+                    LiteralKind.String => input.ReadString(length),
+                    LiteralKind.Float => input.ReadBigEndian<long>(),
+                    LiteralKind.CompiledJavascript => input.ReadBytes(length)
+                };
             }
             else Value = Offset;
         }

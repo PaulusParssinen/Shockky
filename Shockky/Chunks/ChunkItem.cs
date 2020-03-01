@@ -58,12 +58,12 @@ namespace Shockky.Chunks
                 ChunkKind.RIFX => new FileMetadataChunk(input, header),
                 ChunkKind.imap => new InitialMapChunk(input, header),
                 ChunkKind.mmap => new MemoryMapChunk(input, header),
-                ChunkKind.KEYStar => new AssociationTableChunk(input, header),
+                ChunkKind.KEYPointer => new AssociationTableChunk(input, header),
 
                 ChunkKind.VWCF => new ConfigChunk(input, header),
                 ChunkKind.DRCF => new ConfigChunk(input, header),
 
-                //ChunkKind.VWSC => new VWScoreChunk(input, header),
+                //ChunkKind.VWSC => new ScoreChunk(input, header),
                 ChunkKind.VWLB => new ScoreLabelChunk(input, header),
                 ChunkKind.VWFI => new FileInfoChunk(input, header),
 
@@ -71,7 +71,7 @@ namespace Shockky.Chunks
                 ChunkKind.Lscr => new ScriptChunk(input, header),
                 ChunkKind.Lnam => new NameTableChunk(input, header),
 
-                ChunkKind.CASStar => new CastAssociationTableChunk(input, header),
+                ChunkKind.CASPointer => new CastAssociationTableChunk(input, header),
                 ChunkKind.CASt => new CastMemberPropertiesChunk(input, header),
 
                 ChunkKind.MCsL => new MovieCastListChunk(input, header),
