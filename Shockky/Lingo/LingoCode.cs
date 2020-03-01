@@ -69,7 +69,7 @@ namespace Shockky.Lingo
 
                 _instructions.Add(instruction);
 
-                if (instruction == null) continue;
+                if (instruction == null) continue; //TODO: TEMPORARY DEBUGGING MEASURE
 
                 _indices.Add(instruction, _indices.Count);
 
@@ -79,7 +79,7 @@ namespace Shockky.Lingo
                     _opGroups.Add(instruction.OP, instructions);
                 }
                 instructions.Add(instruction);
-
+                
                 if (sharedExits.TryGetValue(previousPosition, out List<Jumper> jumpers))
                 {
                     foreach (Jumper jumper in jumpers)
@@ -94,11 +94,11 @@ namespace Shockky.Lingo
                     var jumper = (Jumper)instruction;
                     if (jumper.Offset == 0) continue;
 
-                    long exitPosition = previousPosition + jumper.Offset;
-                    if (exitPosition == input.Length) continue;
+                    long exitPosition = instruction.OP == OPCode.EndRepeat ?
+                        previousPosition - jumper.Offset :
+                        previousPosition + jumper.Offset;
 
-                    if (instruction.OP == OPCode.EndRepeat)
-                        exitPosition = previousPosition - jumper.Offset;
+                    if (exitPosition == input.Length) continue;
 
                     jumpers = null;
                     if (!sharedExits.TryGetValue(exitPosition, out jumpers))
@@ -121,6 +121,7 @@ namespace Shockky.Lingo
 
         public bool IsBackwardsJump(Jumper jumper)
         {
+            //TODO: jumper.OP == OPCode.EndRepeat
             return (IndexOf(jumper) > IndexOf(JumpExits[jumper]));
         }
         public Jumper GetJumperEntry(Instruction exit)
