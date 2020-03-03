@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shockky\Shockky.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20104.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Palettes\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
