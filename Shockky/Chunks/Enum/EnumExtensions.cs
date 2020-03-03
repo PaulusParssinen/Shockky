@@ -13,8 +13,6 @@
         {
             if (System.Enum.TryParse(chunkName.Replace("*", "Pointer").Replace(" ", string.Empty), out ChunkKind chunkKind))
                 return chunkKind;
-
-            System.Console.WriteLine(chunkName);
             return ChunkKind.Unknown;
         }
 
