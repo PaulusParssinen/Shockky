@@ -101,12 +101,9 @@ namespace Shockky.IO
 
         public Color ReadColor()
         {
-            byte r = ReadByte();
-            ReadByte();
-            byte g = ReadByte();
-            ReadByte();
-            byte b = ReadByte();
-            ReadByte();
+            int r = (ReadBigEndian<short>() >> 8) & 0xFF;
+            int g = (ReadBigEndian<short>() >> 8) & 0xFF;
+            int b = (ReadBigEndian<short>() >> 8) & 0xFF;
             return Color.FromArgb(r, g, b);
         }
 
@@ -120,6 +117,7 @@ namespace Shockky.IO
         }
 
         #region Manual position tracking
+        //TODO: Get rid of this abomination asap
         public override int Read(Span<char> buffer)
         {
             int read = base.Read(buffer);
