@@ -11,24 +11,24 @@ namespace Shockky.Chunks
         public ScoreReferenceChunk()
             : base(ChunkKind.SCRF)
         { }
-        public ScoreReferenceChunk(ShockwaveReader input, ChunkHeader header) 
+        public ScoreReferenceChunk(ref ShockwaveReader input, ChunkHeader header) 
             : base(header)
         {
-            input.ReadBigEndian<int>();
-            input.ReadBigEndian<int>();
+            input.ReadInt32();
+            input.ReadInt32();
 
-            int entryCount = input.ReadBigEndian<int>();
-            int validCount = input.ReadBigEndian<int>();
+            int entryCount = input.ReadInt32();
+            int validCount = input.ReadInt32();
 
-            input.ReadBigEndian<short>();
-            input.ReadBigEndian<short>();
+            input.ReadInt16();
+            input.ReadInt16();
 
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadInt32());
 
             Entries = new Dictionary<short, int>(entryCount);
             for (int i = 0; i < entryCount; i++)
             {
-                Entries.Add(input.ReadBigEndian<short>(), input.ReadBigEndian<int>());
+                Entries.Add(input.ReadInt16(), input.ReadInt32());
             }
         }
 
@@ -51,20 +51,20 @@ namespace Shockky.Chunks
             const short ENTRY_OFFSET = 24;
             const short UNKNOWN = 8;
             
-            output.WriteBigEndian(0);
-            output.WriteBigEndian(0);
+            output.Write(0);
+            output.Write(0);
 
-            output.WriteBigEndian(Entries.Count);
-            output.WriteBigEndian(Entries.Count);
+            output.Write(Entries.Count);
+            output.Write(Entries.Count);
 
-            output.WriteBigEndian(ENTRY_OFFSET);
-            output.WriteBigEndian(UNKNOWN);
+            output.Write(ENTRY_OFFSET);
+            output.Write(UNKNOWN);
 
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            foreach (var entry in Entries)
+            output.Write((int)Remnants.Dequeue());
+            foreach ((short number, int castMapPtrId) in Entries)
             {
-                output.WriteBigEndian(entry.Key);
-                output.WriteBigEndian(entry.Value);
+                output.Write(number);
+                output.Write(castMapPtrId);
             }
         }
     }

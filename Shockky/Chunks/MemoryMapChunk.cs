@@ -4,6 +4,7 @@ namespace Shockky.Chunks
 {
     public class MemoryMapChunk : ChunkItem
     {
+        public const short ENTRIES_OFFSET = 24;
         public const short ENTRY_SIZE = 20;
 
         public ChunkEntry[] Entries { get; set; }
@@ -11,29 +12,28 @@ namespace Shockky.Chunks
         public int LastJunkId { get; set; }
         public int LastFreeId { get; set; }
 
-        public ChunkEntry this[int index] 
-            => Entries[index];
+        public ChunkEntry this[int index] => Entries[index];
 
         public MemoryMapChunk()
             : base(ChunkKind.mmap)
         { }
-        public MemoryMapChunk(ShockwaveReader input, ChunkHeader header)
+        public MemoryMapChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadInt16());
-            input.ReadInt16();
+            input.ReadBEInt16();
+            input.ReadBEInt16();
 
-            int entryCountMax = input.ReadInt32();
-            int entryCount = input.ReadInt32();
+            int entryCountMax = input.ReadBEInt32();
+            int entryCount = input.ReadBEInt32();
 
-            LastJunkId = input.ReadInt32();
-            Remnants.Enqueue(input.ReadInt32());
-            LastFreeId = input.ReadInt32();
+            LastJunkId = input.ReadBEInt32();
+            Remnants.Enqueue(input.ReadBEInt32());
+            LastFreeId = input.ReadBEInt32();
 
             Entries = new ChunkEntry[entryCount];
             for (int i = 0; i < Entries.Length; i++)
             {
-                var entry = new ChunkEntry(input);
+                var entry = new ChunkEntry(ref input);
                 entry.Header.Id = i;
 
                 Entries[i] = entry;
@@ -42,16 +42,18 @@ namespace Shockky.Chunks
         
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.Write((short)Remnants.Dequeue());
-            output.Write(ENTRY_SIZE);
-            output.Write(Entries.Length); //TODO: I GUESS
-            output.Write(Entries.Length);
-            output.Write(LastJunkId);
-            output.Write((int)Remnants.Dequeue());
-            output.Write(LastFreeId);
-            for (int i = 0; i < Entries.Length; i++)
+            output.WriteBE(ENTRIES_OFFSET);
+            output.WriteBE(ENTRY_SIZE);
+
+            output.WriteBE(Entries.Length); //TODO: I GUESS
+            output.WriteBE(Entries.Length);
+
+            output.WriteBE(LastJunkId);
+            output.WriteBE((int)Remnants.Dequeue());
+            output.WriteBE(LastFreeId);
+            foreach (var entry in Entries)
             {
-                output.Write(Entries[i]);
+                entry.WriteTo(output);
             }
         }
 

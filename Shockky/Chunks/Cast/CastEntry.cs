@@ -11,13 +11,12 @@ namespace Shockky.Chunks.Cast
         public int OwnerId { get; set; }
         public ChunkKind Kind { get; set; }
 
-        public CastEntry()
-        { }
-        public CastEntry(ShockwaveReader input)
+        public CastEntry() { }
+        public CastEntry(ref ShockwaveReader input)
         {
-            Id = input.ReadInt32();
-            OwnerId = input.ReadInt32();
-            Kind = input.ReadReversedString(4).ToChunkKind();
+            Id = input.ReadBEInt32();
+            OwnerId = input.ReadBEInt32();
+            Kind = (ChunkKind)input.ReadBEInt32();
         }
 
         public override int GetBodySize()
@@ -31,9 +30,9 @@ namespace Shockky.Chunks.Cast
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.Write(Id);
-            output.Write(OwnerId);
-            output.WriteReversedString(Kind.ToFourCC());
+            output.WriteBE(Id);
+            output.WriteBE(OwnerId);
+            output.Write((int)Kind);
         }
     }
 }

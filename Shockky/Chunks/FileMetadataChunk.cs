@@ -1,37 +1,38 @@
 ﻿using Shockky.IO;
+using System.Buffers.Binary;
 
 namespace Shockky.Chunks
 {
     public class FileMetadataChunk : ChunkItem
     {
-        private long _fileLength;
-        public long FileLength
-        {
-            set { Header.Length = _fileLength = value; }
-            get { return _fileLength = Header.Length; }
-        }
-
         public CodecKind Codec { get; set; }
+
+        public int FileLength => IsBigEndian ? BinaryPrimitives.ReverseEndianness(Header.Length) : Header.Length;
+        public bool IsBigEndian => (Kind == ChunkKind.XFIR);
 
         public FileMetadataChunk()
             : base(ChunkKind.RIFX)
         { }
-        public FileMetadataChunk(ShockwaveReader input)
-            : base(new ChunkHeader(input))
-        {
-            Codec = input.ReadReversedString(4).ToCodec();
-        }
-        public FileMetadataChunk(ShockwaveReader input, ChunkHeader header)
+        public FileMetadataChunk(ref ShockwaveReader input)
+            : this(ref input, new ChunkHeader(ref input))
+        { }
+        public FileMetadataChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Codec = input.ReadReversedString(4).ToCodec();
+            Codec = (CodecKind)(IsBigEndian ?
+                input.ReadInt32() : input.ReadBEInt32());
         }
 
-        public override int GetBodySize() => (int)FileLength;
+        public override int GetBodySize()
+        {
+            int size = 0;
+            size += sizeof(int);
+            return size;
+        }
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.WriteReversedString(Codec.ToString());
+            output.Write((int)Codec);
         }
     }
 }

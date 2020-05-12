@@ -8,7 +8,7 @@ namespace Shockky.Lingo
         protected override string DebuggerDisplay => $"[{Kind}] Value: {Value}, Offset: {Offset}";
 
         public LiteralKind Kind { get; set; }
-        public long Offset { get; set; }
+        public int Offset { get; set; }
         public object Value { get; set; }
 
         public LingoLiteral(LiteralKind kind, object value)
@@ -17,24 +17,24 @@ namespace Shockky.Lingo
             Value = value;
         }
 
-        public LingoLiteral(ShockwaveReader input)
+        public LingoLiteral(ref ShockwaveReader input)
         {
-            Kind = (LiteralKind)input.ReadBigEndian<int>();
-            Offset = input.ReadBigEndian<int>();
+            Kind = (LiteralKind)input.ReadInt32();
+            Offset = input.ReadInt32();
         }
 
-        public void ReadValue(ShockwaveReader input, long dataOffset)
+        public void ReadValue(ref ShockwaveReader input, int dataOffset)
         {
             if (Kind != LiteralKind.Integer) 
             {
-                input.Position = dataOffset + Offset;
+                input.AdvanceTo(dataOffset + Offset);
 
-                int length = input.ReadBigEndian<int>();
+                int length = input.ReadInt32();
                 Value = Kind switch
                 {
                     LiteralKind.String => input.ReadString(length),
-                    LiteralKind.Float => input.ReadBigEndian<long>(),
-                    LiteralKind.CompiledJavascript => input.ReadBytes(length)
+                    LiteralKind.FloatingPoint => input.ReadDouble(),
+                    LiteralKind.CompiledJavascript => input.ReadBytes(length).ToArray()
                 };
             }
             else Value = Offset;
@@ -50,8 +50,8 @@ namespace Shockky.Lingo
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian((int)Kind);
-            output.WriteBigEndian(Offset);
+            output.Write((int)Kind);
+            output.Write(Offset);
         }
 
         public bool Equals(LingoLiteral literal)

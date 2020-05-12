@@ -40,8 +40,8 @@ namespace Shockky.Lingo.Instructions
 
             output.Write(op);
 
-            if (op > 0xC0) output.WriteBigEndian(Value);
-            else if (op > 0x80) output.WriteBigEndian((short)Value);
+            if (op > 0xC0) output.Write(Value);
+            else if (op > 0x80) output.Write((short)Value);
             else if (op > 0x40) output.Write((byte)Value);
         }
 
@@ -67,7 +67,7 @@ namespace Shockky.Lingo.Instructions
 
         public override int GetBodySize() => throw new NotImplementedException();
 
-        public static Instruction Create(LingoHandler handler, ShockwaveReader input)
+        public static Instruction Create(LingoHandler handler, ref ShockwaveReader input)
         {
             int operandValue = 0;
 
@@ -79,8 +79,8 @@ namespace Shockky.Lingo.Instructions
                 op %= 0x40;
                 op += 0x40;
 
-                if (ogOp > 0xC0) operandValue = input.ReadBigEndian<int>();
-                else if (ogOp > 0x80) operandValue = input.ReadBigEndian<short>();
+                if (ogOp > 0xC0) operandValue = input.ReadInt32();
+                else if (ogOp > 0x80) operandValue = input.ReadInt16();
                 else operandValue = input.ReadByte();
             }
 
@@ -114,7 +114,7 @@ namespace Shockky.Lingo.Instructions
                 OPCode.ContainsString => new ContainsStringIns(),
                 OPCode.StartsWith => new StartsWithIns(),
                 OPCode.SplitString => new SplitStringIns(),
-                OPCode.LightString => new LightStringIns(),
+                OPCode.Hilite => new HiliteStringIns(),
                 OPCode.OntoSprite => new OntoSpriteIns(),
                 OPCode.IntoSprite => new IntoSpriteIns(),
                 OPCode.CastString => new CastStringIns(),
@@ -147,8 +147,8 @@ namespace Shockky.Lingo.Instructions
                 OPCode.CallLocal => new CallLocalIns(handler, operandValue),
                 OPCode.CallExternal => new CallExternalIns(handler, operandValue),
                 //OPCode.CallObjOld:
-                //OPCode.Op_59:
-                //OPCode.Op_5a:
+                OPCode.InsertString => new InsertStringIns(handler, operandValue),
+                OPCode.Insert => new InsertIns(handler, operandValue),
                 //OPCode.Op_5b:
                 OPCode.Get => new GetIns(handler, operandValue),
                 OPCode.Set => new SetIns(handler, operandValue),

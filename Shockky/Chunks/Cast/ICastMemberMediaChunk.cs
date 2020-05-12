@@ -3,7 +3,7 @@
 namespace Shockky.Chunks
 {
     public interface ICastMemberMediaChunk<TProperties>
-        where TProperties : ICastTypeProperties
+        where TProperties : ICastProperties
     {
         void PopulateMedia(TProperties castProperties);
     }

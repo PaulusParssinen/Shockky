@@ -9,20 +9,22 @@ namespace Shockky.Chunks.Score
     {
         public Channel[] Channels { get; }
 
-        public Frame(ShockwaveReader input)
+        public Frame(ref ShockwaveReader input)
         {
-            long endOffset = input.Position + input.ReadBigEndian<short>();
+            Debug.WriteLine("## Frame start");
+
+            long endOffset = input.Position + input.ReadInt16();
 
             if ((endOffset - input.Position) < 0)
                 Debugger.Break(); //We at padding of the framez I guess
             
             while ((endOffset - input.Position) > 0)
             {
-                short channelLength = input.ReadBigEndian<short>();
-                ushort channelOffset = input.ReadBigEndian<ushort>();
-                byte[] data = input.ReadBytes(channelLength);
+                short channelLength = input.ReadInt16();
+                ushort channelOffset = input.ReadUInt16();
+                ReadOnlySpan<byte> data = input.ReadBytes(channelLength);
 
-                Debug.WriteLine($"Channel??: {channelOffset / 48} To: {channelOffset} | Len: {channelLength} | Left: {(endOffset - input.Position)}");
+                Debug.WriteLine($"Channel: {channelOffset / 48} To: {channelOffset} | Len: {channelLength} | Left: {(endOffset - input.Position)}");
             }
         }
 

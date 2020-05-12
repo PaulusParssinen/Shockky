@@ -11,16 +11,15 @@ namespace Shockky.Chunks
         public InitialMapChunk()
             : base(ChunkKind.imap)
         { }
-        public InitialMapChunk(ShockwaveReader input, ChunkHeader header)
+        public InitialMapChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            MemoryMapOffsets = new int[input.ReadInt32()];
+            MemoryMapOffsets = new int[input.ReadBEInt32()];
             for (int i = 0; i < MemoryMapOffsets.Length; i++)
             {
-                MemoryMapOffsets[i] = input.ReadInt32();
+                MemoryMapOffsets[i] = input.ReadBEInt32();
             }
-
-            Version = (DirectorVersion)input.ReadInt32();
+            Version = (DirectorVersion)input.ReadBEInt32();
         }
 
         public override int GetBodySize()
@@ -34,12 +33,12 @@ namespace Shockky.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.Write(MemoryMapOffsets.Length);
+            output.WriteBE(MemoryMapOffsets.Length);
             for (int i = 0; i < MemoryMapOffsets.Length; i++)
             {
-                output.Write(MemoryMapOffsets[i]);
+                output.WriteBE(MemoryMapOffsets[i]);
             }
-            output.Write((int)Version);
+            output.WriteBE((int)Version);
         }
     }
 }

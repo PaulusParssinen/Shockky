@@ -12,22 +12,25 @@ namespace Shockky.Chunks
         public NameTableChunk()
             : base(ChunkKind.Lnam)
         { }
-        public NameTableChunk(ShockwaveReader input, ChunkHeader header)
+        public NameTableChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            input.ReadBigEndian<int>();
-            input.ReadBigEndian<int>();
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32());
+            input.ReadInt32();
+            input.ReadInt32();
 
-            short nameOffset = input.ReadBigEndian<short>();
+            short nameOffset = input.ReadInt16();
             
-            Names = new List<string>(input.ReadBigEndian<short>());
+            Names = new List<string>(input.ReadInt16());
 
-            input.Position = Header.Offset + nameOffset;
+            //TODO:
+            input.AdvanceTo(Header.Offset + nameOffset);
+            //input.Position = Header.Offset + nameOffset;
+
             for (int i = 0; i < Names.Capacity; i++)
             {
-                Names.Add(input.ReadString());
+                Names.Add(new string(input.ReadString()));
             }
         }
 
@@ -36,15 +39,17 @@ namespace Shockky.Chunks
             const short NAME_OFFSET = 20;
             int namesLength = Names?.Sum(n => sizeof(byte) + n.Length) ?? 0;
 
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian(namesLength);
-            output.WriteBigEndian(namesLength);
-            output.WriteBigEndian(NAME_OFFSET);
-            output.WriteBigEndian((short)Names.Count);
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write(namesLength);
+            output.Write(namesLength);
+            output.Write(NAME_OFFSET);
+            output.Write((short)Names.Count);
 
             foreach (string name in Names)
+            {
                 output.Write(name);
+            }
         }
 
         public override int GetBodySize()

@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-using Shockky.IO;
+﻿using Shockky.IO;
 
 namespace Shockky.Chunks
 {
@@ -9,34 +7,37 @@ namespace Shockky.Chunks
         public string Text { get; set; }
         public TextFormat[] Formattings { get; set; }
 
-        public StyledTextChunk(ShockwaveReader input, ChunkHeader header)
+        public StyledTextChunk()
+            : base(ChunkKind.STXT)
+        { }
+        public StyledTextChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            input.ReadBigEndian<int>();
-            int textLength = input.ReadBigEndian<int>();
-            input.ReadBigEndian<int>();
+            input.ReadInt32();
+            int textLength = input.ReadInt32();
+            input.ReadInt32();
 
-            Text = Encoding.UTF8.GetString(input.ReadBytes(textLength)); //TODO:
+            Text = input.ReadString(textLength);
 
-            Formattings = new TextFormat[input.ReadBigEndian<short>()];
+            Formattings = new TextFormat[input.ReadInt16()];
             for (int i = 0; i < Formattings.Length; i++)
             {
-                Formattings[i] = new TextFormat(input);
+                Formattings[i] = new TextFormat(ref input);
             }
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            const int TEXT_OFFSET = 12; //I guess
+            const int TEXT_OFFSET = 12;
             const int TEXT_FORMAT_SIZE = 20;
 
-            output.WriteBigEndian(TEXT_OFFSET);
-            output.WriteBigEndian(Text.Length);
-            output.WriteBigEndian(sizeof(short) + (Formattings.Length * TEXT_FORMAT_SIZE));
+            output.Write(TEXT_OFFSET);
+            output.Write(Text.Length);
+            output.Write(sizeof(short) + (Formattings.Length * TEXT_FORMAT_SIZE));
 
-            output.Write(Text.ToCharArray());
+            output.Write(Text); //TODO: 
 
-            output.WriteBigEndian((short)(Formattings?.Length ?? 0));
+            output.Write((short)(Formattings?.Length ?? 0));
             for (int i = 0; i < Formattings?.Length; i++)
             {
                 Formattings[i].WriteTo(output);

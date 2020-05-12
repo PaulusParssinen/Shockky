@@ -15,20 +15,20 @@ namespace Shockky.Chunks
         {
             Labels = new Dictionary<short, string>();
         }
-        public ScoreLabelChunk(ShockwaveReader input, ChunkHeader header)
+        public ScoreLabelChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            var offsetMap = new (short frame, int offset)[input.ReadBigEndian<short>()];
+            var offsetMap = new (short frame, int offset)[input.ReadInt16()];
             Labels = new Dictionary<short, string>(offsetMap.Length);
 
             for (int i = 0; i < offsetMap.Length; i++)
             {
-                short frame = input.ReadBigEndian<short>();
-                short offset = input.ReadBigEndian<short>();
+                short frame = input.ReadInt16();
+                short offset = input.ReadInt16();
                 offsetMap[i] = (frame, offset);
             }
 
-            string labels = input.ReadString(input.ReadBigEndian<int>());
+            string labels = input.ReadString(input.ReadInt32());
 
             for (int i = 0; i < offsetMap.Length; i++)
             {
@@ -55,17 +55,17 @@ namespace Shockky.Chunks
         {
             string labels = string.Empty;
 
-            output.WriteBigEndian(Labels.Count);
+            output.Write(Labels.Count);
             foreach (var entry in Labels)
             {
-                output.WriteBigEndian(entry.Key);
-                output.WriteBigEndian(labels.Length);
+                output.Write(entry.Key);
+                output.Write(labels.Length);
 
                 labels += entry.Value;
             }
 
-            output.WriteBigEndian(labels.Length);
-            output.Write(Encoding.UTF8.GetBytes(labels));
+            output.Write(labels.Length);
+            output.Write(Encoding.UTF8.GetBytes(labels)); //TODO:
         }
     }
 }

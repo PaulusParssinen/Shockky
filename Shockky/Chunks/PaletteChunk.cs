@@ -11,7 +11,7 @@ namespace Shockky.Chunks
         public PaletteChunk()
             : base(ChunkKind.CLUT)
         { }
-        public PaletteChunk(ShockwaveReader input, ChunkHeader header)
+        public PaletteChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
             Colors = new Color[header.Length / 6];

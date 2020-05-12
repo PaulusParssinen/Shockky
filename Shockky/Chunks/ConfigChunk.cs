@@ -27,128 +27,127 @@ namespace Shockky.Chunks
 
         public int DownloadFramesBeforePlaying { get; set; }
 
-        public ConfigChunk(ShockwaveReader input, ChunkHeader header)
+        public ConfigChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            input.ReadBigEndian<short>();
-            Version = (DirectorVersion)input.ReadBigEndian<ushort>();
+            input.ReadInt16();
+            Version = (DirectorVersion)input.ReadUInt16();
 
             StageRectangle = input.ReadRect();
 
-            MinMember = input.ReadBigEndian<short>(); //Obsolete
-            MaxMember = input.ReadBigEndian<short>(); //Obsolete
+            MinMember = input.ReadInt16(); //Obsolete
+            MaxMember = input.ReadInt16(); //Obsolete
 
-            Tempo = input.ReadByte();
-            Remnants.Enqueue(input.ReadByte());
+            Tempo = input.ReadByte(); // == 0 => 20
+            Remnants.Enqueue(input.ReadByte()); //LightSwitch
 
             byte g = input.ReadByte();
             byte b = input.ReadByte();
 
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
+            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt16());
 
-            //https://www.youtube.com/watch?v=sA_eCl4Txzs
             byte r = input.ReadByte();
 
             StageBackgroundColor = Color.FromArgb(r, g, b);
 
             Remnants.Enqueue(input.ReadByte());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
+            Remnants.Enqueue(input.ReadInt16());
             Remnants.Enqueue(input.ReadByte()); //-2 when version < 0x551
             Remnants.Enqueue(input.ReadByte());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadInt32());
 
-            MovieVersion = (DirectorVersion)input.ReadBigEndian<short>();
-            Remnants.Enqueue(input.ReadBigEndian<short>());//16?
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            MovieVersion = (DirectorVersion)input.ReadInt16();
+            Remnants.Enqueue(input.ReadInt16());//16?
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32());
             Remnants.Enqueue(input.ReadByte());
             Remnants.Enqueue(input.ReadByte());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
+            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt16());
 
-            RandomNumber = input.ReadBigEndian<short>();
+            RandomNumber = input.ReadInt16();
 
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            OldDefaultPalette = input.ReadBigEndian<short>();
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            DefaultPalette = input.ReadBigEndian<int>(); //TODO:
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            DownloadFramesBeforePlaying = input.ReadBigEndian<int>(); //90
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32());
+            OldDefaultPalette = input.ReadInt16();
+            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt32());
+            DefaultPalette = input.ReadInt32(); //TODO:
+            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt16());
+            DownloadFramesBeforePlaying = input.ReadInt32(); //90
             //Zeros
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
+            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt16());
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
             const short LENGTH = 100;
-            output.WriteBigEndian(LENGTH);
-            output.WriteBigEndian((ushort)Version);
+            output.Write(LENGTH);
+            output.Write((ushort)Version);
 
             output.Write(StageRectangle);
 
-            output.WriteBigEndian(MinMember);
-            output.WriteBigEndian(MaxMember);
+            output.Write(MinMember);
+            output.Write(MaxMember);
 
             output.Write(Tempo);
-            output.WriteBigEndian((byte)Remnants.Dequeue());
+            output.Write((byte)Remnants.Dequeue());
 
             output.Write(StageBackgroundColor.G);
             output.Write(StageBackgroundColor.B);
 
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
 
             output.Write(StageBackgroundColor.R);
 
             output.Write((byte)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
             output.Write((byte)Remnants.Dequeue());
             output.Write((byte)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
 
-            output.WriteBigEndian((short)MovieVersion);
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.Write((short)MovieVersion);
+            output.Write((short)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
             output.Write((byte)Remnants.Dequeue());
             output.Write((byte)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
 
-            output.WriteBigEndian(RandomNumber);
+            output.Write(RandomNumber);
 
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
 
-            output.WriteBigEndian(OldDefaultPalette);
+            output.Write(OldDefaultPalette);
 
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian(DefaultPalette);
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write(DefaultPalette);
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
 
-            output.WriteBigEndian(DownloadFramesBeforePlaying);
+            output.Write(DownloadFramesBeforePlaying);
             
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
         }
 
         public override int GetBodySize()

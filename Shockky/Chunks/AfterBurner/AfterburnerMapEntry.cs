@@ -17,7 +17,7 @@ namespace Shockky.Chunks
 
         public bool IsCompressed => (CompressionType == EntryCompressionType.Compressed);
 
-        public AfterBurnerMapEntry(ShockwaveReader input)
+        public AfterBurnerMapEntry(ref ShockwaveReader input)
         {
             int id = input.Read7BitEncodedInt();
             Offset = input.Read7BitEncodedInt();
@@ -25,7 +25,7 @@ namespace Shockky.Chunks
             DecompressedLength = input.Read7BitEncodedInt();
             CompressionType = (EntryCompressionType)input.Read7BitEncodedInt();
 
-            Header = new ChunkHeader(input.ReadReversedString(4))
+            Header = new ChunkHeader((ChunkKind)input.ReadBEInt32())
             {
                 Id = id,
                 Length = DecompressedLength
@@ -45,7 +45,7 @@ namespace Shockky.Chunks
             output.Write7BitEncodedInt(DecompressedLength);
             output.Write7BitEncodedInt((int)CompressionType);
 
-            output.WriteReversedString(Header.Kind.ToFourCC());
+            output.WriteBE((int)Header.Kind);
         }
     }
 }

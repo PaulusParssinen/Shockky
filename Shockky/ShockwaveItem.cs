@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using System.Buffers;
 using System.Diagnostics;
 
 using Shockky.IO;
@@ -13,11 +13,19 @@ namespace Shockky
 
         public byte[] ToArray()
         {
-            using var ms = new MemoryStream();
-            using var output = new ShockwaveWriter(ms);
+            var arrayWriter = new ArrayBufferWriter<byte>();
+            WriteTo(arrayWriter);
+
+            return arrayWriter.WrittenSpan.ToArray();
+        }
+
+        public void WriteTo(IBufferWriter<byte> output)
+        {
+            int size = GetBodySize();
+            var writer = new ShockwaveWriter(output.GetSpan(size), bigEndian: true); //TODO: How do we manage endianness when writing files
             
-            WriteTo(output);
-            return ms.ToArray();
+            WriteTo(writer);
+            output.Advance(size);
         }
 
         public abstract int GetBodySize();

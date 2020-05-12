@@ -29,12 +29,12 @@ namespace Shockky.Chunks.Cast
         public int ImageCompression { get; set; }
         public int ImageQuality { get; set; }
 
-        public CommonMemberProperties(ShockwaveReader input)
+        public CommonMemberProperties(ref ShockwaveReader input)
         {
-            int[] propertyOffsets = new int[input.ReadBigEndian<short>() + 1];
+            int[] propertyOffsets = new int[input.ReadInt16() + 1];
             for (int i = 0; i < propertyOffsets.Length; i++)
             {
-                propertyOffsets[i] = input.ReadBigEndian<int>();
+                propertyOffsets[i] = input.ReadInt32();
             }
 
             for (int i = 0; i < propertyOffsets.Length - 1; i++)
@@ -42,11 +42,11 @@ namespace Shockky.Chunks.Cast
                 int length = propertyOffsets[i + 1] - propertyOffsets[i];
                 if (length < 1) continue;
 
-                ReadProperty(input, i, length);
+                ReadProperty(ref input, i, length);
             }
         }
         
-        private void ReadProperty(ShockwaveReader input, int index, int length)
+        private void ReadProperty(ref ShockwaveReader input, int index, int length)
         {
             switch (index)
             {
@@ -67,6 +67,7 @@ namespace Shockky.Chunks.Cast
                     break;
                 case 9:
                     XtraGUID = new Guid(input.ReadBytes(length));
+                    //XtraGUID = input.Read<Guid>();
                     break;
                 case 10:
                     XtraName = input.ReadNullString();
@@ -77,17 +78,17 @@ namespace Shockky.Chunks.Cast
                     RegistrationPoints = new int[length / 4];
                     for (int i = 0; i < RegistrationPoints.Length; i++)
                     {
-                        RegistrationPoints[i] = input.ReadBigEndian<int>();
+                        RegistrationPoints[i] = input.ReadInt32();
                     }
                     break;
                 case 16:
                     ClipboardFormat = input.ReadString(length);
                     break;
                 case 17:
-                    CreationDate = input.ReadBigEndian<int>() * 1000;
+                    CreationDate = input.ReadInt32() * 1000;
                     break;
                 case 18:
-                    ModifiedDate = input.ReadBigEndian<int>() * 1000;
+                    ModifiedDate = input.ReadInt32() * 1000;
                     break;
                 case 19:
                     ModifiedBy = input.ReadNullString();
@@ -96,29 +97,30 @@ namespace Shockky.Chunks.Cast
                     Comments = input.ReadString(length);
                     break;
                 case 21:
-                    byte[] imageFlags = input.ReadBytes(length); //4
+                    ReadOnlySpan<byte> imageFlags = input.ReadBytes(length); //4
 
                     ImageCompression = imageFlags[0] >> 4;
                     ImageQuality = imageFlags[1];
                     break;
-                case 7:
+                case 7: //TODO:
                 default:
-                    byte[] unknown = input.ReadBytes(length);
+                    ReadOnlySpan<byte> unknown = input.ReadBytes(length);
                     break;
             }
         }
 
+        //TODO:
         public override int GetBodySize()
         {
             int size = 0;
+            throw new NotImplementedException();
             size += sizeof(int);
-            size += 22 * sizeof(int); //TODO:
+            size += 22 * sizeof(int); 
 
-            using (var output = new ShockwaveWriter())
-            {
-                for (int i = 0; i < 22; i++)
-                    WriteProperty(output, i, ref size);
-            }
+            //var output = new ShockwaveWriter();
+            //for (int i = 0; i < 22; i++)
+            //    WriteProperty(output, i, ref size);
+
             return size;
         }
 
@@ -128,7 +130,7 @@ namespace Shockky.Chunks.Cast
             switch (index)
             {
                 case 0 when !string.IsNullOrEmpty(ScriptText):
-                    output.Write(ScriptText.ToCharArray());
+                    output.Write(ScriptText);
                     endOffset += ScriptText.Length;
                     break;
                 case 1 when !string.IsNullOrEmpty(Name):
@@ -136,19 +138,20 @@ namespace Shockky.Chunks.Cast
                     endOffset += Name.Length + 1;
                     break;
                 case 2 when !string.IsNullOrEmpty(FilePath):
-                    output.Write(FilePath.ToCharArray());
+                    output.Write(FilePath);
                     endOffset += FilePath.Length;
                     break;
                 case 3 when !string.IsNullOrEmpty(FileName):
-                    output.Write(FileName.ToCharArray());
+                    output.Write(FileName);
                     endOffset += FileName.Length;
                     break;
                 case 4 when !string.IsNullOrEmpty(FileType):
-                    output.Write(FileType.ToCharArray());
+                    output.Write(FileType);
                     endOffset += FileType.Length;
                     break;
                 case 9 when XtraGUID != null:
                     output.Write(XtraGUID.ToByteArray());
+                    //output.Write<T>()
                     endOffset += 16;
                     break;
                 case 10 when !string.IsNullOrEmpty(XtraName):
@@ -158,20 +161,20 @@ namespace Shockky.Chunks.Cast
                 case 12 when RegistrationPoints != null:
                     for (int i = 0; i < RegistrationPoints.Length; i++)
                     {
-                        output.WriteBigEndian(RegistrationPoints[i]);
-                        endOffset += sizeof(int);
+                        output.Write(RegistrationPoints[i]);
                     }
+                    endOffset += RegistrationPoints.Length * sizeof(int);
                     break;
                 case 16 when !string.IsNullOrEmpty(ClipboardFormat):
-                    output.Write(ClipboardFormat.ToCharArray());
+                    output.Write(ClipboardFormat);
                     endOffset += ClipboardFormat.Length;
                     break;
                 case 17 when CreationDate != 0:
-                    output.WriteBigEndian(CreationDate / 1000);
+                    output.Write(CreationDate / 1000);
                     endOffset += sizeof(int);
                     break;
                 case 18 when ModifiedDate != 0:
-                    output.WriteBigEndian(ModifiedDate / 1000);
+                    output.Write(ModifiedDate / 1000);
                     endOffset += sizeof(int);
                     break;
                 case 19 when !string.IsNullOrEmpty(ModifiedBy):
@@ -179,7 +182,7 @@ namespace Shockky.Chunks.Cast
                     endOffset += ModifiedBy.Length + 1; //TODO:
                     break;
                 case 20 when !string.IsNullOrEmpty(Comments):
-                    output.Write(Comments.ToCharArray());
+                    output.Write(Comments);
                     endOffset += Comments.Length;
                     break;
                 case 21 when ImageCompression != 0 || ImageQuality != 0:
@@ -196,28 +199,29 @@ namespace Shockky.Chunks.Cast
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian(21); //TODO: "compress"
-
-            int currentOffset = 0;
-            int[] propertyOffsets = new int[22];
-
-            output.Position += 22 * sizeof(int);
-
-            for (int i = 0; i < 22; i++)
-            {
-                propertyOffsets[i] = currentOffset;
-                WriteProperty(output, i, ref currentOffset);
-            }
-
-            output.Position -= 22 * sizeof(int);
-            output.Position -= currentOffset;
-
-            for (int i = 0; i < 22; i++)
-            {
-                output.WriteBigEndian(propertyOffsets[i]);
-            }
-
-            output.Position += currentOffset; //We are finished here, go to end
+            throw new NotImplementedException(nameof(CommonMemberProperties));
+            //output.Write(21); //TODO: "compress"
+            //
+            //int currentOffset = 0;
+            //int[] propertyOffsets = new int[22];
+            //
+            //output.Position += 22 * sizeof(int);
+            //
+            //for (int i = 0; i < 22; i++)
+            //{
+            //    propertyOffsets[i] = currentOffset;
+            //    WriteProperty(output, i, ref currentOffset);
+            //}
+            //
+            //output.Position -= 22 * sizeof(int);
+            //output.Position -= currentOffset;
+            //
+            //for (int i = 0; i < 22; i++)
+            //{
+            //    output.Write(propertyOffsets[i]);
+            //}
+            //
+            //output.Position += currentOffset; //We are finished here, go to end
         }
     }
 }

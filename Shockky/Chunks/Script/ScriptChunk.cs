@@ -17,32 +17,32 @@ namespace Shockky.Chunks
         public ScriptChunk()
             : base(ChunkKind.Lscr)
         { }
-        public ScriptChunk(ShockwaveReader input, ChunkHeader header)
+        public ScriptChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-
-            input.ReadBigEndian<int>();
-            input.ReadBigEndian<int>();
-
-            input.ReadBigEndian<short>();
-            ScriptNumber = input.ReadBigEndian<short>();
-
-            Remnants.Enqueue(input.ReadBigEndian<short>());
-            Remnants.Enqueue(input.ReadInt32()); // -1
-            Remnants.Enqueue(input.ReadInt32()); // 0
             Remnants.Enqueue(input.ReadInt32());
-            Remnants.Enqueue(input.ReadInt32()); // 0
+            Remnants.Enqueue(input.ReadInt32());
 
-            BehaviourScript = input.ReadBigEndian<int>(); //enum, Behav=0, Global=2
+            input.ReadInt32();
+            input.ReadInt32();
 
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<short>()); //scriptId
+            input.ReadInt16();
+            ScriptNumber = input.ReadInt16();
 
             Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadBEInt32()); // -1
+            Remnants.Enqueue(input.ReadBEInt32()); // 0
+            Remnants.Enqueue(input.ReadBEInt32());
+            Remnants.Enqueue(input.ReadBEInt32()); // 0
+
+            BehaviourScript = input.ReadInt32(); //enum, Behav=0, Global=2
+
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt16()); //scriptId
+
+            Remnants.Enqueue(input.ReadBEInt16());
             
-            Pool = new LingoValuePool(this, input);
+            Pool = new LingoValuePool(this, ref input);
         }
 
         public int GetHeaderSize()
@@ -74,7 +74,6 @@ namespace Shockky.Chunks
 
         public override int GetBodySize()
         {
-            //TODO: RELEASE compilation should be able to handle these well, otherwise gonna start hardcoding them as constants
             int size = 0;
             size += GetHeaderSize();
             size += Pool.GetBodySize();
@@ -85,27 +84,27 @@ namespace Shockky.Chunks
         {
             const short HEADER_LENGTH = 92;
 
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
 
-            output.WriteBigEndian(HEADER_LENGTH + Pool.GetBodySize());
-            output.WriteBigEndian(HEADER_LENGTH + Pool.GetBodySize());
+            output.Write(HEADER_LENGTH + Pool.GetBodySize());
+            output.Write(HEADER_LENGTH + Pool.GetBodySize());
 
-            output.WriteBigEndian(HEADER_LENGTH);
-            output.WriteBigEndian(ScriptNumber);
-
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.Write((int)Remnants.Dequeue());
-            output.Write((int)Remnants.Dequeue());
-            output.Write((int)Remnants.Dequeue());
-            output.Write((int)Remnants.Dequeue());
-            
-            output.WriteBigEndian(BehaviourScript);
-            
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
+            output.Write(HEADER_LENGTH);
+            output.Write(ScriptNumber);
 
             output.Write((short)Remnants.Dequeue());
+            output.WriteBE((int)Remnants.Dequeue());
+            output.WriteBE((int)Remnants.Dequeue());
+            output.WriteBE((int)Remnants.Dequeue());
+            output.WriteBE((int)Remnants.Dequeue());
+            
+            output.Write(BehaviourScript);
+            
+            output.Write((int)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+
+            output.WriteBE((short)Remnants.Dequeue());
 
             Pool.WriteTo(output);
         }

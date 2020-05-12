@@ -9,10 +9,10 @@ namespace Shockky.Chunks
         protected BinaryDataChunk(ChunkKind kind)
             : base(kind)
         { }
-        protected BinaryDataChunk(ShockwaveReader input, ChunkHeader header) 
+        protected BinaryDataChunk(ref ShockwaveReader input, ChunkHeader header) 
             : base(header)
         {
-            Data = input.ReadBytes((int)header.Length);
+            Data = input.ReadBytes(header.Length).ToArray();
         }
 
         public override int GetBodySize() => Data.Length;

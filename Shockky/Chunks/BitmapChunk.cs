@@ -1,9 +1,7 @@
-﻿using System.IO;
-using System;
+﻿using System;
 
-using Shockky.Chunks.Enum;
-using Shockky.Chunks.Cast;
 using Shockky.IO;
+using Shockky.Chunks.Cast;
 
 namespace Shockky.Chunks
 {
@@ -22,27 +20,28 @@ namespace Shockky.Chunks
         public BitmapChunk()
             : base(ChunkKind.BITD)
         { }
-        public BitmapChunk(ShockwaveReader input, ChunkHeader header)
-            : base(input, header)
+        public BitmapChunk(ref ShockwaveReader input, ChunkHeader header)
+            : base(ref input, header)
         { }
 
         public void PopulateMedia(BitmapCastProperties properties)
         {
             BitDepth = properties.BitDepth;
-
+        
             Flags = properties.Flags;
-
+        
             TotalWidth = properties.TotalWidth;
             Width = properties.Rectangle.Width;
             Height = properties.Rectangle.Height;
-
+        
             if (Data.Length == TotalWidth * Height)
                 return;
 
-            using var ms = new MemoryStream(TotalWidth * Height);
-            using var output = new ShockwaveWriter(ms);
-            using var input = new ShockwaveReader(Data);
-
+            //TODO: A closer look
+            Span<byte> outputSpan = TotalWidth * Height < 1024 ? stackalloc byte[TotalWidth * Height] : new byte[TotalWidth * Height];
+            var output = new ShockwaveWriter(outputSpan, false);
+            var input = new ShockwaveReader(Data.AsSpan());
+        
             while (input.IsDataAvailable)
             {
                 byte marker = input.ReadByte();
@@ -52,10 +51,10 @@ namespace Shockky.Chunks
                     buffer.Fill(input.ReadByte());
                     output.Write(buffer);
                 }
-                else output.Write(input.ReadBytes(++marker));
+                else output.Write(input.ReadBytes(marker + 1));
             }
 
-            Data = ms.ToArray();
+            Data = outputSpan.ToArray();
         }
     }
 }

@@ -11,12 +11,12 @@ namespace Shockky.Chunks
 
         public ScriptContextSection()
         { }
-        public ScriptContextSection(ShockwaveReader input)
+        public ScriptContextSection(ref ShockwaveReader input)
         {
-            Unknown = input.ReadBigEndian<int>();
-            Id = input.ReadBigEndian<int>();
-            Flags = input.ReadBigEndian<short>(); // 4=Used
-            Link = input.ReadBigEndian<short>();
+            Unknown = input.ReadInt32();
+            Id = input.ReadInt32();
+            Flags = input.ReadInt16(); // 4=Used
+            Link = input.ReadInt16();
         }
 
         public override int GetBodySize()
@@ -31,10 +31,10 @@ namespace Shockky.Chunks
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian(Unknown);
-            output.WriteBigEndian(Id);
-            output.WriteBigEndian(Flags);
-            output.WriteBigEndian(Link);
+            output.Write(Unknown);
+            output.Write(Id);
+            output.Write(Flags);
+            output.Write(Link);
         }
     }
 }

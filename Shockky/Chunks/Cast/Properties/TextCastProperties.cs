@@ -2,11 +2,10 @@
 using System.Drawing;
 
 using Shockky.IO;
-using Shockky.Chunks.Enum;
 
 namespace Shockky.Chunks.Cast
 {
-    public class TextCastProperties : ICastTypeProperties
+    public class TextCastProperties : ICastProperties
     {
         public TextAlignment Alignment { get; set; }
         public Color BackgroundColor { get; set; }
@@ -17,19 +16,19 @@ namespace Shockky.Chunks.Cast
 
         public TextCastProperties()
         { }
-        public TextCastProperties(ShockwaveReader input)
+        public TextCastProperties(ref ShockwaveReader input)
         {
-            input.Position += 4;
+            input.Advance(4);
 
-            Alignment = (TextAlignment)input.ReadBigEndian<short>();
+            Alignment = (TextAlignment)input.ReadInt16();
             BackgroundColor = input.ReadColor();
 
-            Font = input.ReadBigEndian<short>();
+            Font = input.ReadInt16();
             Rectangle = input.ReadRect();
-            LineHeight = input.ReadBigEndian<short>();
+            LineHeight = input.ReadInt16();
 
-            input.Position += 4;
-            ButtonType = input.ReadBigEndian<short>();
+            input.Advance(4);
+            ButtonType = input.ReadInt16();
         }
 
         public int GetBodySize()
@@ -49,14 +48,15 @@ namespace Shockky.Chunks.Cast
         public void WriteTo(ShockwaveWriter output)
         {
             throw new NotImplementedException(nameof(TextCastProperties));
-            output.WriteBigEndian((short)Alignment);
+            output.Write((short)Alignment);
             output.Write(BackgroundColor);
 
-            output.WriteBigEndian(Font);
+            output.Write(Font);
             output.Write(Rectangle);
-            output.WriteBigEndian(LineHeight);
+            output.Write(LineHeight);
 
-            output.WriteBigEndian(ButtonType);
+
+            output.Write(ButtonType);
         }
     }
 }

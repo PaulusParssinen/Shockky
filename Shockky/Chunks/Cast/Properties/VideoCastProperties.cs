@@ -2,11 +2,10 @@
 using System.Drawing;
 
 using Shockky.IO;
-using Shockky.Chunks.Enum;
 
 namespace Shockky.Chunks.Cast
 {
-    public class VideoCastProperties : ICastTypeProperties
+    public class VideoCastProperties : ShockwaveItem, ICastProperties
     {
         public string Type { get; set; }
 
@@ -20,10 +19,11 @@ namespace Shockky.Chunks.Cast
 
         public VideoCastProperties()
         { }
-        public VideoCastProperties(ShockwaveReader input)
+        public VideoCastProperties(ref ShockwaveReader input)
         {
-            Type = input.ReadString((int)input.ReadBigEndian<uint>());
-            input.Position += 10;
+            //TODO: A lot of unknown values.
+            Type = input.ReadString((int)input.ReadUInt32());
+            input.Advance(10);
 
             byte videoFlags = input.ReadByte();
             Streaming = ((videoFlags & 1) == 1);
@@ -33,13 +33,13 @@ namespace Shockky.Chunks.Cast
             PausedAtStart = ((videoFlags & 2) == 2);
 
             Flags = (VideoCastFlags)input.ReadByte();
-            input.Position += 3;
+            input.Advance(3);
             Framerate = input.ReadByte();
-            input.Position += 32;
+            input.Advance(32);
             Rectangle = input.ReadRect();
         }
 
-        public int GetBodySize()
+        public override int GetBodySize()
         {
             int size = 0;
             size += sizeof(short);
@@ -54,10 +54,9 @@ namespace Shockky.Chunks.Cast
             return size;
         }
 
-        public void WriteTo(ShockwaveWriter output)
+        public override void WriteTo(ShockwaveWriter output)
         {
             throw new NotImplementedException(nameof(VideoCastProperties));
-            //output.WriteBigEndian(Type);
         }
     }
 }

@@ -10,8 +10,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20104.2" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta*" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-*" />
   </ItemGroup>
 
   <ItemGroup>

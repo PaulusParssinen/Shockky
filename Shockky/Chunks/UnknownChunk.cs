@@ -6,10 +6,10 @@ namespace Shockky.Chunks
     {
         public byte[] Data { get; set; }
 
-        public UnknownChunk(ShockwaveReader input, ChunkHeader header)
+        public UnknownChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Data = input.ReadBytes((int)header.Length);
+            Data = input.ReadBytes(header.Length).ToArray();
         }
 
         public override int GetBodySize() => Data.Length;

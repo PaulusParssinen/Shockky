@@ -13,45 +13,45 @@ namespace Shockky.Chunks
         public ScoreChunk()
             : base(ChunkKind.VWSC)
         { }
-        public ScoreChunk(ShockwaveReader input, ChunkHeader header)
+        public ScoreChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            int totalLength = input.ReadBigEndian<int>();
-            int headerType = input.ReadBigEndian<int>(); //-3
+            int totalLength = input.ReadInt32();
+            int headerType = input.ReadInt32(); //-3
 
-            int spritePropertiesOffsetThingy = input.ReadBigEndian<int>();
-            int[] spritePropertyOffsets = new int[input.ReadBigEndian<int>() + 1];
+            int spritePropertiesOffsetThingy = input.ReadInt32();
+            int[] spritePropertyOffsets = new int[input.ReadInt32() + 1];
 
-            int notationOffset = input.ReadBigEndian<int>() * 4 + 12 + spritePropertiesOffsetThingy;
-            int lastSpritePropertyOffset = input.ReadBigEndian<int>();
+            int notationOffset = input.ReadInt32() * 4 + 12 + spritePropertiesOffsetThingy;
+            int lastSpritePropertyOffset = input.ReadInt32();
 
             for (int i  = 0; i < spritePropertyOffsets.Length; i++)
             {
-                spritePropertyOffsets[i] = input.ReadBigEndian<int>();
+                spritePropertyOffsets[i] = input.ReadInt32();
             }
 
             Debug.Assert(input.Position == (Header.Offset + notationOffset), "What");
             
-            int frameEndOffset = input.ReadBigEndian<int>();
+            int frameEndOffset = input.ReadInt32();
 
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadInt32());
 
-            Frames = new Frame[input.ReadBigEndian<int>()];
-            short framesType = input.ReadBigEndian<short>(); //13, 14
+            Frames = new Frame[input.ReadInt32()];
+            short framesType = input.ReadInt16(); //13, 14
 
-            short channelLength = input.ReadBigEndian<short>();
-            short lastChannelMax = input.ReadBigEndian<short>(); //1006
-            short lastChannel = input.ReadBigEndian<short>();
+            short channelLength = input.ReadInt16();
+            short lastChannelMax = input.ReadInt16(); //1006
+            short lastChannel = input.ReadInt16();
 
             for (int i = 0; i < Frames.Length; i++)
             {
-                Frames[i] = new Frame(input);
+                Frames[i] = new Frame(ref input);
             }
 
-            int[] spritePropertyOffsetIndices = new int[input.ReadBigEndian<int>()];
+            int[] spritePropertyOffsetIndices = new int[input.ReadInt32()];
             for (int i = 0; i < spritePropertyOffsetIndices.Length; i++)
             {
-                spritePropertyOffsetIndices[i] = input.ReadBigEndian<int>();
+                spritePropertyOffsetIndices[i] = input.ReadInt32();
             }
 
             SpriteProperties[] spriteProperties = new SpriteProperties[spritePropertyOffsetIndices.Length];
@@ -59,8 +59,8 @@ namespace Shockky.Chunks
             {
                 int spritePropertyOffset = spritePropertyOffsets[spritePropertyOffsetIndices[i]];
 
-                input.Position = Header.Offset + notationOffset + spritePropertyOffset;
-                spriteProperties[i] = new SpriteProperties(input);
+                input.AdvanceTo(Header.Offset + notationOffset + spritePropertyOffset);
+                spriteProperties[i] = new SpriteProperties(ref input);
             }
         }
 

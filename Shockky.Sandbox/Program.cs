@@ -2,10 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Drawing;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 using Shockky.Chunks;
@@ -24,8 +21,6 @@ namespace Shockky.Sandbox
         static int Main(string[] args)
         {
             Console.Title = "Shockky.Sandbox";
-            Console.WriteLine("Shockky.Sandbox");
-            Console.WriteLine();
 
             //TODO: Verbose and Quiet levels, and rest of the resources of course
             var rootCommand = new RootCommand()
@@ -37,8 +32,7 @@ namespace Shockky.Sandbox
                 }.ExistingOnly(),
 
                 new Option<bool>("--images",
-                    getDefaultValue: () => true,
-                    description: "Extract all (with bit depth 8) bitmaps from the file."),
+                    description: "Extract (not all yet) bitmaps from the file."),
 
                 new Option<DirectoryInfo>("--output",
                     getDefaultValue: () => new DirectoryInfo("Output/"),
@@ -112,7 +106,7 @@ namespace Shockky.Sandbox
 
                 Console.Write($"Disassembling file \"{file.Name}\"..");
 
-                using var shockwaveFile = new ShockwaveFile(file.FullName);
+                var shockwaveFile = new ShockwaveFile(file.FullName);
                 shockwaveFile.Disassemble();
 
                 Console.WriteLine("Done!");
@@ -120,10 +114,10 @@ namespace Shockky.Sandbox
                 List<(CastMemberPropertiesChunk Member, ChunkItem Media)> memberMedia = new List<(CastMemberPropertiesChunk, ChunkItem)>();
 
                 var associationTable = shockwaveFile.Chunks
-                    .FirstOrDefault(c => c.Kind == ChunkKind.KEYPointer) as AssociationTableChunk;
+                    .FirstOrDefault(c => c.Kind == ChunkKind.KEYPtr) as AssociationTableChunk;
 
                 var castAssociationTable = shockwaveFile.Chunks
-                    .FirstOrDefault(c => c.Kind == ChunkKind.CASPointer) as CastAssociationTableChunk;
+                    .FirstOrDefault(c => c.Kind == ChunkKind.CASPtr) as CastAssociationTableChunk;
 
                 if (associationTable == null)
                 {
@@ -165,8 +159,7 @@ namespace Shockky.Sandbox
 
                     if (bitmapProperties == null) continue;
 
-                    string outputFileName = CoerceValidFileName(member.Common?.Name)
-                        ?? $"NONAME-{member.Header.Id}-{media.Header.Id}";
+                    string outputFileName = CoerceValidFileName(member?.Common?.Name ?? $"NONAME-{member.Header.Id}-{media.Header.Id}");
 
                     int paletteIndex = bitmapProperties.Palette - 1; //castMemRef
 
@@ -209,11 +202,11 @@ namespace Shockky.Sandbox
         //TODO: Look more into ImageSharp, could offer some helpful tools to do this
         private static bool TryExtractBitmapResource(DirectoryInfo outputDirectory, string name, BitmapChunk bitmap, System.Drawing.Color[] palette)
         {
-            //TODO: Properly render flags etc. TrimWhitespace for example uses flood fill apparently so that could be fun.
+            //TODO: Properly render flags etc.
 
             Span<byte> buffer = bitmap.Data.AsSpan();
 
-            int width = bitmap.Width < bitmap.TotalWidth ? bitmap.Width : bitmap.TotalWidth; //TODO: This is wrong way
+            int width = bitmap.Width < bitmap.TotalWidth ? bitmap.Width : bitmap.TotalWidth;
 
             using var image = new Image<Bgra32>(bitmap.Width, bitmap.Height);
             for (int y = 0; y < bitmap.Height; y++)
@@ -253,7 +246,7 @@ namespace Shockky.Sandbox
                 }
             }
 
-            using var fs = File.Create(Path.GetFullPath(name + ".png", outputDirectory.FullName));
+            using var fs = File.Create(Path.Combine(outputDirectory.FullName, name + ".png"));
             image.SaveAsPng(fs);
 
             return true;

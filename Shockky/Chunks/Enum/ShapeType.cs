@@ -1,4 +1,4 @@
-﻿namespace Shockky.Chunks.Enum
+﻿namespace Shockky.Chunks
 {
     public enum ShapeType
     {

@@ -13,19 +13,19 @@ namespace Shockky.Chunks
         public int AssignedCount { get; set; }
 
         public AssociationTableChunk()
-            : base(ChunkKind.KEYPointer)
+            : base(ChunkKind.KEYPtr)
         { }
-        public AssociationTableChunk(ShockwaveReader input, ChunkHeader header)
+        public AssociationTableChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            input.ReadInt16();
-            input.ReadInt16();
-            CastEntries = new List<CastEntry>(input.ReadInt32());
-            AssignedCount = input.ReadInt32();
+            input.ReadBEInt16();
+            input.ReadBEInt16();
+            CastEntries = new List<CastEntry>(input.ReadBEInt32());
+            AssignedCount = input.ReadBEInt32();
             
             for (int i = 0; i < CastEntries.Capacity; i++)
             {
-                CastEntries.Add(new CastEntry(input));
+                CastEntries.Add(new CastEntry(ref input));
             }
 
             //CastEntries.RemoveRange(AssignedCount, TotalCount - AssignedCount);
@@ -33,10 +33,10 @@ namespace Shockky.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.Write(ENTRY_SIZE);
-            output.Write(ENTRY_SIZE);
-            output.Write(CastEntries?.Count ?? 0);
-            output.Write(CastEntries?.Count ?? 0);
+            output.WriteBE(ENTRY_SIZE);
+            output.WriteBE(ENTRY_SIZE);
+            output.WriteBE(CastEntries?.Count ?? 0);
+            output.WriteBE(CastEntries?.Count ?? 0);
             foreach (CastEntry entry in CastEntries)
             {
                 entry.WriteTo(output);

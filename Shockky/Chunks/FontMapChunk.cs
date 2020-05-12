@@ -7,8 +7,8 @@ namespace Shockky.Chunks
         public FontMapChunk()
             : base(ChunkKind.FXmp)
         { }
-        public FontMapChunk(ShockwaveReader input, ChunkHeader header)
-            : base(input, header)
+        public FontMapChunk(ref ShockwaveReader input, ChunkHeader header)
+            : base(ref input, header)
         { }
     }
 }

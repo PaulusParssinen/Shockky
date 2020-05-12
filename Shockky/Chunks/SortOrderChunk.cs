@@ -11,20 +11,20 @@ namespace Shockky.Chunks
         public SortOrderChunk()
             : base(ChunkKind.Sord)
         { }
-        public SortOrderChunk(ShockwaveReader input, ChunkHeader header)
+        public SortOrderChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32());
 
-            Entries = new List<int>(input.ReadBigEndian<int>());
+            Entries = new List<int>(input.ReadInt32());
 
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32());
 
             for (int i = 0; i < Entries.Capacity; i++)
             {
-                Entries.Add(input.ReadBigEndian<int>());
+                Entries.Add(input.ReadInt32());
             }
         }
 
@@ -45,17 +45,17 @@ namespace Shockky.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
 
-            output.WriteBigEndian(Entries.Count);
+            output.Write(Entries.Count);
 
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
 
             for (int i = 0; i < Entries.Count; i++)
             {
-                output.WriteBigEndian(Entries[i]);
+                output.Write(Entries[i]);
             }
         }
     }

@@ -17,16 +17,16 @@ namespace Shockky.Chunks.Cast
 
         public CastListEntry()
         { }
-        public CastListEntry(ShockwaveReader input)
+        public CastListEntry(ref ShockwaveReader input)
         {
             Name = input.ReadString();
             FilePath = input.ReadString();
 
-            PreloadSettings = input.ReadBigEndian<short>();
-            MemberMin = input.ReadBigEndian<short>();
-            MemberCount = input.ReadBigEndian<short>();
+            PreloadSettings = input.ReadInt16();
+            MemberMin = input.ReadInt16();
+            MemberCount = input.ReadInt16();
 
-            Id = input.ReadBigEndian<int>();
+            Id = input.ReadInt32();
         }
 
         public override int GetBodySize()
@@ -44,10 +44,10 @@ namespace Shockky.Chunks.Cast
         {
             output.Write(Name);
             output.Write(FilePath);
-            output.WriteBigEndian(PreloadSettings);
-            output.WriteBigEndian(MemberMin);
-            output.WriteBigEndian(MemberCount);
-            output.WriteBigEndian(Id);
+            output.Write(PreloadSettings);
+            output.Write(MemberMin);
+            output.Write(MemberCount);
+            output.Write(Id);
         }
     }
 }

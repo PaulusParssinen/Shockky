@@ -6,50 +6,49 @@ namespace Shockky.Chunks
     public class CastMemberPropertiesChunk : ChunkItem
     {
         public CastType Type { get; set; }
-        public ICastTypeProperties Properties { get; set; }
+        public ICastProperties Properties { get; set; }
 
         public CommonMemberProperties Common { get; set; }
 
         public CastMemberPropertiesChunk()
             : base(ChunkKind.CASt)
         { }
-        public CastMemberPropertiesChunk(ShockwaveReader input, ChunkHeader header)
+        public CastMemberPropertiesChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Type = (CastType)input.ReadBigEndian<int>();
-            input.ReadBigEndian<int>();
-            int dataLength = input.ReadBigEndian<int>();
+            Type = (CastType)input.ReadInt32();
+            input.ReadInt32();
+            int dataLength = input.ReadInt32();
 
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32());
 
-            Common = new CommonMemberProperties(input);
-            Properties = ReadTypeProperties(input, dataLength);
+            Common = new CommonMemberProperties(ref input);
+            Properties = ReadTypeProperties(ref input, dataLength);
         }
 
-        private ICastTypeProperties ReadTypeProperties(ShockwaveReader input, int dataLength)
+        private ICastProperties ReadTypeProperties(ref ShockwaveReader input, int dataLength)
         {
             switch (Type)
             {
                 case CastType.Bitmap:
                 case CastType.OLE:
-                    return new BitmapCastProperties(Header, input);
+                    return new BitmapCastProperties(Header, ref input);
                 case CastType.Shape:
-                    return new ShapeCastProperties(input);
+                    return new ShapeCastProperties(ref input);
                 case CastType.DigitalVideo:
                 case CastType.Movie:
-                    return new VideoCastProperties(input);
+                    return new VideoCastProperties(ref input);
                 case CastType.Button:
                 case CastType.Text:
-                    return new TextCastProperties(input);
+                    return new TextCastProperties(ref input);
                 case CastType.Script:
-                    return new ScriptCastProperties(input);
-                    
+                    return new ScriptCastProperties(ref input);
                 default:
-                    return new UnknownCastProperties(input, dataLength);
+                    return new UnknownCastProperties(ref input, dataLength);
             }
         }
 
@@ -73,15 +72,15 @@ namespace Shockky.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian((int)Type);
-            output.WriteBigEndian(Common.GetBodySize()); //TODO:
-            output.WriteBigEndian(Properties.GetBodySize());
+            output.Write((int)Type);
+            output.Write(Common.GetBodySize()); //TODO:
+            output.Write(Properties.GetBodySize());
 
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
 
             Common.WriteTo(output); //TODO:
             Properties.WriteTo(output);

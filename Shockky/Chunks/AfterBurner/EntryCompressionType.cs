@@ -1,9 +1,8 @@
 ﻿namespace Shockky.Chunks
 {
-    public enum EntryCompressionType
+    public enum EntryCompressionType : int
     {
-        Compressed,
-        Uncompressed,
-        Unknown
+        Compressed = 0,
+        Uncompressed = 1
     }
 }

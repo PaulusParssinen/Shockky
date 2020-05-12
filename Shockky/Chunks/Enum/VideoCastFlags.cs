@@ -1,11 +1,12 @@
 ﻿using System;
 
-namespace Shockky.Chunks.Enum
+namespace Shockky.Chunks
 {
     [Flags]
     public enum VideoCastFlags : byte
     {
         None,
+
         Controller    = 1 << 0,
         Crop          = 1 << 1,
         Center        = 1 << 2,

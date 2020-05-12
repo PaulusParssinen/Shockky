@@ -1,11 +1,10 @@
 ﻿using System.Drawing;
 
 using Shockky.IO;
-using Shockky.Chunks.Enum;
 
 namespace Shockky.Chunks.Cast
 {
-    public class BitmapCastProperties : ICastTypeProperties
+    public class BitmapCastProperties : ICastProperties
     {
         public int TotalWidth { get; set; }
 
@@ -22,28 +21,26 @@ namespace Shockky.Chunks.Cast
 
         public BitmapCastProperties()
         { }
-        public BitmapCastProperties(ChunkHeader header, ShockwaveReader input)
+        public BitmapCastProperties(ChunkHeader header, ref ShockwaveReader input)
         {
-            bool IsDataAvailable()
+            static bool IsDataAvailable(ShockwaveReader input, ChunkHeader header)
                 => input.Position < header.Offset + header.Length;
 
-            TotalWidth = input.ReadBigEndian<ushort>() & 0x7FFF;
+            TotalWidth = input.ReadUInt16() & 0x7FFF;
 
             Rectangle = input.ReadRect();
             AlphaThreshold = input.ReadByte();
-            OLE = input.ReadBytes(7); //TODO:
+            OLE = input.ReadBytes(7).ToArray(); //TODO:
 
-            short regX = input.ReadBigEndian<short>();
-            short regY = input.ReadBigEndian<short>();
-            RegistrationPoint = new Point(regX, regY);
+            RegistrationPoint = new Point(input.ReadInt16(), input.ReadInt16());
             
             Flags = (BitmapFlags)input.ReadByte();
             
-            if (!IsDataAvailable()) return;
+            if (!IsDataAvailable(input, header)) return;
             BitDepth = input.ReadByte();
 
-            if (!IsDataAvailable()) return;
-            Palette = input.ReadBigEndian<int>();
+            if (!IsDataAvailable(input, header)) return;
+            Palette = input.ReadInt32();
 
             //TODO: PaletteRef or something
             if (!IsSystemPalette)
@@ -70,14 +67,14 @@ namespace Shockky.Chunks.Cast
 
         public void WriteTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian((ushort)TotalWidth | 0x8000);
+            output.Write((ushort)TotalWidth | 0x8000);
 
             output.Write(Rectangle);
             output.Write(AlphaThreshold);
             output.Write(OLE);
 
-            output.WriteBigEndian((short)RegistrationPoint.X);
-            output.WriteBigEndian((short)RegistrationPoint.Y);
+            output.Write((short)RegistrationPoint.X);
+            output.Write((short)RegistrationPoint.Y);
 
             output.Write((byte)Flags);
 
@@ -86,7 +83,7 @@ namespace Shockky.Chunks.Cast
 
             if (Palette != 0) return;
             if (!IsSystemPalette) Palette |= 0x8000;
-            output.WriteBigEndian(Palette);
+            output.Write(Palette);
         }
     }
 }

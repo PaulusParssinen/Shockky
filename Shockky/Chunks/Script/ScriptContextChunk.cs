@@ -16,34 +16,34 @@ namespace Shockky.Chunks
         public ScriptContextChunk()
             : base(ChunkKind.LctX)
         { }
-        public ScriptContextChunk(ShockwaveReader input, ChunkHeader header)
+        public ScriptContextChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32());
 
-            int entryCount = input.ReadBigEndian<int>();
-            input.ReadBigEndian<int>();
+            int entryCount = input.ReadInt32();
+            input.ReadInt32();
             
-            short entryOffset = input.ReadBigEndian<short>(); //TODO: Research
-            input.ReadBigEndian<short>();
+            short entryOffset = input.ReadInt16(); //TODO: Research
+            input.ReadInt16();
 
-            Remnants.Enqueue(input.ReadBigEndian<int>()); //0
-            Type = input.ReadBigEndian<int>(); //TODO: Enum
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadInt32()); //0
+            Type = input.ReadInt32(); //TODO: Enum
+            Remnants.Enqueue(input.ReadInt32());
 
-            NameListChunkId = input.ReadBigEndian<int>();
+            NameListChunkId = input.ReadInt32();
 
-            Remnants.Enqueue(input.ReadBigEndian<short>()); //validCount
-            Remnants.Enqueue(input.ReadBytes(2)); //flags, short?
-            Remnants.Enqueue(input.ReadBigEndian<short>()); //freePtr
+            Remnants.Enqueue(input.ReadInt16()); //validCount
+            Remnants.Enqueue(input.ReadInt16()); //flags, short?
+            Remnants.Enqueue(input.ReadInt16()); //freePtr
 
-            input.Position = Header.Offset + entryOffset;
+            input.AdvanceTo(Header.Offset + entryOffset);
 
             Sections = new List<ScriptContextSection>(entryCount);
             for (int i = 0; i < entryCount; i++)
             {
-                Sections.Add(new ScriptContextSection(input));
+                Sections.Add(new ScriptContextSection(ref input));
             }
         }
 
@@ -51,23 +51,23 @@ namespace Shockky.Chunks
         {
             const short ENTRY_OFFSET = 48;
 
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian(Sections?.Count ?? 0); //TODO:
-            output.WriteBigEndian(Sections?.Count ?? 0); //TODO:
+            output.Write((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write(Sections?.Count ?? 0); //TODO:
+            output.Write(Sections?.Count ?? 0); //TODO:
 
-            output.WriteBigEndian(ENTRY_OFFSET);
-            output.WriteBigEndian(SECTION_SIZE);
+            output.Write(ENTRY_OFFSET);
+            output.Write(SECTION_SIZE);
 
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian(Type);
-            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write(Type);
+            output.Write((int)Remnants.Dequeue());
 
-            output.WriteBigEndian(NameListChunkId);
+            output.Write(NameListChunkId);
 
-            output.WriteBigEndian((short)Remnants.Dequeue());
-            output.Write((byte[])Remnants.Dequeue());
-            output.WriteBigEndian((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
+            output.Write((short)Remnants.Dequeue());
 
             foreach (ScriptContextSection section in Sections)
             {
@@ -89,7 +89,7 @@ namespace Shockky.Chunks
             size += sizeof(int);
             size += sizeof(int);
             size += sizeof(short);
-            size += 2;
+            size += sizeof(short);
             size += sizeof(short);
             size += Sections.Count * SECTION_SIZE;
             return size;

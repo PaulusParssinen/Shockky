@@ -7,23 +7,23 @@ namespace Shockky.Chunks
         public int[] Members { get; set; }
 
         public CastAssociationTableChunk()
-            : base(ChunkKind.CASPointer)
+            : base(ChunkKind.CASPtr)
         { }
-        public CastAssociationTableChunk(ShockwaveReader input, ChunkHeader header)
+        public CastAssociationTableChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Members = new int[(int)header.Length / sizeof(int)];
+            Members = new int[header.Length / sizeof(int)];
             for (int i = 0; i < Members.Length; i++)
             {
-                Members[i] = input.ReadBigEndian<int>();
+                Members[i] = input.ReadInt32();
             }
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            for(int i = 0; i < Members.Length; i++)
+            for (int i = 0; i < Members.Length; i++)
             {
-                output.WriteBigEndian(Members[i]);
+                output.Write(Members[i]);
             }
         }
 

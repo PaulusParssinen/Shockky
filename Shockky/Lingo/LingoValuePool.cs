@@ -46,51 +46,52 @@ namespace Shockky.Lingo
         {
             Script = script;
         }
-        public LingoValuePool(ScriptChunk script, ShockwaveReader input)
+        public LingoValuePool(ScriptChunk script, ref ShockwaveReader input)
             : this(script)
         {
-            LingoHandler ReadHandler() => new LingoHandler(script, input);
-            LingoLiteral ReadLiteral() => new LingoLiteral(input);
+            //LingoHandler ReadHandler() => new LingoHandler(script, input);
+            //LingoLiteral ReadLiteral() => new LingoLiteral(input);
 
-            HandlerVectors.Capacity = input.ReadBigEndian<short>();
-            int handlerVectorOffset = input.ReadBigEndian<int>();
-            HandlerVectorFlags = (HandlerVectorFlags)input.ReadInt32();
+            HandlerVectors.Capacity = input.ReadInt16();
+            int handlerVectorOffset = input.ReadInt32();
+            HandlerVectorFlags = (HandlerVectorFlags)input.ReadBEInt32();
 
-            Properties.Capacity = input.ReadBigEndian<short>();
-            int propertiesOffset = input.ReadBigEndian<int>();
+            Properties.Capacity = input.ReadInt16();
+            int propertiesOffset = input.ReadInt32();
 
-            Globals.Capacity = input.ReadBigEndian<short>();
-            int globalsOffset = input.ReadBigEndian<int>();
+            Globals.Capacity = input.ReadInt16();
+            int globalsOffset = input.ReadInt32();
 
-            Handlers.Capacity = input.ReadBigEndian<short>();
-            int handlersOffset = input.ReadBigEndian<int>();
+            Handlers.Capacity = input.ReadInt16();
+            int handlersOffset = input.ReadInt32();
 
-            Literals.Capacity = input.ReadBigEndian<short>();
-            int literalsOffset = input.ReadBigEndian<int>();
+            Literals.Capacity = input.ReadInt16();
+            int literalsOffset = input.ReadInt32();
 
-            int literalDataLength = input.ReadBigEndian<int>();
-            int literalDataOffset = input.ReadBigEndian<int>();
+            int literalDataLength = input.ReadInt32();
+            int literalDataOffset = input.ReadInt32();
 
-            input.PopulateVList(script.Header.Offset + propertiesOffset, Properties, input.ReadBigEndian<short>);
-            input.PopulateVList(script.Header.Offset + globalsOffset, Globals, input.ReadBigEndian<short>);
-
-            input.PopulateVList(script.Header.Offset + handlersOffset, Handlers, ReadHandler);
-            foreach (LingoHandler handler in Handlers)
-            {
-                handler.Populate(input, script.Header.Offset);
-            }
-
-            input.PopulateVList(script.Header.Offset + literalsOffset, Literals, ReadLiteral);
-            foreach (LingoLiteral literal in Literals)
-            {
-                literal.ReadValue(input, script.Header.Offset + literalDataOffset);
-
-                if (script.Header.Offset + literalDataOffset + literalDataLength <= input.Position)
-                    break;
-            }
-
-            input.PopulateVList(script.Header.Offset + handlerVectorOffset, HandlerVectors, input.ReadBigEndian<short>, 
-                forceLengthCheck: false);
+            //TODO: PrefixedReader
+            //input.PopulateVList(script.Header.Offset + propertiesOffset, Properties, input.ReadInt16);
+            //input.PopulateVList(script.Header.Offset + globalsOffset, Globals, input.ReadInt16);
+            //
+            //input.PopulateVList(script.Header.Offset + handlersOffset, Handlers, ReadHandler);
+            //foreach (LingoHandler handler in Handlers)
+            //{
+            //    handler.Populate(input, script.Header.Offset);
+            //}
+            //
+            //input.PopulateVList(script.Header.Offset + literalsOffset, Literals, ReadLiteral);
+            //foreach (LingoLiteral literal in Literals)
+            //{
+            //    literal.ReadValue(input, script.Header.Offset + literalDataOffset);
+            //
+            //    if (script.Header.Offset + literalDataOffset + literalDataLength <= input.Position)
+            //        break;
+            //}
+            //
+            //input.PopulateVList(script.Header.Offset + handlerVectorOffset, HandlerVectors, input.ReadInt16, 
+            //    forceLengthCheck: false);
         }
 
         public string GetName(int index)
@@ -109,7 +110,7 @@ namespace Shockky.Lingo
             {
                 TypeCode.String => LiteralKind.String,
                 TypeCode.Int32 => LiteralKind.Integer,
-                TypeCode.Int64 => LiteralKind.Float,
+                TypeCode.Int64 => LiteralKind.FloatingPoint,
 
                 _ => throw new ArgumentException()
             };
@@ -119,7 +120,7 @@ namespace Shockky.Lingo
         
         //TODO: implement ConstantKind?
 
-        protected virtual int AddConstant<T>(List<T> constants, T value, bool recycle)
+        public virtual int AddConstant<T>(List<T> constants, T value, bool recycle)
         {
             int index = (recycle ? constants.IndexOf(value) : -1);
             if (index == -1)
@@ -161,20 +162,20 @@ namespace Shockky.Lingo
 
             int entriesOffset = Script.GetHeaderSize() + Script.GetBodySize();
 
-            output.WriteBigEndian((short)HandlerVectors.Capacity);
-            output.WriteBigEndian(0);
-            output.WriteBigEndian(HandlerVectorFlags);
+            output.Write((short)HandlerVectors.Capacity);
+            output.Write(0);
+            output.WriteBE((int)HandlerVectorFlags);
             
-            output.WriteBigEndian((short)Properties.Capacity);
-            output.WriteBigEndian(entriesOffset);
+            output.Write((short)Properties.Capacity);
+            output.Write(entriesOffset);
             entriesOffset += Properties.Capacity * sizeof(short);
             
-            output.WriteBigEndian((short)Globals.Capacity);
-            output.WriteBigEndian(entriesOffset);
+            output.Write((short)Globals.Capacity);
+            output.Write(entriesOffset);
             entriesOffset += Globals.Capacity * sizeof(short);
             
-            output.WriteBigEndian((short)Handlers.Capacity);
-            output.WriteBigEndian(entriesOffset);
+            output.Write((short)Handlers.Capacity);
+            output.Write(entriesOffset);
             entriesOffset += Handlers.Capacity * HANDLER_SIZE;
             throw new NotImplementedException();
         }

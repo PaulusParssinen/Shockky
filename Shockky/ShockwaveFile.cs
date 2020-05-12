@@ -8,41 +8,37 @@ using Shockky.Chunks;
 
 namespace Shockky
 {
-    public class ShockwaveFile : IDisposable
+    public class ShockwaveFile
     {
-        private readonly ShockwaveReader _input;
+        private ReadOnlyMemory<byte> _input;
 
-        public List<ChunkItem> Chunks { get; }
+        public IList<ChunkItem> Chunks { get; }
+        //public IDictionary<int, ChunkItem> Chunks { get; set; } //TODO: Might have to implement ChunkContainer abstraction to handle the resource/chunk identifiers and ownership etc.
 
         public DirectorVersion Version { get; set; }
         public FileMetadataChunk Metadata { get; set; }
 
+        //TODO: Slow and fired too much anyways
         public ChunkItem this[int id]
-            => Chunks?.FirstOrDefault(chunk => chunk.Header.Id == id);
+            => Chunks.FirstOrDefault(chunk => chunk.Header.Id == id);
 
         public ShockwaveFile()
         {
             Chunks = new List<ChunkItem>();
         }
         public ShockwaveFile(string path)
-            : this(File.OpenRead(path))
+            : this(File.ReadAllBytes(path))
         { }
         public ShockwaveFile(byte[] data)
-            : this(new MemoryStream(data))
-        { }
-        public ShockwaveFile(Stream inputStream)
-            : this(new ShockwaveReader(inputStream))
-        { }
-
-        public ShockwaveFile(ShockwaveReader input)
             : this()
         {
-            _input = input;
+            _input = data;
 
-            Metadata = new FileMetadataChunk(input);
+            var input = new ShockwaveReader(_input.Span);
+            Metadata = new FileMetadataChunk(ref input);
         }
 
-        public void Disassemble(Action<ChunkItem> callback = null)
+        public void Disassemble(Action<ChunkItem> callback = default)
         {
             void HandleChunk(ChunkItem chunk)
             {
@@ -50,63 +46,59 @@ namespace Shockky
                 Chunks.Add(chunk);
             }
 
+            var input = new ShockwaveReader(_input.Span, Metadata.IsBigEndian);
+            input.Advance(Metadata.Header.GetBodySize() + Metadata.GetBodySize());
+
             if (Metadata.Codec == CodecKind.FGDM ||
                 Metadata.Codec == CodecKind.FGDC)
             {
-                if (ChunkItem.Read(_input) is FileVersionChunk version &&
-                    ChunkItem.Read(_input) is FileCompressionTypesChunk compressionTypes &&
-                    ChunkItem.Read(_input) is AfterburnerMapChunk afterburnerMap &&
-                    ChunkItem.Read(_input) is FGEIChunk fgei)
-                {
-                    var ilsChunk = fgei.ReadInitialLoadSegment(afterburnerMap.Entries[0]);
+                throw new NotSupportedException("TODO: 'Spanified' decompression"); //plz "DeflateDecoder" 
 
-                    fgei.ReadChunks(afterburnerMap.Entries, HandleChunk);
-                    ilsChunk.ReadChunks(afterburnerMap.Entries, HandleChunk);
-                }
+                //if (ChunkItem.Read(input) is FileVersionChunk version &&
+                //    ChunkItem.Read(input) is FileCompressionTypesChunk compressionTypes &&
+                //    ChunkItem.Read(input) is AfterburnerMapChunk afterburnerMap &&
+                //    ChunkItem.Read(input) is FGEIChunk fgei)
+                //{
+                //    var ilsChunk = fgei.ReadInitialLoadSegment(afterburnerMap.Entries[0]);
+                //
+                //    fgei.ReadChunks(afterburnerMap.Entries, HandleChunk);
+                //    ilsChunk.ReadChunks(afterburnerMap.Entries, HandleChunk);
+                //}
             }
             else if (Metadata.Codec == CodecKind.MV93)
             {
-                var imapChunk = ChunkItem.Read(_input) as InitialMapChunk;
+                var imapChunk = ChunkItem.Read(ref input) as InitialMapChunk;
                 Version = imapChunk.Version;
 
                 foreach (int offset in imapChunk.MemoryMapOffsets)
                 {
-                    _input.Position = offset;
-                    if (ChunkItem.Read(_input) is MemoryMapChunk mmapChunk)
+                    input.AdvanceTo(offset);
+                    if (ChunkItem.Read(ref input) is MemoryMapChunk mmapChunk)
                     {
                         foreach (ChunkEntry entry in mmapChunk.Entries)
                         {
-                            if (entry.Flags.HasFlag(ChunkEntryFlags.Ignore))
+                            if (entry.Flags.HasFlag(ChunkEntryFlags.Ignore)) //TODO:
                             {
-                                HandleChunk(new UnknownChunk(_input, entry.Header)); //TODO:
+                                HandleChunk(new UnknownChunk(ref input, entry.Header));
                                 continue;
                             }
-                            _input.Position = entry.Offset;
+                            input.AdvanceTo(entry.Offset);
 
-                            ChunkItem chunk = ChunkItem.Read(_input);
+                            ChunkItem chunk = ChunkItem.Read(ref input);
                             chunk.Header.Id = entry.Header.Id;
                             HandleChunk(chunk);
                         }
                     }
                 }
             }
+
+            //TODO:
+            _input = null;
         }
 
-        public void Assemble(ShockwaveWriter output)
+        public void Assemble()
         {
             throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _input.Dispose();
-            }
         }
     }
 }

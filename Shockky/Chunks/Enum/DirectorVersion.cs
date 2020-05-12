@@ -2,7 +2,7 @@
 {
     public enum DirectorVersion
     {
-        V4 = 0,
+        V4 = 0x0,
         V5 = 0x4C1,
         V6 = 0x4C7,
         V7 = 0x57E,

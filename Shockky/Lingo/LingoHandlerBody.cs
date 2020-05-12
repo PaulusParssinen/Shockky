@@ -17,14 +17,14 @@ namespace Shockky.Lingo
         public LingoHandlerBody(LingoHandler handler, ShockwaveReader input)
             : this(handler)
         {
-            Code = new byte[input.ReadBigEndian<int>()];
+            Code = new byte[input.ReadInt32()];
         }
 
         public LingoCode ParseCode() => new LingoCode(this);
 
         public override int GetBodySize() => Code.Length;
 
-        public override void WriteTo(ShockwaveWriter output) 
+        public override void WriteTo(ShockwaveWriter output)
             => throw new NotImplementedException();
     }
 }

@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
-
-using Shockky.IO;
+﻿using Shockky.IO;
+using System.Diagnostics;
 
 namespace Shockky.Chunks
 {
@@ -24,38 +23,36 @@ namespace Shockky.Chunks
             }
         }
 
-        public int Id { get; set; }
         public ChunkKind Kind { get; set; }
-        public long Offset { get; set; }
-        public long Length { get; set; }
+        
+        public int Id { get; set; } //TODO: eh
+        public int Offset { get; set; }
+        public int Length { get; set; }
 
         public ChunkHeader(ChunkKind kind)
         {
             Kind = kind;
         }
-        public ChunkHeader(string name)
-            : this(name.ToChunkKind())
-        { }
-        public ChunkHeader(ShockwaveReader input)
-            : this(input.ReadReversedString(4))
+        public ChunkHeader(ref ShockwaveReader input)
+            : this((ChunkKind)input.ReadBEInt32())
         {
             Length = (IsVariableLength ? 
-                input.Read7BitEncodedInt() : input.ReadInt32());
-            Offset = input.Position;
+                input.Read7BitEncodedInt() : input.ReadBEInt32());
+            Offset = input.Position; //TODO: How much we will rely on this? It's not even really true in some cases..
         }
 
         public override int GetBodySize()
         {
             int size = 0;
-            size += 4;
             size += sizeof(int);
+            size += sizeof(int); //TODO: VariableLength => GetByteCount() or somethingg
             return size;
         }
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.WriteReversedString(Kind.ToFourCC());
-            output.Write(Length);
+            output.Write((int)Kind);
+            output.WriteBE(Length); //TODO: VariableLength
         }
     }
 }

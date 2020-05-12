@@ -17,15 +17,15 @@ namespace Shockky.Chunks
 
         public TextFormat()
         { }
-        public TextFormat(ShockwaveReader input)
+        public TextFormat(ref ShockwaveReader input)
         {
-            Offset = input.ReadBigEndian<int>();
-            Height = input.ReadBigEndian<short>();
-            Ascent = input.ReadBigEndian<short>();
-            FontId = input.ReadBigEndian<short>();
+            Offset = input.ReadInt32();
+            Height = input.ReadInt16();
+            Ascent = input.ReadInt16();
+            FontId = input.ReadInt16();
             Slant = input.ReadBoolean();
             Padding = input.ReadByte();
-            FontSize = input.ReadBigEndian<short>();
+            FontSize = input.ReadInt16();
             Color = input.ReadColor();
         }
 
@@ -47,13 +47,13 @@ namespace Shockky.Chunks
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian(Offset);
-            output.WriteBigEndian(Height);
-            output.WriteBigEndian(Ascent);
-            output.WriteBigEndian(FontId);
+            output.Write(Offset);
+            output.Write(Height);
+            output.Write(Ascent);
+            output.Write(FontId);
             output.Write(Slant);
             output.Write(Padding);
-            output.WriteBigEndian(FontSize);
+            output.Write(FontSize);
             output.Write(Color);
         }
     }

@@ -9,7 +9,7 @@ namespace Shockky.Chunks
     {
         public ChunkHeader Header { get; set; }
 
-        public int Offset { get; set; }
+        public int Offset { get; set; } //TODO: vs. ChunkHeader offsets
         public ChunkEntryFlags Flags { get; set; }
         public short Unknown { get; set; }
         public int Link { get; set; }
@@ -18,13 +18,13 @@ namespace Shockky.Chunks
         {
             Header = header;
         }
-        public ChunkEntry(ShockwaveReader input)
-            : this(new ChunkHeader(input))
+        public ChunkEntry(ref ShockwaveReader input)
+            : this(new ChunkHeader(ref input))
         {
-            Offset = input.ReadInt32();
-            Flags = (ChunkEntryFlags)input.ReadInt16();
-            Unknown = input.ReadInt16();
-            Link = input.ReadInt32();
+            Offset = input.ReadBEInt32();
+            Flags = (ChunkEntryFlags)input.ReadBEInt16();
+            Unknown = input.ReadBEInt16();
+            Link = input.ReadBEInt32();
         }
 
         public override int GetBodySize()
@@ -41,11 +41,10 @@ namespace Shockky.Chunks
         public override void WriteTo(ShockwaveWriter output)
         {
             Header.WriteTo(output);
-
-            output.Write(Offset);
-            output.Write((short)Flags);
-            output.Write(Unknown);
-            output.Write(Link);
+            output.WriteBE(Offset);
+            output.WriteBE((short)Flags);
+            output.WriteBE(Unknown);
+            output.WriteBE(Link);
         }
     }
 }

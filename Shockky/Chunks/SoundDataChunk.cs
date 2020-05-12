@@ -7,8 +7,8 @@ namespace Shockky.Chunks
         public SoundDataChunk()
             : base(ChunkKind.snd)
         { }
-        public SoundDataChunk(ShockwaveReader input, ChunkHeader header)
-            : base(input, header)
+        public SoundDataChunk(ref ShockwaveReader input, ChunkHeader header)
+            : base(ref input, header)
         { }
     }
 }

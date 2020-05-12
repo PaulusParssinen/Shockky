@@ -1,12 +1,14 @@
 ﻿namespace Shockky.Chunks
 {
-    public enum CodecKind
+    public enum CodecKind : int
     {
-        MV93,
-        MC95,
+        Unknown = -1,
 
-        FGDM,
-        FGDC,
-        Unknown
+        MV93 = 0x4D563933,
+        MC95 = 0x4D433935,
+
+        //Afterburned
+        FGDM = 0x4647444D,
+        FGDC = 0x46474443
     }
 }

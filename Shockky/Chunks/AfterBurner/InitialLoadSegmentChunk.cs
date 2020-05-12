@@ -8,29 +8,32 @@ namespace Shockky.Chunks
 {
     public class InitialLoadSegmentChunk : ChunkItem
     {
-        private readonly ShockwaveReader _input;
-
-        public InitialLoadSegmentChunk(ShockwaveReader input, ChunkHeader header)
+        public InitialLoadSegmentChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
-        {
-            _input = WrapDecompressor(input);
-        }
+        { }
         
-        public void ReadChunks(List<AfterBurnerMapEntry> entries, Action<ChunkItem> callback)
+        public void ReadChunks(ref ShockwaveReader input, List<AfterBurnerMapEntry> entries, Action<ChunkItem> callback)
         {
+            throw new NotImplementedException();
+
             int ilsChunkCount = entries.Count(e => e.Offset == -1);
 
             for (int i = 0; i < ilsChunkCount; i++)
             {
-                if (_input.Position >= Header.Length) break;
+                if (input.Position >= Header.Length)
+                    break;
 
-                int id = _input.Read7BitEncodedInt();
+                int id = input.Read7BitEncodedInt();
 
                 AfterBurnerMapEntry entry = entries.FirstOrDefault(e => e.Header.Id == id);
-                if (entry == null) break; //TODO:
+                if (entry == null)
+                    break; //TODO:
 
-                entry.Header.Offset = _input.Position;
-                callback?.Invoke(Read(_input, entry.Header));
+                if (entry.Header.Kind == ChunkKind.Unknown) //TODO: Probably temporary (as )
+                    continue;
+
+                entry.Header.Offset = input.Position;
+                callback?.Invoke(Read(ref input, entry.Header));
             }
         }
 

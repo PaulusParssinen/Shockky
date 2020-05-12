@@ -9,24 +9,24 @@ namespace Shockky.Chunks
         public XtraListChunk()
             : base(ChunkKind.XTRl)
         { }
-        public XtraListChunk(ShockwaveReader input, ChunkHeader header)
+        public XtraListChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadBigEndian<int>());
+            Remnants.Enqueue(input.ReadInt32());
 
-            int xtraCount = input.ReadBigEndian<int>();
+            int xtraCount = input.ReadInt32();
             for (int i = 0; i < xtraCount; i++)
             {
-                long xtraEndOffset = input.Position + input.ReadBigEndian<int>() + 4;
+                long xtraEndOffset = input.Position + input.ReadInt32() + 4;
 
-                int unk2 = input.ReadBigEndian<int>();
-                int unk3 = input.ReadBigEndian<int>(); //Flags or just booleans?
+                int unk2 = input.ReadInt32();
+                int unk3 = input.ReadInt32(); //Flags or just booleans?
                 Guid guid = new Guid(input.ReadBytes(16));
 
-                int[] offsets = new int[input.ReadBigEndian<short>() + 1];
+                int[] offsets = new int[input.ReadInt16() + 1];
                 for (int j = 0; j < offsets.Length; j++)
                 {
-                    offsets[j] = input.ReadBigEndian<int>();
+                    offsets[j] = input.ReadInt32();
                 }
 
                 do

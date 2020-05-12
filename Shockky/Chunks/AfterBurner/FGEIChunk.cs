@@ -7,33 +7,30 @@ namespace Shockky.Chunks
 {
     public class FGEIChunk : ChunkItem
     {
-        private readonly ShockwaveReader _input;
-
-        public FGEIChunk(ShockwaveReader input, ChunkHeader header)
+        public FGEIChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
-        {
-            _input = input;
-        }
+        { }
         
-        public InitialLoadSegmentChunk ReadInitialLoadSegment(AfterBurnerMapEntry ilsEntry)
+        public InitialLoadSegmentChunk ReadInitialLoadSegment(ref ShockwaveReader input, AfterBurnerMapEntry ilsEntry)
         {
-            _input.Position += ilsEntry.Offset;
+            input.AdvanceTo(ilsEntry.Offset);
             
-            return Read(_input, ilsEntry.Header) as InitialLoadSegmentChunk;
+            return Read(ref input, ilsEntry.Header) as InitialLoadSegmentChunk;
         }
 
-        public void ReadChunks(List<AfterBurnerMapEntry> entries, Action<ChunkItem> callback)
+        public void ReadChunks(ref ShockwaveReader input, IEnumerable<AfterBurnerMapEntry> entries, Action<ChunkItem> callback)
         {
-            foreach (var entry in entries)
+            foreach (AfterBurnerMapEntry entry in entries)
             {
                 if (entry.Offset < 1) continue;
 
-                _input.Position = Header.Offset + entry.Offset;
+                input.AdvanceTo(Header.Offset + entry.Offset);
 
-                ShockwaveReader chunkInput = (entry.IsCompressed ?
-                    _input.WrapDecompressor(entry.CompressedLength) : _input);
-
-                callback?.Invoke(Read(chunkInput, entry.Header));
+                throw new NotImplementedException();
+                //ShockwaveReader chunkInput = (entry.IsCompressed ?
+                //    _input.WrapDecompressor(entry.CompressedLength) : _input);
+                //
+                //callback?.Invoke(Read(chunkInput, entry.Header));
             }
         }
 

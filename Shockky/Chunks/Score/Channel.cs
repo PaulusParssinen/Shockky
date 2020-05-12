@@ -15,7 +15,7 @@ namespace Shockky.Chunks.Score
         public short Height { get; set; }
         public short Width { get; set; }
 
-        public Channel(ShockwaveReader input)
+        public Channel(ref ShockwaveReader input)
         { }
 
         public override int GetBodySize()

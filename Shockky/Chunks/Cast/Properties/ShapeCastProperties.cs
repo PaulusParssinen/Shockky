@@ -1,11 +1,10 @@
 ﻿using System.Drawing;
 
 using Shockky.IO;
-using Shockky.Chunks.Enum;
 
 namespace Shockky.Chunks.Cast
 {
-    public class ShapeCastProperties : ICastTypeProperties
+    public class ShapeCastProperties : ShockwaveItem, ICastProperties
     {
         public ShapeType Type { get; set; }
         public Rectangle Rectangle { get; set; }
@@ -18,12 +17,12 @@ namespace Shockky.Chunks.Cast
 
         public ShapeCastProperties()
         { }
-        public ShapeCastProperties(ShockwaveReader input)
+        public ShapeCastProperties(ref ShockwaveReader input)
         {
-            Type = (ShapeType)input.ReadBigEndian<short>();
+            Type = (ShapeType)input.ReadInt16();
             Rectangle = input.ReadRect();
 
-            Pattern = input.ReadBigEndian<short>();
+            Pattern = input.ReadInt16();
             ForegroundColor = input.ReadByte();
             BackgroundColor = input.ReadByte();
             IsFilled = input.ReadBoolean(); //TODO:
@@ -31,7 +30,7 @@ namespace Shockky.Chunks.Cast
             LineDirection = input.ReadByte(); //-5
         }
 
-        public int GetBodySize()
+        public override int GetBodySize()
         {
             int size = 0;
             size += sizeof(short);
@@ -45,12 +44,12 @@ namespace Shockky.Chunks.Cast
             return size;
         }
 
-        public void WriteTo(ShockwaveWriter output)
+        public override void WriteTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian((short)Type);
+            output.Write((short)Type);
             output.Write(Rectangle);
 
-            output.WriteBigEndian(Pattern);
+            output.Write(Pattern);
             output.Write(ForegroundColor);
             output.Write(BackgroundColor);
 

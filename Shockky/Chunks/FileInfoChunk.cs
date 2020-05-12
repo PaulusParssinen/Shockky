@@ -18,19 +18,48 @@ namespace Shockky.Chunks
         public FileInfoChunk()
             : base(ChunkKind.VWFI)
         { }
-        public FileInfoChunk(ShockwaveReader input, ChunkHeader header)
+        public FileInfoChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            int bitfieldLen = input.ReadBigEndian<int>();
-            BitField = input.ReadBytes(bitfieldLen);
+            /*
+             * def parseSubstrings(self, data, hasHeader=True):
+		if hasHeader:
+			ci_offset = read32(data)
+			unk2 = read32(data) # not int!
+			unk3 = read32(data) # not int!
+			entryType = read32(data)
+			data.seek(ci_offset)
+		else:
+			unk2 = 0
+			unk3 = 0
+			entryType = 0
 
-	        Offsets = new List<int>(input.ReadBigEndian<short>());
+		count = read16(data) + 1
+		entries = []
+		for i in range(count):
+			entries.append(read32(data))
+		rawdata = data.read(entries[-1])
+		assert entries[0] == 0
+		assert entries[-1] == len(rawdata)
+
+		strings = []
+		for i in range(count-1):
+			strings.append(rawdata[entries[i]:entries[i+1]])
+
+		return (strings, unk2, unk3, entryType)
+
+             * 
+             * */
+
+            BitField = input.ReadBytes(input.ReadInt32()).ToArray();
+
+	        Offsets = new List<int>(input.ReadInt16());
 
             input.ReadByte();
 
             for (short i = 0; i < Offsets.Capacity; i++)
             {
-                Offsets.Add(input.ReadBigEndian<int>());
+                Offsets.Add(input.ReadInt32());
             }
 
             input.ReadByte();
@@ -43,13 +72,13 @@ namespace Shockky.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian(BitField.Length);
+            output.Write(BitField.Length);
             output.Write(BitField);
 
-            output.WriteBigEndian((ushort)Offsets.Count);
+            output.Write((ushort)Offsets.Count);
             for(int i = 0; i < Offsets.Count; i++)
             {
-                output.WriteBigEndian(Offsets[i]);
+                output.Write(Offsets[i]);
             }
             //TODO
         }

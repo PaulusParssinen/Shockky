@@ -23,7 +23,7 @@ namespace Shockky.Lingo
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian((short)NameIndex);
+            output.Write((short)NameIndex);
         }
 
         protected override string DebuggerDisplay => ToString();

@@ -14,17 +14,17 @@ namespace Shockky.Chunks.Score
 
         public SpriteProperties()
         { }
-        public SpriteProperties(ShockwaveReader input)
+        public SpriteProperties(ref ShockwaveReader input)
         {
-            StartFrame = input.ReadBigEndian<int>(); 
-            EndFrame = input.ReadBigEndian<int>();
+            StartFrame = input.ReadInt32(); 
+            EndFrame = input.ReadInt32();
 
-            input.ReadBigEndian<int>();
+            input.ReadInt32();
 
-            Channel = input.ReadBigEndian<int>();
-            SpritePropertiesOffsetsOffset = input.ReadBigEndian<int>();
+            Channel = input.ReadInt32();
+            SpritePropertiesOffsetsOffset = input.ReadInt32();
 
-            input.Position += 28;
+            input.Advance(28);
         }
 
         public override int GetBodySize()
@@ -44,11 +44,11 @@ namespace Shockky.Chunks.Score
         public override void WriteTo(ShockwaveWriter output)
         {
             throw new NotImplementedException();
-            output.WriteBigEndian(StartFrame);
-            output.WriteBigEndian(EndFrame);
-            output.WriteBigEndian(0);
-            output.WriteBigEndian(Channel);
-            output.WriteBigEndian(SpritePropertiesOffsetsOffset);
+            output.Write(StartFrame);
+            output.Write(EndFrame);
+            output.Write(0);
+            output.Write(Channel);
+            output.Write(SpritePropertiesOffsetsOffset);
         }
     }
 }

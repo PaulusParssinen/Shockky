@@ -15,39 +15,39 @@ namespace Shockky.Chunks
         public MovieCastListChunk()
             : base(ChunkKind.MCsL)
         { }
-        public MovieCastListChunk(ShockwaveReader input, ChunkHeader header)
+        public MovieCastListChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadBigEndian<int>());
-            Entries = new List<CastListEntry>(input.ReadBigEndian<int>());
-            Remnants.Enqueue(input.ReadBigEndian<short>());
+            Remnants.Enqueue(input.ReadInt32());
+            Entries = new List<CastListEntry>(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt16());
 
-            Unknowns = new int[input.ReadBigEndian<int>()];
+            Unknowns = new int[input.ReadInt32()];
             for (int i = 0; i < Unknowns.Length; i++)
             {
-                Unknowns[i] = input.ReadBigEndian<int>();
+                Unknowns[i] = input.ReadInt32();
             }
 
-            input.ReadBigEndian<int>();
+            input.ReadInt32();
             for (int i = 0; i < Entries.Capacity; i++)
             {
-                Entries.Add(new CastListEntry(input));
+                Entries.Add(new CastListEntry(ref input));
             }
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.WriteBigEndian((int)Remnants.Dequeue());
-            output.WriteBigEndian(Entries.Count);
-            output.WriteBigEndian((int)Remnants.Dequeue());
+            output.Write((int)Remnants.Dequeue());
+            output.Write(Entries.Count);
+            output.Write((int)Remnants.Dequeue());
 
-            output.WriteBigEndian(Unknowns.Length);
+            output.Write(Unknowns.Length);
             for (int i = 0; i < Remnants.Count; i++)
             {
-                output.WriteBigEndian(Unknowns[i]);
+                output.Write(Unknowns[i]);
             }
 
-            output.WriteBigEndian(ENTRY_SIZE);
+            output.Write(ENTRY_SIZE);
             for (int i = 0; i < Entries.Count; i++)
             {
                 Entries[i].WriteTo(output);

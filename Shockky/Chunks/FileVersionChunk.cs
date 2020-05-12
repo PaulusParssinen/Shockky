@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 using Shockky.IO;
 
@@ -6,30 +7,30 @@ namespace Shockky.Chunks
 {
     public class FileVersionChunk : ChunkItem
     {
-        public byte[] What { get; }
         public string Version { get; set; }
 
         public FileVersionChunk()
             : base(ChunkKind.Fver)
         { }
-        public FileVersionChunk(ShockwaveReader input, ChunkHeader header)
+        public FileVersionChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            What = input.ReadBytes(5);
-            Version = input.ReadString();
+            var unknown = input.ReadBytes(3); // likely varints?
+            var unknown2 = input.ReadBytes(2);
+            Version = new string(input.ReadString());
         }
 
         public override int GetBodySize()
         {
             int size = 0;
-            size += 5; //TODO
+            size += 5; //TODO:
             size += Encoding.UTF8.GetByteCount(Version) + 1;
             return size;
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.Write(What);
+            throw new NotImplementedException();
             output.Write(Version);
         }
     }

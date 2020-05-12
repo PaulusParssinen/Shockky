@@ -60,11 +60,11 @@ namespace Shockky.Lingo
             var marks = new Dictionary<long, Instruction>();
             var sharedExits = new Dictionary<long, List<Jumper>>();
 
-            using var input = new ShockwaveReader(_body.Code);
+            var input = new ShockwaveReader(_body.Code);
             while (input.IsDataAvailable)
             {
                 long previousPosition = input.Position;
-                var instruction = Instruction.Create(_body.Handler, input);
+                var instruction = Instruction.Create(_body.Handler, ref input);
                 marks[previousPosition] = instruction;
 
                 _instructions.Add(instruction);
@@ -213,7 +213,9 @@ namespace Shockky.Lingo
         public override void WriteTo(ShockwaveWriter output)
         {
             foreach (var instruction in _instructions)
+            {
                 instruction.WriteTo(output);
+            }
         }
 
         public IEnumerator<Instruction> GetEnumerator() => _instructions.GetEnumerator();
