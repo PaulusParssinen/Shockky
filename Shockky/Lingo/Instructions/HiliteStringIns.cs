@@ -1,9 +1,9 @@
 ﻿namespace Shockky.Lingo.Instructions
 {
-    public class LightStringIns : Instruction
+    public class HiliteStringIns : Instruction
     {
-        public LightStringIns()
-            : base(OPCode.LightString)
+        public HiliteStringIns()
+            : base(OPCode.Hilite)
         { }
 
         public override int GetPopCount() => 9;

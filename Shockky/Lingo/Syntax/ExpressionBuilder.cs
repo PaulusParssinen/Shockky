@@ -36,6 +36,25 @@ namespace Shockky.Lingo.Syntax
             expressionStack.Push(listExpression);
         }
 
+        public override void VisitSplitStringInstruction(SplitStringIns splitString, Stack<Expression> expressionStack)
+        {
+            throw new NotImplementedException("Under construction..");
+
+            Expression @string = expressionStack.Pop();
+
+            Expression lastLine = expressionStack.Pop();
+            Expression firstLine = expressionStack.Pop();
+            Expression lastItem = expressionStack.Pop();
+            Expression firstItem = expressionStack.Pop();
+            Expression lastWord = expressionStack.Pop();
+            Expression firstWord = expressionStack.Pop();
+            Expression lastChar = expressionStack.Pop();
+            Expression firstChar = expressionStack.Pop();
+
+            Console.WriteLine("splittyboi");
+            expressionStack.Push(null);
+        }
+
         public override void VisitNewPropertyListInstruction(NewPropListIns newPropList, Stack<Expression> expressionStack)
         {
             if (!(expressionStack.Pop() is ListExpression listExpression))
@@ -58,11 +77,10 @@ namespace Shockky.Lingo.Syntax
 
             if (variableReference.IsMovieReference)
             {
-                expressionStack.Pop(); //TODO:
+                expressionStack.Pop(); //empty?
                 referenceExpression = new MovieReferenceExpression(referenceExpression);
             }
-
-            if (variableReference.IsObjectReference)
+            else if (variableReference.IsObjectReference)
             {
                 Expression objectExpression = expressionStack.Pop();
                 referenceExpression = new MemberReferenceExpression(objectExpression, (IdentifierExpression)referenceExpression);

@@ -19,6 +19,12 @@
         public virtual void VisitWrapListInstrution(WrapListIns wrapList) => Default(wrapList);
         public virtual void VisitNewPropertyListInstruction(NewPropListIns newPropList) => Default(newPropList);
 
+        public virtual void VisitInsertInstruction(InsertIns insert) => Default(insert);
+        public virtual void VisitInsertStringInstruction(InsertStringIns insertString) => Default(insertString);
+
+        public virtual void VisitSplitStringInstruction(SplitStringIns splitString) => Default(splitString);
+        public virtual void VisitLightStringInstruction(HiliteStringIns lightString) => Default(lightString);
+
         public virtual void VisitPopInstruction(PopIns pop) => Default(pop);
         public virtual void VisitSwapInstruction(SwapIns swap) => Default(swap);
         public virtual void VisitDuplicateInstruction(DupIns dup) => Default(dup);
@@ -43,6 +49,12 @@
         public virtual void VisitWrapListInstrution(WrapListIns wrapList, TContext context) => Default(wrapList, context);
         public virtual void VisitNewPropertyListInstruction(NewPropListIns newPropList, TContext context) => Default(newPropList, context);
 
+        public virtual void VisitInsertInstruction(InsertIns insert, TContext context) => Default(insert, context);
+        public virtual void VisitInsertStringInstruction(InsertStringIns insertString, TContext context) => Default(insertString, context);
+
+        public virtual void VisitSplitStringInstruction(SplitStringIns splitString, TContext context) => Default(splitString, context);
+        public virtual void VisitLightStringInstruction(HiliteStringIns lightString, TContext context) => Default(lightString, context);
+
         public virtual void VisitPopInstruction(PopIns pop, TContext context) => Default(pop, context);
         public virtual void VisitSwapInstruction(SwapIns swap, TContext context) => Default(swap, context);
         public virtual void VisitDuplicateInstruction(DupIns dup, TContext context) => Default(dup, context);
@@ -66,6 +78,12 @@
         public virtual T VisitSymbolInstruction(PushSymbolIns symbol, TContext context) => Default(symbol, context);
         public virtual T VisitWrapListInstrution(WrapListIns wrapList, TContext context) => Default(wrapList, context);
         public virtual T VisitNewPropertyListInstruction(NewPropListIns newPropList, TContext context) => Default(newPropList, context);
+
+        public virtual T VisitInsertInstruction(InsertIns insert, TContext context) => Default(insert, context);
+        public virtual T VisitInsertStringInstruction(InsertStringIns insertString, TContext context) => Default(insertString, context);
+
+        public virtual T VisitSplitStringInstruction(SplitStringIns splitString, TContext context) => Default(splitString, context);
+        public virtual T VisitLightStringInstruction(HiliteStringIns lightString, TContext context) => Default(lightString, context);
 
         public virtual T VisitPopInstruction(PopIns pop, TContext context) => Default(pop, context);
         public virtual T VisitSwapInstruction(SwapIns swap, TContext context) => Default(swap, context);

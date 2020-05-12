@@ -24,7 +24,7 @@
         ContainsString,
         StartsWith,
         SplitString, //ChunkExpression
-        LightString,
+        Hilite,
         OntoSprite,
         IntoSprite,
         CastString,
@@ -56,7 +56,7 @@
         SetLocal,
         Jump,
         EndRepeat,
-        IfTrue,
+        IfTrue, //AVM2 spec would call this IfFalse
         CallLocal,
         CallExternal,
         CallObjOld, //?

@@ -8,6 +8,7 @@
 
         void VisitIfStatement(IfStatement ifStatement);
         void VisitBlockStatement(BlockStatement blockStatement);
+        void VisitHiliteStatement(HiliteStatement hiliteStatement);
         void VisitSwitchStatement(SwitchStatement switchStatement);
         void VisitRepeatStatement(RepeatStatement repeatStatement);
         void VisitAssigmentStatement(AssignmentStatement assignmentStatement);
@@ -18,6 +19,7 @@
         void VisitSymbolExpression(SymbolExpression symbolExpression);
         void VisitPrimitiveExpression(PrimitiveExpression primitiveExpression);
         void VisitIdentifierExpression(IdentifierExpression identifierExpression);
+        void VisitStringSplitExpression(StringSplitExpression stringSplitExpression);
         void VisitPropertyListExpression(PropertyListExpression propertyListExpression);
         void VisitArgumentListExpression(ArgumentListExpression argumentListExpression);
         void VisitUnaryOperatorExpression(UnaryOperatorExpression unaryOperatorExpression);
