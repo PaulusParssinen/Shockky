@@ -24,9 +24,8 @@ namespace Shockky.Chunks
         }
 
         public ChunkKind Kind { get; set; }
-        
-        public int Id { get; set; } //TODO: eh
-        public int Offset { get; set; }
+
+        public int Offset { get; set; } //TODO: Pull this out of ChunkHeader
         public int Length { get; set; }
 
         public ChunkHeader(ChunkKind kind)
@@ -38,7 +37,7 @@ namespace Shockky.Chunks
         {
             Length = (IsVariableLength ? 
                 input.Read7BitEncodedInt() : input.ReadBEInt32());
-            Offset = input.Position; //TODO: How much we will rely on this? It's not even really true in some cases..
+            Offset = input.Position; //TODO: How much we will rely on this? It's not even correct "offset" ffs.
         }
 
         public override int GetBodySize()

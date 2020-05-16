@@ -36,7 +36,8 @@ namespace Shockky.Sandbox
 
                 new Option<DirectoryInfo>("--output",
                     getDefaultValue: () => new DirectoryInfo("Output/"),
-                    description: "Directory for the extracted resources").LegalFilePathsOnly()
+                    description: "Directory for the extracted resources")
+                .LegalFilePathsOnly()
             };
             rootCommand.Handler = CommandHandler.Create<IEnumerable<FileInfo>, bool, DirectoryInfo>(HandleExtractCommand);
 
@@ -113,10 +114,10 @@ namespace Shockky.Sandbox
 
                 List<(CastMemberPropertiesChunk Member, ChunkItem Media)> memberMedia = new List<(CastMemberPropertiesChunk, ChunkItem)>();
 
-                var associationTable = shockwaveFile.Chunks
+                var associationTable = shockwaveFile.Chunks.Values
                     .FirstOrDefault(c => c.Kind == ChunkKind.KEYPtr) as AssociationTableChunk;
 
-                var castAssociationTable = shockwaveFile.Chunks
+                var castAssociationTable = shockwaveFile.Chunks.Values
                     .FirstOrDefault(c => c.Kind == ChunkKind.CASPtr) as CastAssociationTableChunk;
 
                 if (associationTable == null)
@@ -159,7 +160,7 @@ namespace Shockky.Sandbox
 
                     if (bitmapProperties == null) continue;
 
-                    string outputFileName = CoerceValidFileName(member?.Common?.Name ?? $"NONAME-{member.Header.Id}-{media.Header.Id}");
+                    string outputFileName = CoerceValidFileName(member?.Common?.Name ?? $"NONAME-" + member.Header.Offset);
 
                     int paletteIndex = bitmapProperties.Palette - 1; //castMemRef
 

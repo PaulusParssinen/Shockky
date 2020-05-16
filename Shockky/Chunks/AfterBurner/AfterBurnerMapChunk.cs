@@ -1,28 +1,29 @@
-﻿using System.Collections.Generic;
-
-using Shockky.IO;
+﻿using Shockky.IO;
 
 namespace Shockky.Chunks
 {
-    public class AfterburnerMapChunk : ChunkItem
+    public unsafe class AfterburnerMapChunk : ChunkItem
     {
-        public List<AfterBurnerMapEntry> Entries { get; set; }
+        public AfterBurnerMapEntry[] Entries { get; set; }
 
+        public AfterburnerMapChunk()
+            : base(ChunkKind.ABMP)
+        { }
         public AfterburnerMapChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
             input.ReadByte();
             Remnants.Enqueue(input.Read7BitEncodedInt());
 
-            //var decompressedInput = WrapDecompressor(input);
-            //Remnants.Enqueue(decompressedInput.Read7BitEncodedInt());
-            //Remnants.Enqueue(decompressedInput.Read7BitEncodedInt());
-            //
-            //Entries = new List<AfterBurnerMapEntry>(decompressedInput.Read7BitEncodedInt());
-            //for (int i = 0; i < Entries.Capacity; i++)
-            //{
-            //    Entries.Add(new AfterBurnerMapEntry(ref decompressedInput));
-            //}
+            using var deflaterInput = CreateDeflateReader(ref input);
+            Remnants.Enqueue(deflaterInput.Read7BitEncodedInt());
+            Remnants.Enqueue(deflaterInput.Read7BitEncodedInt());
+
+            Entries = new AfterBurnerMapEntry[deflaterInput.Read7BitEncodedInt()];
+            for (int i = 0; i < Entries.Length; i++)
+            {
+                Entries[i] = new AfterBurnerMapEntry(deflaterInput);
+            }
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
@@ -33,7 +34,7 @@ namespace Shockky.Chunks
             output.Write7BitEncodedInt((int)Remnants.Dequeue());
             output.Write7BitEncodedInt((int)Remnants.Dequeue());
 
-            output.Write7BitEncodedInt(Entries.Count);
+            output.Write7BitEncodedInt(Entries.Length);
             foreach (var entry in Entries)
             {
                 entry.WriteTo(output);

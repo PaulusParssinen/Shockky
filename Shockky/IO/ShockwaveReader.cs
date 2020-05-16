@@ -9,25 +9,23 @@ using System.Runtime.CompilerServices;
 
 namespace Shockky.IO
 {
-    //TODO: Measure measure. BPrimitives vs Bitshifting - BPrimitives.ReverseEndiannes fast tho
     public ref struct ShockwaveReader
     {
-        private readonly bool _bigEndian;
         private readonly ReadOnlySpan<byte> _data;
 
-        private int _position;
-        public int Position => _position; // { get; private set; }
+        public bool IsBigEndian { get; }
+        public int Position { get; private set; }
+
         public int Length => _data.Length;
+        public bool IsDataAvailable => Position < _data.Length;
 
-        //TODO: _currentSpan => _data.Slice(_position);
-
-        public bool IsDataAvailable => _position < _data.Length;
+        private ReadOnlySpan<byte> _currentSpan => _data.Slice(Position);
 
         public ShockwaveReader(ReadOnlySpan<byte> data, bool bigEndian = false)
         {
             _data = data;
-            _position = 0;
-            _bigEndian = bigEndian;
+            Position = 0;
+            IsBigEndian = bigEndian;
         }
 
         //TODO: Measure, measure and measure
@@ -37,17 +35,17 @@ namespace Shockky.IO
             int size = Marshal.SizeOf<T>();
             T value;
 
-            if (!_bigEndian)
+            if (!IsBigEndian)
             {
                 Span<byte> buffer = stackalloc byte[size];
-                _data.Slice(_position, size).CopyTo(buffer);
+                _data.Slice(Position, size).CopyTo(buffer);
 
                 buffer.Reverse();
                 value = MemoryMarshal.Read<T>(buffer);
             }
-            else value = MemoryMarshal.Read<T>(_data.Slice(_position));
+            else value = MemoryMarshal.Read<T>(_currentSpan);
 
-            _position += size;
+            Position += size;
             return value;
         }
 
@@ -56,18 +54,18 @@ namespace Shockky.IO
 
         //TODO: V Position { get; set; }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Advance(int count) => _position += count;
+        public void Advance(int count) => Position += count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AdvanceTo(int offset) => _position = offset;
+        public void AdvanceTo(int offset) => Position = offset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte ReadByte() => _data[_position++];
+        public byte ReadByte() => _data[Position++];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<byte> ReadBytes(int count)
         {
-            ReadOnlySpan<byte> data = _data.Slice(_position, count);
+            ReadOnlySpan<byte> data = _data.Slice(Position, count);
             Advance(count);
             return data;
         }
@@ -75,97 +73,97 @@ namespace Shockky.IO
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ReadBytes(Span<byte> buffer)
         {
-            _data.Slice(_position, buffer.Length).CopyTo(buffer);
+            _data.Slice(Position, buffer.Length).CopyTo(buffer);
             Advance(buffer.Length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ReadBoolean() => _data[_position++] == 1;
+        public bool ReadBoolean() => _data[Position++] == 1;
 
         //Should be one less branch (only emit bswap when), should ignore machine endianness afaik
         //TODO: BigEndian => "ReverseEndian"
         public short ReadInt16()
         {
-            short value = MemoryMarshal.Read<short>(_data.Slice(_position));
+            short value = MemoryMarshal.Read<short>(_currentSpan);
             Advance(sizeof(short));
         
-            return _bigEndian ? 
+            return IsBigEndian ? 
                 BinaryPrimitives.ReverseEndianness(value) : value;
         }
         public short ReadBEInt16()
         {
-            short value = MemoryMarshal.Read<short>(_data.Slice(_position));
+            short value = MemoryMarshal.Read<short>(_currentSpan);
             Advance(sizeof(short));
 
-            return _bigEndian ?
+            return IsBigEndian ?
                 value : BinaryPrimitives.ReverseEndianness(value);
         }
 
         public ushort ReadUInt16()
         {
-            ushort value = MemoryMarshal.Read<ushort>(_data.Slice(_position));
+            ushort value = MemoryMarshal.Read<ushort>(_currentSpan);
             Advance(sizeof(ushort));
 
-            return _bigEndian ?
+            return IsBigEndian ?
                 BinaryPrimitives.ReverseEndianness(value) : value;
         }
         public ushort ReadBEUInt16()
         {
-            ushort value = MemoryMarshal.Read<ushort>(_data.Slice(_position));
+            ushort value = MemoryMarshal.Read<ushort>(_currentSpan);
             Advance(sizeof(ushort));
 
-            return _bigEndian ?
+            return IsBigEndian ?
                 value : BinaryPrimitives.ReverseEndianness(value);
         }
 
         public int ReadInt32()
         {
-            int value = MemoryMarshal.Read<int>(_data.Slice(_position));
+            int value = MemoryMarshal.Read<int>(_currentSpan);
             Advance(sizeof(int));
 
-            return _bigEndian ?
+            return IsBigEndian ?
                 BinaryPrimitives.ReverseEndianness(value) : value;
         }
         public int ReadBEInt32()
         {
-            int value = MemoryMarshal.Read<int>(_data.Slice(_position));
+            int value = MemoryMarshal.Read<int>(_currentSpan);
             Advance(sizeof(int));
 
-            return _bigEndian ?
+            return IsBigEndian ?
                 value : BinaryPrimitives.ReverseEndianness(value);
         }
 
         public uint ReadUInt32()
         {
-            uint value = MemoryMarshal.Read<uint>(_data.Slice(_position));
+            uint value = MemoryMarshal.Read<uint>(_currentSpan);
             Advance(sizeof(uint));
 
-            return _bigEndian ?
+            return IsBigEndian ?
                 BinaryPrimitives.ReverseEndianness(value) : value;
         }
         public uint ReadBEUInt32()
         {
-            uint value = MemoryMarshal.Read<uint>(_data.Slice(_position));
+            uint value = MemoryMarshal.Read<uint>(_currentSpan);
             Advance(sizeof(uint));
 
-            return _bigEndian ?
+            return IsBigEndian ?
                 value : BinaryPrimitives.ReverseEndianness(value);
         }
 
         public double ReadDouble()
         {
-            double value = _bigEndian ?
-                BitConverter.Int64BitsToDouble(BinaryPrimitives.ReverseEndianness(MemoryMarshal.Read<long>(_data.Slice(_position)))) :
-                MemoryMarshal.Read<double>(_data.Slice(_position));
+            double value = IsBigEndian ?
+                BitConverter.Int64BitsToDouble(BinaryPrimitives.ReverseEndianness(MemoryMarshal.Read<long>(_currentSpan))) :
+                MemoryMarshal.Read<double>(_currentSpan);
 
             Advance(sizeof(double));
             return value;
         }
         public double ReadBEDouble()
         {
-            double value = _bigEndian ?
-                MemoryMarshal.Read<double>(_data.Slice(_position)) :
-                BitConverter.Int64BitsToDouble(BinaryPrimitives.ReverseEndianness(MemoryMarshal.Read<long>(_data.Slice(_position))));
+            double value = IsBigEndian ?
+                MemoryMarshal.Read<double>(_currentSpan) :
+                BitConverter.Int64BitsToDouble(BinaryPrimitives.ReverseEndianness(MemoryMarshal.Read<long>(_currentSpan)));
 
             Advance(sizeof(double));
             return value;
@@ -197,14 +195,14 @@ namespace Shockky.IO
         }
         public string ReadNullString()
         {
-            int length = _data.Slice(_position).IndexOf((byte)0);
-            string value = Encoding.UTF8.GetString(_data.Slice(_position, length));
+            int length = _currentSpan.IndexOf((byte)0);
+            string value = Encoding.UTF8.GetString(_data.Slice(Position, length));
 
             //TODO: Check? maxlength?
             //if (length == -1) 
-            //  length = _data.Length - _position;
+            //  length = _data.Length - Position;
 
-            _position += length + 1; //+ terminator
+            Position += length + 1; //+ terminator
 
             return value;
         }
@@ -212,14 +210,13 @@ namespace Shockky.IO
         public Color ReadColor()
         {
             // [R, R, G, G, B, B]
-            byte r = _data[_position];
-            byte g = _data[_position + 2];
-            byte b = _data[_position + 4];
+            byte r = _data[Position];
+            byte g = _data[Position + 2];
+            byte b = _data[Position + 4];
 
             Advance(6);
             return Color.FromArgb(r, g, b);
         }
-
         public Rectangle ReadRect()
         {
             short top = ReadInt16();

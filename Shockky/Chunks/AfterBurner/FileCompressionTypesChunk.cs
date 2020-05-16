@@ -13,20 +13,24 @@ namespace Shockky.Chunks
         public int Speed { get; set; }
         public string Name { get; set; }
 
+        public FileCompressionTypesChunk()
+            : base(ChunkKind.Fcdr)
+        { }
         public FileCompressionTypesChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            throw new NotImplementedException(nameof(FileCompressionTypesChunk));
-            //var decompressedInput = WrapDecompressor(input);
-            //CompressionTypeId = decompressedInput.ReadInt16();
-            //ImageQuality = decompressedInput.ReadInt32();
-            //ImageTypes = decompressedInput.ReadInt16();
-            //DirTypes = decompressedInput.ReadInt16();
-            //CompressionLevel= decompressedInput.ReadInt32();
-            //Speed = decompressedInput.ReadInt32();
-            //
-            //if (CompressionTypeId == 256)
-            //    Name = decompressedInput.ReadNullString();
+            using var decompressedInput = CreateDeflateReader(ref input);
+
+            CompressionTypeId = decompressedInput.ReadInt16();
+            ImageQuality = decompressedInput.ReadInt32();
+            ImageTypes = decompressedInput.ReadInt16();
+            DirTypes = decompressedInput.ReadInt16();
+
+            CompressionLevel = decompressedInput.ReadInt32();
+            Speed = decompressedInput.ReadInt32();
+            
+            if (CompressionTypeId == 256)
+                Name = decompressedInput.ReadNullString();
         }
 
         public override int GetBodySize()

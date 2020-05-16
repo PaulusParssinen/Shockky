@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Collections.Generic;
 
 using Shockky.IO;
@@ -12,19 +11,24 @@ namespace Shockky
     {
         private ReadOnlyMemory<byte> _input;
 
-        public IList<ChunkItem> Chunks { get; }
-        //public IDictionary<int, ChunkItem> Chunks { get; set; } //TODO: Might have to implement ChunkContainer abstraction to handle the resource/chunk identifiers and ownership etc.
+        //TODO: Some kind of abstraction, adding and modifying is a bit annoying like this. Also doing chunk lookups etc is weird now.
+        public IDictionary<int, ChunkItem> Chunks { get; set; }
 
         public DirectorVersion Version { get; set; }
         public FileMetadataChunk Metadata { get; set; }
 
-        //TODO: Slow and fired too much anyways
-        public ChunkItem this[int id]
-            => Chunks.FirstOrDefault(chunk => chunk.Header.Id == id);
+        public ChunkItem? this[int id]
+        {
+            get
+            {
+                Chunks.TryGetValue(id, out ChunkItem chunk);
+                return chunk;
+            }
+        }
 
         public ShockwaveFile()
         {
-            Chunks = new List<ChunkItem>();
+            Chunks = new Dictionary<int, ChunkItem>();
         }
         public ShockwaveFile(string path)
             : this(File.ReadAllBytes(path))
@@ -38,32 +42,21 @@ namespace Shockky
             Metadata = new FileMetadataChunk(ref input);
         }
 
-        public void Disassemble(Action<ChunkItem> callback = default)
+        public void Disassemble()
         {
-            void HandleChunk(ChunkItem chunk)
-            {
-                callback?.Invoke(chunk);
-                Chunks.Add(chunk);
-            }
-
             var input = new ShockwaveReader(_input.Span, Metadata.IsBigEndian);
             input.Advance(Metadata.Header.GetBodySize() + Metadata.GetBodySize());
 
             if (Metadata.Codec == CodecKind.FGDM ||
                 Metadata.Codec == CodecKind.FGDC)
             {
-                throw new NotSupportedException("TODO: 'Spanified' decompression"); //plz "DeflateDecoder" 
-
-                //if (ChunkItem.Read(input) is FileVersionChunk version &&
-                //    ChunkItem.Read(input) is FileCompressionTypesChunk compressionTypes &&
-                //    ChunkItem.Read(input) is AfterburnerMapChunk afterburnerMap &&
-                //    ChunkItem.Read(input) is FGEIChunk fgei)
-                //{
-                //    var ilsChunk = fgei.ReadInitialLoadSegment(afterburnerMap.Entries[0]);
-                //
-                //    fgei.ReadChunks(afterburnerMap.Entries, HandleChunk);
-                //    ilsChunk.ReadChunks(afterburnerMap.Entries, HandleChunk);
-                //}
+                if (ChunkItem.Read(ref input) is FileVersionChunk version &&
+                    ChunkItem.Read(ref input) is FileCompressionTypesChunk compressionTypes &&
+                    ChunkItem.Read(ref input) is AfterburnerMapChunk afterburnerMap &&
+                    ChunkItem.Read(ref input) is FileGzipEmbeddedImageChunk fgei)
+                {
+                    Chunks = fgei.ReadChunks(ref input, afterburnerMap.Entries);
+                }
             }
             else if (Metadata.Codec == CodecKind.MV93)
             {
@@ -77,16 +70,14 @@ namespace Shockky
                     {
                         foreach (ChunkEntry entry in mmapChunk.Entries)
                         {
-                            if (entry.Flags.HasFlag(ChunkEntryFlags.Ignore)) //TODO:
+                            if (entry.Flags.HasFlag(ChunkEntryFlags.Ignore))
                             {
-                                HandleChunk(new UnknownChunk(ref input, entry.Header));
+                                Chunks.Add(entry.Id, new UnknownChunk(ref input, entry.Header));
                                 continue;
                             }
-                            input.AdvanceTo(entry.Offset);
 
-                            ChunkItem chunk = ChunkItem.Read(ref input);
-                            chunk.Header.Id = entry.Header.Id;
-                            HandleChunk(chunk);
+                            input.AdvanceTo(entry.Offset);
+                            Chunks.Add(entry.Id, ChunkItem.Read(ref input));
                         }
                     }
                 }

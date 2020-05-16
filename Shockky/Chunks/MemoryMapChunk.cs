@@ -33,10 +33,7 @@ namespace Shockky.Chunks
             Entries = new ChunkEntry[entryCount];
             for (int i = 0; i < Entries.Length; i++)
             {
-                var entry = new ChunkEntry(ref input);
-                entry.Header.Id = i;
-
-                Entries[i] = entry;
+                Entries[i] = new ChunkEntry(ref input, i);
             }
         }
         

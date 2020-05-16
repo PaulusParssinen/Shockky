@@ -9,7 +9,9 @@ namespace Shockky.Chunks
     {
         public ChunkHeader Header { get; set; }
 
-        public int Offset { get; set; } //TODO: vs. ChunkHeader offsets
+        public int Id { get; set; }
+
+        public int Offset { get; set; }
         public ChunkEntryFlags Flags { get; set; }
         public short Unknown { get; set; }
         public int Link { get; set; }
@@ -18,9 +20,11 @@ namespace Shockky.Chunks
         {
             Header = header;
         }
-        public ChunkEntry(ref ShockwaveReader input)
+        public ChunkEntry(ref ShockwaveReader input, int id)
             : this(new ChunkHeader(ref input))
         {
+            Id = id;
+
             Offset = input.ReadBEInt32();
             Flags = (ChunkEntryFlags)input.ReadBEInt16();
             Unknown = input.ReadBEInt16();

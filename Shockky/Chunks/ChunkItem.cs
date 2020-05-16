@@ -5,13 +5,13 @@ using Shockky.IO;
 
 namespace Shockky.Chunks
 {
-    [DebuggerDisplay("[{Header.Id}] {Kind}")]
+    [DebuggerDisplay("[{Kind}] Length: {Header.Length}")]
     public abstract class ChunkItem : ShockwaveItem
     {
-        public ChunkKind Kind => Header.Kind;
         public ChunkHeader Header { get; set; }
+        public Queue<object> Remnants { get; set; } //
 
-        public Queue<object> Remnants { get; set; }
+        public ChunkKind Kind => Header.Kind;
 
         protected ChunkItem(ChunkKind kind)
             : this(new ChunkHeader(kind))
@@ -21,6 +21,16 @@ namespace Shockky.Chunks
             Header = header;
 
             Remnants = new Queue<object>();
+        }
+
+        public DeflateShockwaveReader CreateDeflateReader(ref ShockwaveReader input)
+        {
+            input.ReadBytes(2); //Skip ZLib header
+
+            int dataLeft = Header.Length - (input.Position - Header.Offset);
+            byte[] compressedData = input.ReadBytes(dataLeft).ToArray();
+
+            return new DeflateShockwaveReader(compressedData, input.IsBigEndian);
         }
 
         public override void WriteTo(ShockwaveWriter output)
@@ -40,12 +50,11 @@ namespace Shockky.Chunks
         {
             return header.Kind switch
             {
-                //ChunkKind.Fver => new FileVersionChunk(ref input, header),
-                //ChunkKind.Fcdr => new FileCompressionTypesChunk(ref input, header),
-                //ChunkKind.ABMP => new AfterburnerMapChunk(ref input, header),
-                //ChunkKind.FGEI => new FGEIChunk(ref input, header),
-                //ChunkKind.ILS => new InitialLoadSegmentChunk(ref input, header),
-
+                ChunkKind.Fver => new FileVersionChunk(ref input, header),
+                ChunkKind.Fcdr => new FileCompressionTypesChunk(ref input, header),
+                ChunkKind.ABMP => new AfterburnerMapChunk(ref input, header),
+                ChunkKind.FGEI => new FileGzipEmbeddedImageChunk(header),
+                
                 ChunkKind.RIFX => new FileMetadataChunk(ref input, header),
                 ChunkKind.imap => new InitialMapChunk(ref input, header),
                 ChunkKind.mmap => new MemoryMapChunk(ref input, header),
