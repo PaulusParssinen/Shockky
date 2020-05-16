@@ -1,7 +1,7 @@
 ﻿namespace Shockky.Chunks
 {
     /// <summary>
-    /// Represents TODO
+    /// Represents all the chunk types that can be in a Shockwave movie/cast.
     /// <para/>
     /// See: https://en.wikipedia.org/wiki/FourCC
     /// </summary>
@@ -17,8 +17,10 @@
         FCOL = 0x46434F4C,
         PUBL = 0x5055424C,
         GRID = 0x47524944,
-        DRCF = 0x44524346,
         SCRF = 0x53435246,
+
+        DRCF = 0x44524346,
+        VWCF = 0x56574346,
 
         // Afterburner
         Fver = 0x46766572,
@@ -29,6 +31,7 @@
 
         imap = 0x696d6170,
         mmap = 0x6D6D6170,
+
         junk = 0x6A756E6B,
         free = 0x66726565,
 
@@ -40,6 +43,7 @@
         MCsL = 0x4D43734C,
         Cinf = 0x43696E66,
         CASt = 0x43415374,
+
         CASPtr = 0x4341532A, // CAS*
         KEYPtr = 0x4B45592A, // KEY*
 
@@ -66,7 +70,6 @@
 
         // Score
         SCVW = 0x53435657,
-        VWCF = 0x56574346,
         VWFI = 0x56574649,
         VWSC = 0x56575343,
         VWLB = 0x56574C42,
@@ -74,7 +77,8 @@
 
         ccl  = 0x63636C20,
         Sord = 0x536F7264,
-
-        MDFL = 0x4D44464C
+        
+        Chan = 0x4368616E,
+        MDFL = 0x4D44464C,
     }
 }

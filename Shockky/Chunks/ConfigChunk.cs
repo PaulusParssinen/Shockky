@@ -27,6 +27,9 @@ namespace Shockky.Chunks
 
         public int DownloadFramesBeforePlaying { get; set; }
 
+        public ConfigChunk()
+            : base(ChunkKind.DRCF) //TODO: Version handling..
+        { }
         public ConfigChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
