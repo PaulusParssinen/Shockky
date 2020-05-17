@@ -87,7 +87,7 @@ namespace Shockky.Chunks
                 ChunkKind.XTRl => new XtraListChunk(ref input, header),
 
                 //case ChunkKind.PUBL => new PublishSettingsChunk(ref input, header),
-                //case ChunkKind.GRID => new GridChunk(ref input, header),
+                ChunkKind.GRID => new GridChunk(ref input, header),
                 ChunkKind.FCOL => new FavoriteColorsChunk(ref input, header),
                 
                 ChunkKind.FXmp => new FontMapChunk(ref input, header),
