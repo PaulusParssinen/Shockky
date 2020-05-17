@@ -9,7 +9,7 @@ namespace Shockky.Chunks
     public abstract class ChunkItem : ShockwaveItem
     {
         public ChunkHeader Header { get; set; }
-        public Queue<object> Remnants { get; set; } //
+        public Queue<object> Remnants { get; set; }
 
         public ChunkKind Kind => Header.Kind;
 
@@ -25,7 +25,7 @@ namespace Shockky.Chunks
 
         public DeflateShockwaveReader CreateDeflateReader(ref ShockwaveReader input)
         {
-            input.ReadBytes(2); //Skip ZLib header
+            input.Advance(2); //Skip ZLib header
 
             int dataLeft = Header.Length - (input.Position - Header.Offset);
             byte[] compressedData = input.ReadBytes(dataLeft).ToArray();
@@ -88,7 +88,8 @@ namespace Shockky.Chunks
 
                 //case ChunkKind.PUBL => new PublishSettingsChunk(ref input, header),
                 //case ChunkKind.GRID => new GridChunk(ref input, header),
-
+                ChunkKind.FCOL => new FavoriteColorsChunk(ref input, header),
+                
                 ChunkKind.FXmp => new FontMapChunk(ref input, header),
                 ChunkKind.snd => new SoundDataChunk(ref input, header),
                 ChunkKind.BITD => new BitmapChunk(ref input, header),
