@@ -18,7 +18,7 @@ namespace Shockky.Chunks
             input.ReadInt32();
 
             int entryCount = input.ReadInt32();
-            int validCount = input.ReadInt32();
+            input.ReadInt32();
 
             input.ReadInt16();
             input.ReadInt16();

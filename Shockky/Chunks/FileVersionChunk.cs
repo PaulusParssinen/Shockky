@@ -17,7 +17,7 @@ namespace Shockky.Chunks
         {
             var unknown = input.ReadBytes(3); // likely varints?
             var unknown2 = input.ReadBytes(2);
-            Version = new string(input.ReadString());
+            Version = input.ReadString(); //TOOD: => DirectorVersion
         }
 
         public override int GetBodySize()

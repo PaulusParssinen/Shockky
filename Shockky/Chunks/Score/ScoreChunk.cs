@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 
 using Shockky.IO;
 using Shockky.Chunks.Score;
@@ -22,19 +21,19 @@ namespace Shockky.Chunks
             int spritePropertiesOffsetThingy = input.ReadInt32();
             int[] spritePropertyOffsets = new int[input.ReadInt32() + 1];
 
-            int notationOffset = input.ReadInt32() * 4 + 12 + spritePropertiesOffsetThingy;
+            int notationOffset = input.ReadInt32() * sizeof(int) + 12 + spritePropertiesOffsetThingy; //..* 4 *..
             int lastSpritePropertyOffset = input.ReadInt32();
 
             for (int i  = 0; i < spritePropertyOffsets.Length; i++)
             {
                 spritePropertyOffsets[i] = input.ReadInt32();
             }
-
-            Debug.Assert(input.Position == (Header.Offset + notationOffset), "What");
             
+            //notationOffset
+
             int frameEndOffset = input.ReadInt32();
 
-            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32()); 
 
             Frames = new Frame[input.ReadInt32()];
             short framesType = input.ReadInt16(); //13, 14
@@ -59,7 +58,7 @@ namespace Shockky.Chunks
             {
                 int spritePropertyOffset = spritePropertyOffsets[spritePropertyOffsetIndices[i]];
 
-                input.AdvanceTo(Header.Offset + notationOffset + spritePropertyOffset);
+                input.Position = notationOffset + spritePropertyOffset;
                 spriteProperties[i] = new SpriteProperties(ref input);
             }
         }

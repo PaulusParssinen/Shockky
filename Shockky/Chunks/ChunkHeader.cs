@@ -1,11 +1,11 @@
 ﻿using Shockky.IO;
-using System.Diagnostics;
 
 namespace Shockky.Chunks
 {
-    [DebuggerDisplay("{Kind}")]
     public class ChunkHeader : ShockwaveItem
     {
+        protected override string DebuggerDisplay => Kind.ToString();
+
         public bool IsVariableLength
         {
             get
@@ -24,8 +24,6 @@ namespace Shockky.Chunks
         }
 
         public ChunkKind Kind { get; set; }
-
-        public int Offset { get; set; } //TODO: Pull this out of ChunkHeader
         public int Length { get; set; }
 
         public ChunkHeader(ChunkKind kind)
@@ -35,9 +33,8 @@ namespace Shockky.Chunks
         public ChunkHeader(ref ShockwaveReader input)
             : this((ChunkKind)input.ReadBEInt32())
         {
-            Length = (IsVariableLength ? 
-                input.Read7BitEncodedInt() : input.ReadBEInt32());
-            Offset = input.Position; //TODO: How much we will rely on this? It's not even correct "offset" ffs.
+            Length = IsVariableLength ? 
+                input.Read7BitEncodedInt() : input.ReadBEInt32();
         }
 
         public override int GetBodySize()

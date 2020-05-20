@@ -6,7 +6,7 @@ namespace Shockky.Chunks
     {
         public int Unknown { get; set; }
         public int Id { get; set; }
-        public short Flags { get; set; }
+        public ScriptContextSectionFlags Flags { get; set; }
         public short Link { get; set; }
 
         public ScriptContextSection()
@@ -15,7 +15,7 @@ namespace Shockky.Chunks
         {
             Unknown = input.ReadInt32();
             Id = input.ReadInt32();
-            Flags = input.ReadInt16(); // 4=Used
+            Flags = (ScriptContextSectionFlags)input.ReadInt16();
             Link = input.ReadInt16();
         }
 
@@ -33,7 +33,7 @@ namespace Shockky.Chunks
         {
             output.Write(Unknown);
             output.Write(Id);
-            output.Write(Flags);
+            output.Write((short)Flags);
             output.Write(Link);
         }
     }

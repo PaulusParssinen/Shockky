@@ -11,7 +11,12 @@ namespace Shockky.Chunks
         public List<ScriptContextSection> Sections { get; set; }
 
         public int Type { get; set; }
+        public short Flags { get; set; }
+
         public int NameListChunkId { get; set; }
+
+        public short ValidCount { get; set; }
+        public short FreeChunkId { get; set; }
 
         public ScriptContextChunk()
             : base(ChunkKind.LctX)
@@ -22,10 +27,10 @@ namespace Shockky.Chunks
             Remnants.Enqueue(input.ReadInt32());
             Remnants.Enqueue(input.ReadInt32());
 
-            int entryCount = input.ReadInt32();
+            Sections = new List<ScriptContextSection>(input.ReadInt32());
             input.ReadInt32();
             
-            short entryOffset = input.ReadInt16(); //TODO: Research
+            short entryOffset = input.ReadInt16();
             input.ReadInt16();
 
             Remnants.Enqueue(input.ReadInt32()); //0
@@ -34,14 +39,13 @@ namespace Shockky.Chunks
 
             NameListChunkId = input.ReadInt32();
 
-            Remnants.Enqueue(input.ReadInt16()); //validCount
-            Remnants.Enqueue(input.ReadInt16()); //flags, short?
-            Remnants.Enqueue(input.ReadInt16()); //freePtr
+            ValidCount = input.ReadInt16(); //validCount - tremor "length"
+            Flags = input.ReadInt16(); //TODO: 1, 5
+            FreeChunkId = input.ReadInt16();
 
-            input.AdvanceTo(Header.Offset + entryOffset);
+            input.Position = entryOffset;
 
-            Sections = new List<ScriptContextSection>(entryCount);
-            for (int i = 0; i < entryCount; i++)
+            for (int i = 0; i < Sections.Capacity; i++)
             {
                 Sections.Add(new ScriptContextSection(ref input));
             }
@@ -65,9 +69,9 @@ namespace Shockky.Chunks
 
             output.Write(NameListChunkId);
 
-            output.Write((short)Remnants.Dequeue());
-            output.Write((short)Remnants.Dequeue());
-            output.Write((short)Remnants.Dequeue());
+            output.Write(ValidCount);
+            output.Write(Flags);
+            output.Write(FreeChunkId);
 
             foreach (ScriptContextSection section in Sections)
             {

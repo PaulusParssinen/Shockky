@@ -54,12 +54,14 @@
         CLUT = 0x434C5554,
         ALFA = 0x414C4641,
 
+        cupt = 0x63757074,
         snd  = 0x736E6420,
         sndH = 0x736E6448,
         sndS = 0x736E6453,
 
         // Lingo
         LctX = 0x4C637458,
+        Lctx = 0x4C637478,
         Lnam = 0x4C6E616D,
         Lscr = 0x4C736372,
 
@@ -68,7 +70,6 @@
         XMED = 0x584D4544,
         ediM = 0x6564694D,
 
-        // Score
         SCVW = 0x53435657,
         VWFI = 0x56574649,
         VWSC = 0x56575343,
@@ -79,6 +80,6 @@
         Sord = 0x536F7264,
         
         Chan = 0x4368616E,
-        MDFL = 0x4D44464C,
+        MDFL = 0x4D44464C, //Wikipedia: "קובצי תלת־ממד, שבשימוש בתוכנות הפלאש. " -> MDFL - files 3-D , used by the Flash content
     }
 }

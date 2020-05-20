@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 
 using Shockky.IO;
@@ -27,7 +28,7 @@ namespace Shockky.Chunks
         {
             input.Advance(2); //Skip ZLib header
 
-            int dataLeft = Header.Length - (input.Position - Header.Offset);
+            int dataLeft = Header.Length - input.Position;
             byte[] compressedData = input.ReadBytes(dataLeft).ToArray();
 
             return new DeflateShockwaveReader(compressedData, input.IsBigEndian);
@@ -46,55 +47,67 @@ namespace Shockky.Chunks
         {
             return Read(ref input, new ChunkHeader(ref input));
         }
+        public static ChunkItem Read(ref ShockwaveReader input, AfterBurnerMapEntry entry)
+        {
+            if (entry.IsCompressed)
+            {
+                return input.ReadCompressedChunk(entry);
+            }
+            else return Read(ref input, entry.Header);
+        }
         public static ChunkItem Read(ref ShockwaveReader input, ChunkHeader header)
         {
+            ReadOnlySpan<byte> chunkSpan = input.ReadBytes(header.Length);
+            ShockwaveReader chunkInput = new ShockwaveReader(chunkSpan, input.IsBigEndian);
+
+            //TODO: set endianness on chunk basis
             return header.Kind switch
             {
-                ChunkKind.Fver => new FileVersionChunk(ref input, header),
-                ChunkKind.Fcdr => new FileCompressionTypesChunk(ref input, header),
-                ChunkKind.ABMP => new AfterburnerMapChunk(ref input, header),
+                ChunkKind.Fver => new FileVersionChunk(ref chunkInput, header),
+                ChunkKind.Fcdr => new FileCompressionTypesChunk(ref chunkInput, header),
+                ChunkKind.ABMP => new AfterburnerMapChunk(ref chunkInput, header),
                 ChunkKind.FGEI => new FileGzipEmbeddedImageChunk(header),
                 
-                ChunkKind.RIFX => new FileMetadataChunk(ref input, header),
-                ChunkKind.imap => new InitialMapChunk(ref input, header),
-                ChunkKind.mmap => new MemoryMapChunk(ref input, header),
-                ChunkKind.KEYPtr => new AssociationTableChunk(ref input, header),
+                ChunkKind.RIFX => new FileMetadataChunk(ref chunkInput, header),
+                ChunkKind.imap => new InitialMapChunk(ref chunkInput, header),
+                ChunkKind.mmap => new MemoryMapChunk(ref chunkInput, header),
+                ChunkKind.KEYPtr => new AssociationTableChunk(ref chunkInput, header),
 
-                ChunkKind.VWCF => new ConfigChunk(ref input, header),
-                ChunkKind.DRCF => new ConfigChunk(ref input, header),
-
-                //ChunkKind.VWSC => new ScoreChunk(ref input, header),
-                ChunkKind.VWLB => new ScoreLabelChunk(ref input, header),
-                ChunkKind.VWFI => new FileInfoChunk(ref input, header),
-
-                ChunkKind.LctX => new ScriptContextChunk(ref input, header),
-                ChunkKind.Lscr => new ScriptChunk(ref input, header),
-                ChunkKind.Lnam => new NameTableChunk(ref input, header),
-
-                ChunkKind.CASPtr => new CastAssociationTableChunk(ref input, header),
-                ChunkKind.CASt => new CastMemberPropertiesChunk(ref input, header),
-
-                ChunkKind.MCsL => new MovieCastListChunk(ref input, header),
-
-                //ChunkKind.Cinf => new CastInfoChunk(ref input, header),
-                ChunkKind.SCRF => new ScoreReferenceChunk(ref input, header),
-                ChunkKind.Sord => new SortOrderChunk(ref input, header),
-                ChunkKind.CLUT => new PaletteChunk(ref input, header),
-                ChunkKind.STXT => new StyledTextChunk(ref input, header),
-
-                //case ChunkKind.Fmap => new CastFontMapChunk(ref input, header),
-
-                ChunkKind.XTRl => new XtraListChunk(ref input, header),
-
-                //case ChunkKind.PUBL => new PublishSettingsChunk(ref input, header),
-                ChunkKind.GRID => new GridChunk(ref input, header),
-                ChunkKind.FCOL => new FavoriteColorsChunk(ref input, header),
+                ChunkKind.VWCF => new ConfigChunk(ref chunkInput, header),
+                ChunkKind.DRCF => new ConfigChunk(ref chunkInput, header),
                 
-                ChunkKind.FXmp => new FontMapChunk(ref input, header),
-                ChunkKind.snd => new SoundDataChunk(ref input, header),
-                ChunkKind.BITD => new BitmapChunk(ref input, header),
+                //ChunkKind.VWSC => new ScoreChunk(ref chunkInput, header),
+                ChunkKind.VWLB => new ScoreLabelChunk(ref chunkInput, header),
+                ChunkKind.VWFI => new FileInfoChunk(ref chunkInput, header),
+                
+                ChunkKind.LctX => new ScriptContextChunk(ref chunkInput, header),
+                ChunkKind.Lscr => new ScriptChunk(ref chunkInput, header),
+                ChunkKind.Lnam => new NameTableChunk(ref chunkInput, header),
+                
+                ChunkKind.CASPtr => new CastAssociationTableChunk(ref chunkInput, header),
+                ChunkKind.CASt => new CastMemberPropertiesChunk(ref chunkInput, header),
+                ChunkKind.MCsL => new MovieCastListChunk(ref chunkInput, header),
+                
+                //ChunkKind.Cinf => new CastInfoChunk(ref chunkInput, header),
+                ChunkKind.SCRF => new ScoreReferenceChunk(ref chunkInput, header),
+                ChunkKind.Sord => new SortOrderChunk(ref chunkInput, header),
+                ChunkKind.CLUT => new PaletteChunk(ref chunkInput, header),
+                ChunkKind.STXT => new StyledTextChunk(ref chunkInput, header),
+                
+                //ChunkKind.cupt => new CuePointsChunk(ref chunkInput, header),
+                ChunkKind.snd => new SoundDataChunk(ref chunkInput, header),
 
-                _ => new UnknownChunk(ref input, header),
+                //ChunkKind.XTRl => new XtraListChunk(ref chunkInput, header),
+                //ChunkKind.Fmap => new CastFontMapChunk(ref chunkInput, header),
+                
+                //ChunkKind.PUBL => new PublishSettingsChunk(ref chunkInput, header),
+                ChunkKind.GRID => new GridChunk(ref chunkInput, header),
+                ChunkKind.FCOL => new FavoriteColorsChunk(ref chunkInput, header),
+                
+                ChunkKind.FXmp => new FontMapChunk(ref chunkInput, header),
+                ChunkKind.BITD => new BitmapChunk(ref chunkInput, header),
+
+                _ => new UnknownChunk(ref chunkInput, header),
             };
         }
     }

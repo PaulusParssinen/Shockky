@@ -20,7 +20,7 @@ namespace Shockky.Chunks
             input.ReadInt32();
             int dataLength = input.ReadInt32();
 
-            Remnants.Enqueue(input.ReadInt32());
+            Remnants.Enqueue(input.ReadInt32()); //TOOD: Why is DIRAPI checking this 24/7 if its a constant(?) 0x14
             Remnants.Enqueue(input.ReadInt32());
             Remnants.Enqueue(input.ReadInt32());
             Remnants.Enqueue(input.ReadInt32());
@@ -36,11 +36,11 @@ namespace Shockky.Chunks
             {
                 case CastType.Bitmap:
                 case CastType.OLE:
-                    return new BitmapCastProperties(Header, ref input);
+                    return new BitmapCastProperties(ref input);
                 case CastType.Shape:
                     return new ShapeCastProperties(ref input);
-                case CastType.DigitalVideo:
                 case CastType.Movie:
+                case CastType.DigitalVideo:
                     return new VideoCastProperties(ref input);
                 case CastType.Button:
                 case CastType.Text:

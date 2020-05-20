@@ -1,5 +1,6 @@
-﻿using Shockky.IO;
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
+
+using Shockky.IO;
 
 namespace Shockky.Chunks
 {
@@ -19,7 +20,7 @@ namespace Shockky.Chunks
         public FileMetadataChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Codec = (CodecKind)(IsBigEndian ?
+            Codec = (CodecKind)(IsBigEndian ? 
                 input.ReadInt32() : input.ReadBEInt32());
         }
 

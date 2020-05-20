@@ -17,29 +17,29 @@ namespace Shockky.Chunks.Cast
         public byte BitDepth { get; set; } = 1;
         public int Palette { get; set; }
 
-        public bool IsSystemPalette => ((Palette & (1 << 15)) != 0);
+        public bool IsSystemPalette => ((Palette & (1 << 15)) != 0); //TODO: lmao, rewrite
 
         public BitmapCastProperties()
         { }
-        public BitmapCastProperties(ChunkHeader header, ref ShockwaveReader input)
+        public BitmapCastProperties(ref ShockwaveReader input)
         {
-            static bool IsDataAvailable(ShockwaveReader input, ChunkHeader header)
-                => input.Position < header.Offset + header.Length;
+            int v27 = input.ReadUInt16();
 
-            TotalWidth = input.ReadUInt16() & 0x7FFF;
+            TotalWidth = v27 & 0x7FFF; //TODO: what does that last bit even do.. some sneaky flag?
+            //DIRAPI checks if TotalWidth & 0x8000 == 0
 
             Rectangle = input.ReadRect();
             AlphaThreshold = input.ReadByte();
-            OLE = input.ReadBytes(7).ToArray(); //TODO:
+            OLE = input.ReadBytes(7).ToArray();
 
-            RegistrationPoint = new Point(input.ReadInt16(), input.ReadInt16());
+            RegistrationPoint = input.ReadPoint();
             
             Flags = (BitmapFlags)input.ReadByte();
             
-            if (!IsDataAvailable(input, header)) return;
+            if (!input.IsDataAvailable) return;
             BitDepth = input.ReadByte();
 
-            if (!IsDataAvailable(input, header)) return;
+            if (!input.IsDataAvailable) return;
             Palette = input.ReadInt32();
 
             //TODO: PaletteRef or something
@@ -67,7 +67,7 @@ namespace Shockky.Chunks.Cast
 
         public void WriteTo(ShockwaveWriter output)
         {
-            output.Write((ushort)TotalWidth | 0x8000);
+            output.Write((ushort)TotalWidth | 0x8000); 
 
             output.Write(Rectangle);
             output.Write(AlphaThreshold);

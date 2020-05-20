@@ -5,16 +5,16 @@ using Shockky.IO;
 
 namespace Shockky.Chunks
 {
-    [DebuggerDisplay("[{Header.Kind}] Id: {Id} Offset: {Offset} CompressedLength: {CompressedLength}")]
+    [DebuggerDisplay("[{Header.Kind}] Id: {Id} Offset: {Offset}")]
     public class AfterBurnerMapEntry : ShockwaveItem
     {
         public ChunkHeader Header { get; }
 
         public int Id { get; set; }
         public int Offset { get; set; }
-        public int CompressedLength { get; set; }
+        public int Length { get; set; }
         public int DecompressedLength { get; set; }
-        public int CompressionType { get; set; } // TODO: Just 0 and 1?
+        public int CompressionType { get; set; }
 
         public bool IsCompressed => (CompressionType == 0); 
 
@@ -22,13 +22,15 @@ namespace Shockky.Chunks
         {
             Id = input.Read7BitEncodedInt();
             Offset = input.Read7BitEncodedInt();
-            CompressedLength = input.Read7BitEncodedInt();
+            Length = input.Read7BitEncodedInt();
             DecompressedLength = input.Read7BitEncodedInt();
             CompressionType = input.Read7BitEncodedInt();
 
-            Header = new ChunkHeader((ChunkKind)input.ReadInt32(true))
+            Debug.Assert(CompressionType == 1 || CompressionType == 0);
+
+            Header = new ChunkHeader((ChunkKind)input.ReadBEInt32())
             {
-                Length = DecompressedLength
+                Length = IsCompressed ? DecompressedLength : Length
             };
         }
 
@@ -41,7 +43,7 @@ namespace Shockky.Chunks
         {
             output.Write7BitEncodedInt(Id);
             output.Write7BitEncodedInt(Offset);
-            output.Write7BitEncodedInt(CompressedLength);
+            output.Write7BitEncodedInt(Length);
             output.Write7BitEncodedInt(DecompressedLength);
             output.Write7BitEncodedInt(CompressionType);
 

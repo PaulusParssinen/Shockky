@@ -65,18 +65,20 @@ namespace Shockky
 
                 foreach (int offset in imapChunk.MemoryMapOffsets)
                 {
-                    input.AdvanceTo(offset);
+                    input.Position = offset;
                     if (ChunkItem.Read(ref input) is MemoryMapChunk mmapChunk)
                     {
                         foreach (ChunkEntry entry in mmapChunk.Entries)
                         {
+                            if (entry.Header.Kind == ChunkKind.RIFX) continue; //TODO: HACK
+
                             if (entry.Flags.HasFlag(ChunkEntryFlags.Ignore))
                             {
                                 Chunks.Add(entry.Id, new UnknownChunk(ref input, entry.Header));
                                 continue;
                             }
 
-                            input.AdvanceTo(entry.Offset);
+                            input.Position = entry.Offset;
                             Chunks.Add(entry.Id, ChunkItem.Read(ref input));
                         }
                     }

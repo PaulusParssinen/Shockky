@@ -15,9 +15,10 @@ namespace Shockky.Chunks
             : base(header)
         { }
 
-        //TODO: I'm gonna keep rewriting this. not happy with it at all
+        //TODO: Tidy up more.
         public IDictionary<int, ChunkItem> ReadChunks(ref ShockwaveReader input, AfterBurnerMapEntry[] entries)
         {
+            int chunkStart = input.Position;
             var chunks = new Dictionary<int, ChunkItem>(entries.Length);
 
             ReadInitialLoadSegment(ref input, entries, chunks);
@@ -25,26 +26,10 @@ namespace Shockky.Chunks
             for (int i = 1; i < entries.Length; i++)
             {
                 AfterBurnerMapEntry entry = entries[i];
-
                 if (entry.Offset == -1) continue;
 
-                input.AdvanceTo(Header.Offset + entry.Offset);
-
-                if (entry.IsCompressed)
-                {
-                    //TODO: Clean-up the decompression code. Polluted this section too much. 
-                    ReadOnlySpan<byte> compressedData = input.ReadBytes(entry.CompressedLength);
-
-                    Span<byte> decompressedData = entry.DecompressedLength <= 1024 ?
-                        stackalloc byte[entry.DecompressedLength] : new byte[entry.DecompressedLength];
-
-                    ZLib.Decompress(compressedData, decompressedData);
-
-                    ShockwaveReader chunkInput = new ShockwaveReader(decompressedData, input.IsBigEndian); //TODO: Check whether the endianness is preserved in the compressed chunks
-
-                    chunks.Add(entry.Id, Read(ref chunkInput, entry.Header));
-                }
-                else chunks.Add(entry.Id, Read(ref input, entry.Header));                
+                input.Position = chunkStart + entry.Offset;
+                chunks.Add(entry.Id, Read(ref input, entry));
             }
             return chunks;
         }
@@ -53,13 +38,13 @@ namespace Shockky.Chunks
         {
             //First entry in the AfterBurnerMap must be ILS.
             AfterBurnerMapEntry ilsEntry = entries[0];
-            input.AdvanceTo(Header.Offset + ilsEntry.Offset);
+            input.Advance(ilsEntry.Offset);
 
-            //TODO: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArgh
-            ReadOnlySpan<byte> compressedData = input.ReadBytes(ilsEntry.CompressedLength);
+            //TODO: this shouldn't be here
+            ReadOnlySpan<byte> compressedData = input.ReadBytes(ilsEntry.Length);
 
             Span<byte> decompressedData = ilsEntry.DecompressedLength <= 1024 ?
-                    stackalloc byte[ilsEntry.DecompressedLength] : new byte[ilsEntry.DecompressedLength]; //TODO: yea that's never gonne be under stack limit lmao
+                    stackalloc byte[ilsEntry.DecompressedLength] : new byte[ilsEntry.DecompressedLength];
 
             ZLib.Decompress(compressedData, decompressedData);
 
@@ -69,14 +54,12 @@ namespace Shockky.Chunks
             {
                 int id = ilsReader.Read7BitEncodedInt();
 
-                AfterBurnerMapEntry entry = entries.FirstOrDefault(e => e.Id == id);
+                AfterBurnerMapEntry entry = entries.FirstOrDefault(e => e.Id == id); //TODO: Chunk entries as dictionary
                 if (entry == null) break;
 
-                entry.Header.Offset = ilsReader.Position;
                 chunks.Add(id, Read(ref ilsReader, entry.Header));
             }
         }
-
 
         public override int GetBodySize()
         {

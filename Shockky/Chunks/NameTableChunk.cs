@@ -24,9 +24,7 @@ namespace Shockky.Chunks
             
             Names = new List<string>(input.ReadInt16());
 
-            //TODO:
-            input.AdvanceTo(Header.Offset + nameOffset);
-            //input.Position = Header.Offset + nameOffset;
+            input.Position = nameOffset;
 
             for (int i = 0; i < Names.Capacity; i++)
             {

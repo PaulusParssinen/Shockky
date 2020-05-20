@@ -29,7 +29,6 @@ namespace Shockky.IO
             return result >> 7;
         }
 
-        //TODO: Bad, everythings bad here
         public string ReadNullString()
         {
             char currentChar;
@@ -41,13 +40,22 @@ namespace Shockky.IO
             return value;
         }
 
-        public short ReadInt16(bool reverseEndian = false)
+        public new short ReadInt16()
         {
-            return !reverseEndian && IsBigEndian ? BinaryPrimitives.ReverseEndianness(base.ReadInt16()) : base.ReadInt16();;
+            return IsBigEndian ? BinaryPrimitives.ReverseEndianness(base.ReadInt16()) : base.ReadInt16();
         }
-        public int ReadInt32(bool reverseEndian = false)
+        public short ReadBEInt16()
         {
-            return !reverseEndian && IsBigEndian ? BinaryPrimitives.ReverseEndianness(base.ReadInt32()) : base.ReadInt32();;
+            return IsBigEndian ?  base.ReadInt16() : BinaryPrimitives.ReverseEndianness(base.ReadInt16());
+        }
+
+        public new int ReadInt32()
+        {
+            return IsBigEndian ? BinaryPrimitives.ReverseEndianness(base.ReadInt32()) : base.ReadInt32();
+        }
+        public int ReadBEInt32()
+        {
+            return IsBigEndian ? base.ReadInt32() : BinaryPrimitives.ReverseEndianness(base.ReadInt32());
         }
     }
 }

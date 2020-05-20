@@ -38,7 +38,7 @@ namespace Shockky.IO
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(bool value) 
         {
-            _data[_position++] = value ? (byte)1 : (byte)0;
+            _data[_position++] = Unsafe.As<bool, byte>(ref value);
         }
 
         public void Write(short value)
@@ -157,14 +157,17 @@ namespace Shockky.IO
 
         public void Write(Color value)
         {
-            //TODO: Endianness
-            //TODO: ENSURE INLINED + compare to single offset increment by 6
             Write(value.R);
             Write(value.R);
             Write(value.G);
             Write(value.G);
             Write(value.B);
             Write(value.B);
+        }
+        public void Write(Point value)
+        {
+            Write((short)value.X);
+            Write((short)value.Y);
         }
         public void Write(Rectangle value)
         {

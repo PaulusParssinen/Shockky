@@ -1,11 +1,15 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Buffers.Binary;
+using System.IO.Compression;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
+
+using Shockky.Chunks;
 
 namespace Shockky.IO
 {
@@ -13,19 +17,19 @@ namespace Shockky.IO
     {
         private readonly ReadOnlySpan<byte> _data;
 
-        public bool IsBigEndian { get; }
-        public int Position { get; private set; }
+        public bool IsBigEndian { get; set; }
+        public int Position { get; set; }
 
-        public int Length => _data.Length;
-        public bool IsDataAvailable => Position < _data.Length;
+        public readonly int Length => _data.Length;
+        public readonly bool IsDataAvailable => Position < _data.Length;
 
-        private ReadOnlySpan<byte> _currentSpan => _data.Slice(Position);
+        private readonly ReadOnlySpan<byte> _currentSpan => _data.Slice(Position);
 
-        public ShockwaveReader(ReadOnlySpan<byte> data, bool bigEndian = false)
+        public ShockwaveReader(ReadOnlySpan<byte> data, bool isBigEndian = false)
         {
             _data = data;
             Position = 0;
-            IsBigEndian = bigEndian;
+            IsBigEndian = isBigEndian;
         }
 
         //TODO: Measure, measure and measure
@@ -52,12 +56,8 @@ namespace Shockky.IO
         //TODO: Try-methods? yoloing this right now
         //TODO: Check inlining
 
-        //TODO: V Position { get; set; }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Advance(int count) => Position += count;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AdvanceTo(int offset) => Position = offset;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte ReadByte() => _data[Position++];
@@ -206,6 +206,14 @@ namespace Shockky.IO
 
             return value;
         }
+        public string ReadInternationalString()
+        {
+            //Read 32-bit scalar values
+            byte length = ReadByte();
+            ReadOnlySpan<byte> data = ReadBytes(length * sizeof(int));
+
+            return Encoding.UTF32.GetString(data);
+        }
 
         public Color ReadColor()
         {
@@ -217,6 +225,10 @@ namespace Shockky.IO
             Advance(6);
             return Color.FromArgb(r, g, b);
         }
+        public Point ReadPoint()
+        {
+            return new Point(ReadInt16(), ReadInt16());
+        }
         public Rectangle ReadRect()
         {
             short top = ReadInt16();
@@ -227,13 +239,31 @@ namespace Shockky.IO
             return Rectangle.FromLTRB(left, top, right, bottom);
         }
 
+        public unsafe ChunkItem ReadCompressedChunk(AfterBurnerMapEntry entry)
+        {
+            Span<byte> decompressedData = entry.DecompressedLength <= 1024 ?
+                    stackalloc byte[entry.DecompressedLength] : new byte[entry.DecompressedLength];
+
+            fixed (byte* pBuffer = &_data.Slice(Position + 2)[0]) //Skip ZLib header
+            {
+                using var stream = new UnmanagedMemoryStream(pBuffer, entry.Length - 2);
+                using var deflateStream = new DeflateStream(stream, CompressionMode.Decompress);
+
+                deflateStream.Read(decompressedData);
+            }
+            Advance(entry.Length);
+
+            ShockwaveReader input = new ShockwaveReader(decompressedData, IsBigEndian);
+            return ChunkItem.Read(ref input, entry.Header);
+        }
+
         //TODO: PrefixedReader
         public void PopulateVList<T>(int offset,
             List<T> list, Func<T> reader, bool forceLengthCheck = true)
         {
             if (forceLengthCheck && list.Capacity == 0) return;
 
-            AdvanceTo(offset);
+            Position = offset;
 
             for (int i = 0; i < list.Capacity; i++)
             {
