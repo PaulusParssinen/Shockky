@@ -15,6 +15,8 @@ namespace Shockky.Chunks
         public NameTableChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
+            input.IsBigEndian = true;
+
             Remnants.Enqueue(input.ReadInt32());
             Remnants.Enqueue(input.ReadInt32());
             input.ReadInt32();

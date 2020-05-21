@@ -33,6 +33,8 @@ namespace Shockky.Chunks
         public ConfigChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
+            input.IsBigEndian = true;
+
             input.ReadInt16();
             Version = (DirectorVersion)input.ReadUInt16();
 
@@ -44,14 +46,14 @@ namespace Shockky.Chunks
             Tempo = input.ReadByte(); // == 0 => 20
             Remnants.Enqueue(input.ReadByte()); //LightSwitch
 
-            byte g = input.ReadByte();
-            byte b = input.ReadByte();
+            byte g = input.ReadByte(); //??
+            byte b = input.ReadByte(); //??
 
             Remnants.Enqueue(input.ReadInt16());
-            Remnants.Enqueue(input.ReadInt16());
+            Remnants.Enqueue(input.ReadInt16()); //768 - Seen this one alot in DIRAPI
             Remnants.Enqueue(input.ReadInt16());
 
-            byte r = input.ReadByte();
+            byte r = input.ReadByte(); //??????????
 
             StageBackgroundColor = Color.FromArgb(r, g, b);
 
@@ -78,8 +80,12 @@ namespace Shockky.Chunks
             OldDefaultPalette = input.ReadInt16();
             Remnants.Enqueue(input.ReadInt16());
             Remnants.Enqueue(input.ReadInt32());
+
             DefaultPalette = input.ReadInt32(); //TODO:
-            Remnants.Enqueue(input.ReadInt16());
+            //two int16?? ^^
+
+            Remnants.Enqueue(input.ReadInt16()); //two bytes? - IDA
+
             Remnants.Enqueue(input.ReadInt16());
             DownloadFramesBeforePlaying = input.ReadInt32(); //90
             //Zeros

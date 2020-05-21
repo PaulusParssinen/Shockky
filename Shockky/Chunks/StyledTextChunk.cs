@@ -13,6 +13,8 @@ namespace Shockky.Chunks
         public StyledTextChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
+            input.IsBigEndian = true;
+
             input.ReadInt32();
             int textLength = input.ReadInt32();
             input.ReadInt32();

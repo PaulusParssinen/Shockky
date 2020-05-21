@@ -16,6 +16,8 @@ namespace Shockky.Chunks
         public CastMemberPropertiesChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
+            input.IsBigEndian = true;
+
             Type = (CastType)input.ReadInt32();
             input.ReadInt32();
             int dataLength = input.ReadInt32();

@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-
-using Shockky.IO;
+﻿using Shockky.IO;
 
 namespace Shockky.Chunks
 {
     public class SortOrderChunk : ChunkItem
     {
-        public List<int> Entries { get; set; }
+        public (short unk, short unk2)[] Entries { get; set; } //TODO: castMemRef related. ref => ?
 
         public SortOrderChunk()
             : base(ChunkKind.Sord)
@@ -14,18 +12,20 @@ namespace Shockky.Chunks
         public SortOrderChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadInt32()); //TODO: I think I'm seeing a pattern here 🤔 See: ScriptContextChunk
-            Remnants.Enqueue(input.ReadInt32()); //0 0, count, count, offset, entry length
+            input.IsBigEndian = true;
 
-            Entries = new List<int>(input.ReadInt32());
+            input.ReadInt32();
+            input.ReadInt32();
+
+            Entries = new (short unk, short unk2)[input.ReadInt32()];
             input.ReadInt32();
             
             input.ReadInt16();
-            input.ReadInt16();
+            input.ReadInt16(); //TODO: dir <= 0x500 ? sizeof(short) : sizeof(short) * 2 
 
-            for (int i = 0; i < Entries.Capacity; i++)
+            for (int i = 0; i < Entries.Length; i++)
             {
-                Entries.Add(input.ReadInt32());
+                Entries[i] = (input.ReadInt16(), input.ReadInt16());
             }
         }
 
@@ -40,27 +40,28 @@ namespace Shockky.Chunks
             size += sizeof(short);
             size += sizeof(short);
 
-            size += sizeof(int) * Entries.Count;
+            size += sizeof(short) * 2 * Entries.Length;
             return size;
         }
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
             const short ENTRIES_OFFSET = 20;
-            const short ENTRY_SIZE = sizeof(int);
+            const short ENTRY_SIZE = sizeof(short) + sizeof(short);
 
-            output.Write((int)Remnants.Dequeue());
-            output.Write((int)Remnants.Dequeue());
+            output.Write(0);
+            output.Write(0);
 
-            output.Write(Entries.Count);
-            output.Write(Entries.Count);
+            output.Write(Entries.Length);
+            output.Write(Entries.Length);
 
             output.Write(ENTRIES_OFFSET);
             output.Write(ENTRY_SIZE);
 
-            for (int i = 0; i < Entries.Count; i++)
+            foreach ((short first, short second) in Entries)
             {
-                output.Write(Entries[i]);
+                output.Write(first);
+                output.Write(second);
             }
         }
     }

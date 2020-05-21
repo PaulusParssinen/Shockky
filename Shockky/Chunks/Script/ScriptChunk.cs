@@ -20,6 +20,8 @@ namespace Shockky.Chunks
         public ScriptChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
+            input.IsBigEndian = true;
+
             Remnants.Enqueue(input.ReadInt32());
             Remnants.Enqueue(input.ReadInt32());
 

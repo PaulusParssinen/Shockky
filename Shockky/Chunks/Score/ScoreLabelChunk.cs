@@ -18,6 +18,8 @@ namespace Shockky.Chunks
         public ScoreLabelChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
+            input.IsBigEndian = true;
+
             var offsetMap = new (short frame, int offset)[input.ReadInt16()];
             Labels = new Dictionary<short, string>(offsetMap.Length);
 

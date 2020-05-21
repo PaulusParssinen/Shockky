@@ -18,6 +18,8 @@ namespace Shockky.Chunks
         public MovieCastListChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
+            input.IsBigEndian = true;
+
             Remnants.Enqueue(input.ReadInt32());
             Entries = new List<CastListEntry>(input.ReadInt32());
             Remnants.Enqueue(input.ReadInt16());
