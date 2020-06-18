@@ -160,7 +160,7 @@ namespace Shockky.Sandbox
 
                     if (bitmapProperties == null) continue;
 
-                    string outputFileName = CoerceValidFileName(member?.Common?.Name ?? $"NONAME-" + member.Header.Offset);
+                    string outputFileName = CoerceValidFileName(member?.Common?.Name ?? "NONAME-" + member.Header.Length);
 
                     int paletteIndex = bitmapProperties.Palette - 1; //castMemRef
 
