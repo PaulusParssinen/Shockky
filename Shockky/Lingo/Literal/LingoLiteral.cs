@@ -27,7 +27,7 @@ namespace Shockky.Lingo
         {
             if (Kind != LiteralKind.Integer) 
             {
-                input.AdvanceTo(dataOffset + Offset);
+                input.Position = dataOffset + Offset;
 
                 int length = input.ReadInt32();
                 Value = Kind switch
