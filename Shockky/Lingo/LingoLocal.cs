@@ -8,7 +8,7 @@ namespace Shockky.Lingo
         public int NameIndex { get; set; }
         public string Name => Script.Pool.GetName(NameIndex);
 
-        public LingoLocal(ScriptChunk script)
+        public LingoLocal(LingoScriptChunk script)
             : base(script)
         { }
 

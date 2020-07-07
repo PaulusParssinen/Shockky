@@ -60,15 +60,15 @@ namespace Shockky.Chunks
             ReadOnlySpan<byte> chunkSpan = input.ReadBytes(header.Length);
             ShockwaveReader chunkInput = new ShockwaveReader(chunkSpan, input.IsBigEndian);
 
-            //TODO: set endianness on chunk basis
             return header.Kind switch
             {
+                ChunkKind.RIFX => new FileMetadataChunk(ref chunkInput, header),
+                
                 ChunkKind.Fver => new FileVersionChunk(ref chunkInput, header),
                 ChunkKind.Fcdr => new FileCompressionTypesChunk(ref chunkInput, header),
                 ChunkKind.ABMP => new AfterburnerMapChunk(ref chunkInput, header),
                 ChunkKind.FGEI => new FileGzipEmbeddedImageChunk(header),
                 
-                ChunkKind.RIFX => new FileMetadataChunk(ref chunkInput, header),
                 ChunkKind.imap => new InitialMapChunk(ref chunkInput, header),
                 ChunkKind.mmap => new MemoryMapChunk(ref chunkInput, header),
                 ChunkKind.KEYPtr => new AssociationTableChunk(ref chunkInput, header),
@@ -80,9 +80,9 @@ namespace Shockky.Chunks
                 ChunkKind.VWLB => new ScoreLabelChunk(ref chunkInput, header),
                 ChunkKind.VWFI => new FileInfoChunk(ref chunkInput, header),
                 
-                ChunkKind.LctX => new ScriptContextChunk(ref chunkInput, header),
-                ChunkKind.Lscr => new ScriptChunk(ref chunkInput, header),
-                ChunkKind.Lnam => new NameTableChunk(ref chunkInput, header),
+                ChunkKind.Lnam => new LingoNameChunk(ref chunkInput, header),
+                ChunkKind.Lscr => new LingoScriptChunk(ref chunkInput, header),
+                ChunkKind.LctX => new LingoContextChunk(ref chunkInput, header),
                 
                 ChunkKind.CASPtr => new CastAssociationTableChunk(ref chunkInput, header),
                 ChunkKind.CASt => new CastMemberPropertiesChunk(ref chunkInput, header),
@@ -105,7 +105,7 @@ namespace Shockky.Chunks
                 ChunkKind.FCOL => new FavoriteColorsChunk(ref chunkInput, header),
                 
                 ChunkKind.FXmp => new FontMapChunk(ref chunkInput, header),
-                ChunkKind.BITD => new BitmapChunk(ref chunkInput, header),
+                ChunkKind.BITD => new BitmapDataChunk(ref chunkInput, header),
 
                 _ => new UnknownChunk(ref chunkInput, header),
             };

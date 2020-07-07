@@ -4,11 +4,11 @@ using Shockky.IO;
 
 namespace Shockky.Chunks
 {
-    public class ScriptContextChunk : ChunkItem
+    public class LingoContextChunk : ChunkItem
     {
         private const short SECTION_SIZE = 12;
 
-        public List<ScriptContextSection> Sections { get; set; }
+        public List<LingoContextSection> Sections { get; set; }
 
         public int Type { get; set; }
         public short Flags { get; set; }
@@ -18,16 +18,16 @@ namespace Shockky.Chunks
         public short ValidCount { get; set; }
         public short FreeChunkId { get; set; }
 
-        public ScriptContextChunk()
+        public LingoContextChunk()
             : base(ChunkKind.LctX)
         { }
-        public ScriptContextChunk(ref ShockwaveReader input, ChunkHeader header)
+        public LingoContextChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            Remnants.Enqueue(input.ReadInt32());
-            Remnants.Enqueue(input.ReadInt32());
+            input.ReadInt32();
+            input.ReadInt32();
 
-            Sections = new List<ScriptContextSection>(input.ReadInt32());
+            Sections = new List<LingoContextSection>(input.ReadInt32());
             input.ReadInt32();
             
             short entryOffset = input.ReadInt16();
@@ -39,7 +39,7 @@ namespace Shockky.Chunks
 
             NameListChunkId = input.ReadInt32();
 
-            ValidCount = input.ReadInt16(); //validCount - tremor "length"
+            ValidCount = input.ReadInt16(); 
             Flags = input.ReadInt16(); //TODO: 1, 5
             FreeChunkId = input.ReadInt16();
 
@@ -47,7 +47,7 @@ namespace Shockky.Chunks
 
             for (int i = 0; i < Sections.Capacity; i++)
             {
-                Sections.Add(new ScriptContextSection(ref input));
+                Sections.Add(new LingoContextSection(ref input));
             }
         }
 
@@ -55,8 +55,8 @@ namespace Shockky.Chunks
         {
             const short ENTRY_OFFSET = 48;
 
-            output.Write((int)Remnants.Dequeue());
-            output.Write((int)Remnants.Dequeue());
+            output.Write(0);
+            output.Write(0);
             output.Write(Sections?.Count ?? 0); //TODO:
             output.Write(Sections?.Count ?? 0); //TODO:
 
@@ -73,7 +73,7 @@ namespace Shockky.Chunks
             output.Write(Flags);
             output.Write(FreeChunkId);
 
-            foreach (ScriptContextSection section in Sections)
+            foreach (LingoContextSection section in Sections)
             {
                 section.WriteTo(output);
             }

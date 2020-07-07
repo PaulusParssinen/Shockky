@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Shockky.IO;
 using Shockky.Chunks;
@@ -8,11 +9,6 @@ namespace Shockky.Lingo
     public class LingoHandler : LingoItem
     {
         protected override string DebuggerDisplay => $"on {Name}";
-
-        private readonly int _codeOffset,
-            _argumentsOffset,
-            _localsOffset,
-            _lineOffset;
 
         public List<short> Arguments { get; }
         public List<short> Locals { get; }
@@ -25,7 +21,7 @@ namespace Shockky.Lingo
         
         public LingoHandlerBody Body { get; }
 
-        public LingoHandler(ScriptChunk script)
+        public LingoHandler(LingoScriptChunk script)
             : base(script)
         {
             Arguments = new List<short>();
@@ -33,44 +29,57 @@ namespace Shockky.Lingo
             BytesPerLine = new List<byte>();
         }
 
-        public LingoHandler(ScriptChunk script, ref ShockwaveReader input)
+        public LingoHandler(LingoScriptChunk script, ref ShockwaveReader input)
             : this(script)
         {
             NameIndex = input.ReadInt16();
             HandlerVectorPosition = input.ReadInt16();
 
-            Body = new LingoHandlerBody(this, input);
-            _codeOffset = input.ReadInt32();
+            Body = new LingoHandlerBody(this, ref input);
+            int codeOffset = input.ReadInt32();
 
             Arguments.Capacity = input.ReadInt16();
-            _argumentsOffset = input.ReadInt32();
+            int argumentsOffset = input.ReadInt32();
 
             Locals.Capacity = input.ReadInt16();
-            _localsOffset = input.ReadInt32();
-            
-            short unk1Length = input.ReadInt16();
-            int unk1Offset = input.ReadInt32();
-            
-            int unk2Length = input.ReadInt32();
-            int unk2Offset = input.ReadInt16();
+            int localsOffset = input.ReadInt32();
+
+            input.ReadInt16(); //offset(?)
+            input.ReadInt32(); //length(?)
+
+            input.ReadInt32(); //offset?
+            input.ReadInt16(); //length?
 
             BytesPerLine.Capacity = input.ReadInt16();
-            _lineOffset = input.ReadInt32();
+            int lineOffset = input.ReadInt32();
 
             Body.StackHeight = input.ReadInt32();
-        }
 
-        public void Populate(ref ShockwaveReader input, int scriptChunkOffset)
-        {
-            input.Advance(scriptChunkOffset + _codeOffset);
+            int handlerEndOffset = input.Position;
+
+            input.Position = codeOffset;
             input.ReadBytes(Body.Code);
 
-            //input.PopulateVList(scriptChunkOffset + _argumentsOffset, Arguments, input.ReadInt16);
-            //input.PopulateVList(scriptChunkOffset + _localsOffset, Locals, input.ReadInt16);
-            //input.PopulateVList(scriptChunkOffset + _lineOffset, new List<byte>(), input.ReadByte);
-        }
+            input.Position = argumentsOffset;
+            for (int i = 0; i < Arguments.Capacity; i++)
+            {
+                Arguments.Add(input.ReadInt16());
+            }
 
-        //AddLocal()
+            input.Position = localsOffset;
+            for (int i = 0; i < Locals.Capacity; i++)
+            {
+                Locals.Add(input.ReadInt16());
+            }
+
+            input.Position = lineOffset;
+            for (int i = 0; i < BytesPerLine.Capacity; i++)
+            {
+                BytesPerLine.Add(input.ReadByte());
+            }
+
+            input.Position = handlerEndOffset;
+        }
 
         public override int GetBodySize()
         {
@@ -96,6 +105,8 @@ namespace Shockky.Lingo
 
         public override void WriteTo(ShockwaveWriter output)
         {
+            throw new NotImplementedException();
+
             output.Write(NameIndex);
             output.Write((short)HandlerVectorPosition);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 
 using Shockky.IO;
@@ -8,18 +9,18 @@ namespace Shockky.Lingo
 {
     public class LingoValuePool : ShockwaveItem
     {
-        private NameTableChunk _nameTableChunk;
-        public NameTableChunk NameTableChunk
+        private LingoNameChunk _lingoNameChunk;
+        public LingoNameChunk NameTableChunk
         {
-            get => _nameTableChunk;
+            get => _lingoNameChunk;
             set
             {
-                _nameTableChunk = value;
-                NameList = _nameTableChunk?.Names ?? new List<string>();
+                _lingoNameChunk = value;
+                NameList = _lingoNameChunk?.Names ?? new List<string>();
             }
         }
 
-        public ScriptChunk Script { get; set; }
+        public LingoScriptChunk Script { get; set; }
 
         public List<string> NameList { get; set; }
 
@@ -41,20 +42,18 @@ namespace Shockky.Lingo
             Handlers = new List<LingoHandler>();
             Literals = new List<LingoLiteral>();
         }
-        public LingoValuePool(ScriptChunk script)
+        public LingoValuePool(LingoScriptChunk script)
             : this()
         {
             Script = script;
         }
-        public LingoValuePool(ScriptChunk script, ref ShockwaveReader input)
+        public LingoValuePool(LingoScriptChunk script, ref ShockwaveReader input)
             : this(script)
         {
-            //LingoHandler ReadHandler() => new LingoHandler(script, input);
-            //LingoLiteral ReadLiteral() => new LingoLiteral(input);
-
             HandlerVectors.Capacity = input.ReadInt16();
             int handlerVectorOffset = input.ReadInt32();
-            HandlerVectorFlags = (HandlerVectorFlags)input.ReadBEInt32();
+
+            HandlerVectorFlags = (HandlerVectorFlags)input.ReadInt32();
 
             Properties.Capacity = input.ReadInt16();
             int propertiesOffset = input.ReadInt32();
@@ -71,27 +70,49 @@ namespace Shockky.Lingo
             int literalDataLength = input.ReadInt32();
             int literalDataOffset = input.ReadInt32();
 
-            //TODO: PrefixedReader
-            //input.PopulateVList(script.Header.Offset + propertiesOffset, Properties, input.ReadInt16);
-            //input.PopulateVList(script.Header.Offset + globalsOffset, Globals, input.ReadInt16);
-            //
-            //input.PopulateVList(script.Header.Offset + handlersOffset, Handlers, ReadHandler);
-            //foreach (LingoHandler handler in Handlers)
-            //{
-            //    handler.Populate(input, script.Header.Offset);
-            //}
-            //
-            //input.PopulateVList(script.Header.Offset + literalsOffset, Literals, ReadLiteral);
-            //foreach (LingoLiteral literal in Literals)
-            //{
-            //    literal.ReadValue(input, script.Header.Offset + literalDataOffset);
-            //
-            //    if (script.Header.Offset + literalDataOffset + literalDataLength <= input.Position)
-            //        break;
-            //}
-            //
-            //input.PopulateVList(script.Header.Offset + handlerVectorOffset, HandlerVectors, input.ReadInt16, 
-            //    forceLengthCheck: false);
+            input.Position = propertiesOffset;
+            for (int i = 0; i < Properties.Capacity; i++)
+            {
+                Properties.Add(input.ReadInt16());
+            }
+
+            input.Position = globalsOffset;
+            for (int i = 0; i < Globals.Capacity; i++)
+            {
+                Globals.Add(input.ReadInt16());
+            }
+
+            input.Position = handlersOffset;
+            for (int i = 0; i < Handlers.Capacity; i++)
+            {
+                Handlers.Add(new LingoHandler(script, ref input));
+            }
+
+            input.Position = literalsOffset;
+
+            var literalEntries = new (LiteralKind Kind, int Offset)[Literals.Capacity];
+            for (int i = 0; i < Literals.Capacity; i++)
+            {
+                literalEntries[i].Kind = (LiteralKind)input.ReadInt32();
+                literalEntries[i].Offset = input.ReadInt32();
+            }
+
+            input.Position = literalDataOffset;
+            for (int i = 0; i < Literals.Capacity; i++)
+            {
+                (LiteralKind kind, int offset) = literalEntries[i];
+
+                Literals.Add(LingoLiteral.Read(ref input, kind, literalDataOffset + offset));
+
+                if (literalDataOffset + literalDataLength < input.Position)
+                    throw new IndexOutOfRangeException();
+            }
+
+            input.Position = handlerVectorOffset;
+            for (int i = 0; i < HandlerVectors.Capacity; i++)
+            {
+                HandlerVectors.Add(input.ReadInt16());
+            }
         }
 
         public string GetName(int index)
@@ -106,11 +127,11 @@ namespace Shockky.Lingo
 
         public int AddLiteral(object value, bool recycle = true)
         {
-            LiteralKind kind = Type.GetTypeCode(value?.GetType() ?? null) switch
+            LiteralKind kind = Type.GetTypeCode(value.GetType()) switch
             {
                 TypeCode.String => LiteralKind.String,
                 TypeCode.Int32 => LiteralKind.Integer,
-                TypeCode.Int64 => LiteralKind.FloatingPoint,
+                TypeCode.Double => LiteralKind.FloatingPoint,
 
                 _ => throw new ArgumentException()
             };
@@ -120,7 +141,7 @@ namespace Shockky.Lingo
         
         //TODO: implement ConstantKind?
 
-        public virtual int AddConstant<T>(List<T> constants, T value, bool recycle)
+        public int AddConstant<T>(List<T> constants, T value, bool recycle)
         {
             int index = (recycle ? constants.IndexOf(value) : -1);
             if (index == -1)
@@ -158,7 +179,7 @@ namespace Shockky.Lingo
         public override void WriteTo(ShockwaveWriter output)
         {
             const int HANDLER_SIZE = 46;
-            const int LITERAL_SIZE = 8; //TODO: You know what, I might really switch to the constants lengths afterall
+            const int LITERAL_ENTRY_SIZE = 8; //TODO: You know what, I might really switch to the constants lengths afterall
 
             int entriesOffset = Script.GetHeaderSize() + Script.GetBodySize();
 

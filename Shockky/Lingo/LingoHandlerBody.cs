@@ -14,7 +14,7 @@ namespace Shockky.Lingo
         {
             Handler = handler;
         }
-        public LingoHandlerBody(LingoHandler handler, ShockwaveReader input)
+        public LingoHandlerBody(LingoHandler handler, ref ShockwaveReader input)
             : this(handler)
         {
             Code = new byte[input.ReadInt32()];

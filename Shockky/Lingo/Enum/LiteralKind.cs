@@ -1,8 +1,9 @@
 ﻿namespace Shockky.Lingo
 {
-    public enum LiteralKind
+    public enum LiteralKind : int
     {
-        Unknown = -1,
+        Unknown = 0,
+
         String = 1,
         Integer = 4,
         FloatingPoint = 9,

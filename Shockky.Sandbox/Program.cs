@@ -153,14 +153,14 @@ namespace Shockky.Sandbox
                 }
 
                 //TODO: DIB and others..
-                foreach (var (member, media) in memberMedia.Where(entry => entry.Media?.Kind == ChunkKind.BITD))
+                foreach (var (memberChunk, mediaChunk) in memberMedia.Where(entry => entry.Media?.Kind == ChunkKind.BITD))
                 {
-                    var bitmapChunk = media as BitmapChunk;
-                    var bitmapProperties = member?.Properties as BitmapCastProperties;
+                    var bitmapDataChunk = mediaChunk as BitmapDataChunk;
+                    var bitmapProperties = memberChunk?.Properties as BitmapCastProperties;
 
                     if (bitmapProperties == null) continue;
 
-                    string outputFileName = CoerceValidFileName(member?.Common?.Name ?? "NONAME-" + member.Header.Length);
+                    string outputFileName = CoerceValidFileName(memberChunk?.Common?.Name ?? "NONAME-" + memberChunk.Header.Length);
 
                     int paletteIndex = bitmapProperties.Palette - 1; //castMemRef
 
@@ -174,8 +174,8 @@ namespace Shockky.Sandbox
                         {
                             if (memberMedia.FirstOrDefault(entry => entry.Member == paletteMember).Media is PaletteChunk paletteChunk)
                             {
-                                bitmapChunk.PopulateMedia(bitmapProperties);
-                                if (TryExtractBitmapResource(fileOutputDirectory, outputFileName, bitmapChunk, paletteChunk.Colors))
+                                bitmapDataChunk.PopulateMedia(bitmapProperties);
+                                if (TryExtractBitmapResource(fileOutputDirectory, outputFileName, bitmapDataChunk, paletteChunk.Colors))
                                 {
                                     Console.Write('.');
                                     continue;
@@ -185,8 +185,8 @@ namespace Shockky.Sandbox
                     }
                     else if (systemPalettes.TryGetValue(paletteIndex, out System.Drawing.Color[] palette))
                     {
-                        bitmapChunk.PopulateMedia(bitmapProperties);
-                        if (TryExtractBitmapResource(fileOutputDirectory, outputFileName, bitmapChunk, palette))
+                        bitmapDataChunk.PopulateMedia(bitmapProperties);
+                        if (TryExtractBitmapResource(fileOutputDirectory, outputFileName, bitmapDataChunk, palette))
                         {
                             Console.Write('.');
                             continue;
@@ -201,20 +201,20 @@ namespace Shockky.Sandbox
         }
 
         //TODO: Look more into ImageSharp, could offer some helpful tools to do this
-        private static bool TryExtractBitmapResource(DirectoryInfo outputDirectory, string name, BitmapChunk bitmap, System.Drawing.Color[] palette)
+        private static bool TryExtractBitmapResource(DirectoryInfo outputDirectory, string name, BitmapDataChunk bitmapDataChunk, System.Drawing.Color[] palette)
         {
             //TODO: Properly render flags etc.
 
-            Span<byte> buffer = bitmap.Data.AsSpan();
+            Span<byte> buffer = bitmapDataChunk.Data.AsSpan();
 
-            int width = bitmap.Width < bitmap.TotalWidth ? bitmap.Width : bitmap.TotalWidth;
+            int width = bitmapDataChunk.Width < bitmapDataChunk.TotalWidth ? bitmapDataChunk.Width : bitmapDataChunk.TotalWidth;
 
-            using var image = new Image<Bgra32>(bitmap.Width, bitmap.Height);
-            for (int y = 0; y < bitmap.Height; y++)
+            using var image = new Image<Bgra32>(bitmapDataChunk.Width, bitmapDataChunk.Height);
+            for (int y = 0; y < bitmapDataChunk.Height; y++)
             {
-                Span<byte> row = buffer.Slice(y * bitmap.TotalWidth, bitmap.TotalWidth);
+                Span<byte> row = buffer.Slice(y * bitmapDataChunk.TotalWidth, bitmapDataChunk.TotalWidth);
 
-                if (bitmap.BitDepth == 32) //TODO: Can't get this right yet, probably wrong PixelFormat
+                if (bitmapDataChunk.BitDepth == 32) //TODO: Can't get this right yet, probably wrong PixelFormat
                 {
                     return false;
 
@@ -225,7 +225,7 @@ namespace Shockky.Sandbox
                     //    image[x, y] = pixels[x];
                     //}
                 }
-                else if (bitmap.BitDepth == 4)
+                else if (bitmapDataChunk.BitDepth == 4)
                 {
                     return false;
 

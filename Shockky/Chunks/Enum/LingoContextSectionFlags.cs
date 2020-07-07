@@ -1,6 +1,6 @@
 ﻿namespace Shockky.Chunks
 {
-    public enum ScriptContextSectionFlags : short
+    public enum LingoContextSectionFlags : short
     {
         None,
         Used = 1 << 2

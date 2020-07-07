@@ -5,14 +5,14 @@ using Shockky.IO;
 
 namespace Shockky.Chunks
 {
-    public class NameTableChunk : ChunkItem
+    public class LingoNameChunk : ChunkItem
     {
         public List<string> Names { get; set; }
 
-        public NameTableChunk()
+        public LingoNameChunk()
             : base(ChunkKind.Lnam)
         { }
-        public NameTableChunk(ref ShockwaveReader input, ChunkHeader header)
+        public LingoNameChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
             input.IsBigEndian = true;
@@ -30,7 +30,7 @@ namespace Shockky.Chunks
 
             for (int i = 0; i < Names.Capacity; i++)
             {
-                Names.Add(new string(input.ReadString()));
+                Names.Add(input.ReadString());
             }
         }
 

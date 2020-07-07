@@ -1,21 +1,14 @@
-﻿using System;
-
-using Shockky.Chunks;
+﻿using Shockky.Chunks;
 
 namespace Shockky.Lingo
 {
     public abstract class LingoItem : ShockwaveItem
     {
-        public ScriptChunk Script { get; }
+        public LingoScriptChunk Script { get; }
 
-        protected LingoItem(ScriptChunk script)
+        protected LingoItem(LingoScriptChunk script)
         {
             Script = script;
-        }
-        
-        public virtual string ToLingo()
-        {
-            throw new NotSupportedException();
         }
     }
 }

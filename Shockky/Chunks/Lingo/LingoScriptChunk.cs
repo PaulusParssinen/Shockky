@@ -5,7 +5,7 @@ using Shockky.Lingo;
 
 namespace Shockky.Chunks
 {
-    public class ScriptChunk : ChunkItem
+    public class LingoScriptChunk : ChunkItem
     {
         public LingoValuePool Pool { get; }
 
@@ -14,10 +14,10 @@ namespace Shockky.Chunks
 
         public List<LingoHandler> Handlers => Pool.Handlers;
 
-        public ScriptChunk()
+        public LingoScriptChunk()
             : base(ChunkKind.Lscr)
         { }
-        public ScriptChunk(ref ShockwaveReader input, ChunkHeader header)
+        public LingoScriptChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
             input.IsBigEndian = true;
