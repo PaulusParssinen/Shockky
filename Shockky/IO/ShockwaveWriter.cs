@@ -11,15 +11,15 @@ namespace Shockky.IO
     public ref struct ShockwaveWriter
     {
         private int _position;
-        private readonly bool _bigEndian;
+        private readonly bool _isBigEndian;
 
-        private Span<byte> _data;
+        private readonly Span<byte> _data;
 
-        public ShockwaveWriter(Span<byte> data, bool bigEndian)
+        public ShockwaveWriter(Span<byte> data, bool isBigEndian)
         {
             _data = data;
             _position = 0;
-            _bigEndian = bigEndian;
+            _isBigEndian = isBigEndian;
         }
 
         //TODO: Measure, with and without inlining
@@ -28,13 +28,14 @@ namespace Shockky.IO
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(byte value) => _data[_position++] = value;
+
         public void Write(ReadOnlySpan<byte> value)
         {
             value.CopyTo(_data.Slice(_position));
             _position += value.Length;
         }
 
-        //TODO: Branchless Unsafe.As<bool, byte>(ref val) & MemoryMarshal: CreateReadOnlyspan ref val => AsBytes => ..[0] 
+        //TODO: Verify behaviour on different archs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(bool value) 
         {
@@ -43,7 +44,7 @@ namespace Shockky.IO
 
         public void Write(short value)
         {
-            if (_bigEndian)
+            if (_isBigEndian)
             {
                 value = BinaryPrimitives.ReverseEndianness(value);
             }
@@ -53,7 +54,7 @@ namespace Shockky.IO
         }
         public void WriteBE(short value)
         {
-            if (!_bigEndian)
+            if (!_isBigEndian)
             {
                 value = BinaryPrimitives.ReverseEndianness(value);
             }
@@ -64,7 +65,7 @@ namespace Shockky.IO
 
         public void Write(ushort value)
         {
-            if (_bigEndian)
+            if (_isBigEndian)
             {
                 value = BinaryPrimitives.ReverseEndianness(value);
             }
@@ -74,7 +75,7 @@ namespace Shockky.IO
         }
         public void WriteBE(ushort value)
         {
-            if (!_bigEndian)
+            if (!_isBigEndian)
             {
                 value = BinaryPrimitives.ReverseEndianness(value);
             }
@@ -85,7 +86,7 @@ namespace Shockky.IO
 
         public void Write(int value)
         {
-            if (_bigEndian)
+            if (_isBigEndian)
             {
                 value = BinaryPrimitives.ReverseEndianness(value);
             }
@@ -95,7 +96,7 @@ namespace Shockky.IO
         }
         public void WriteBE(int value)
         {
-            if (!_bigEndian)
+            if (!_isBigEndian)
             {
                 value = BinaryPrimitives.ReverseEndianness(value);
             }
@@ -106,7 +107,7 @@ namespace Shockky.IO
 
         public void Write(uint value)
         {
-            if (_bigEndian)
+            if (_isBigEndian)
             {
                 value = BinaryPrimitives.ReverseEndianness(value);
             }
@@ -116,7 +117,7 @@ namespace Shockky.IO
         }
         public void WriteBE(uint value)
         {
-            if (!_bigEndian)
+            if (!_isBigEndian)
             {
                 value = BinaryPrimitives.ReverseEndianness(value);
             }
@@ -125,24 +126,38 @@ namespace Shockky.IO
             _position += sizeof(uint);
         }
 
-        //TODO: Verify the impl accuracy
-        public void Write7BitEncodedInt(int value)
+        public void WriteVarInt(int value)
         {
-            uint v = (uint)value;
-            while (v >= 0x80)
+            int size = GetVarIntSize(value);
+            int pos = size - 1;
+
+            Span<byte> buffer = _data.Slice(_position, size);
+            buffer[pos] = (byte)(value & 0x7F);
+
+            while ((value >>= 7) != 0)
             {
-                Write((byte)(v | 0x80));
-                v >>= 7;
+                buffer[--pos] = (byte)(0x80 | (value & 0x7F));
             }
-            Write((byte)v);
+            _position += size;
         }
 
-        //TODO: Measure Encoding performances
-        //TODO: Increment inside accessor vs. later: _position += len + 1
+        public static int GetVarIntSize(int number)
+        {
+            //TODO: C# 9.0 - Relational match pattern
+            if (number > 268435455)
+                return 5;
+            if (number > 2097151)
+                return 4;
+            if (number > 16383)
+                return 3;
+            if (number > 127)
+                return 2;
+            return 1;
+        }
+
         public void Write(ReadOnlySpan<char> value)
         {
-            //Write((byte)value.Length)
-            _data[_position++] = (byte)value.Length;
+            WriteVarInt(value.Length);
 
             int len = Encoding.UTF8.GetBytes(value, _data.Slice(_position));
             _position += len;
@@ -150,7 +165,7 @@ namespace Shockky.IO
         public void WriteNullString(ReadOnlySpan<char> value)
         {
             int len = Encoding.UTF8.GetBytes(value, _data.Slice(_position));
-            _data[_position + len] = (byte)0;
+            _data[_position + len] = 0;
 
             _position += len + 1;
         }

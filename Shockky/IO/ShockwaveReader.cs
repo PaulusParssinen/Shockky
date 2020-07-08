@@ -28,6 +28,7 @@ namespace Shockky.IO
         public ShockwaveReader(ReadOnlySpan<byte> data, bool isBigEndian = false)
         {
             _data = data;
+
             Position = 0;
             IsBigEndian = isBigEndian;
         }
@@ -169,24 +170,23 @@ namespace Shockky.IO
             return value;
         }
 
-        public int Read7BitEncodedInt()
+        public int ReadVarInt()
         {
-            int result = 0;
-            byte lastByte;
+            int value = 0;
+            byte b;
             do
             {
-                lastByte = ReadByte();
-                result |= lastByte & 0x7F;
-                result <<= 7;
+                b = ReadByte();
+                value = (value << 7) + (b & 0x7F);
             }
-            while ((lastByte & 0x80) >> 7 == 1);
-            return result >> 7;
+            while (b >> 7 != 0);
+            return value;
         }
-        
+
         // TODO: Check inlining. Compare Encoding path perfs. aand how implicit casts to ROS<char> work out in IL
         public string ReadString()
         {
-            byte length = ReadByte();
+            int length = ReadVarInt();
             return Encoding.UTF8.GetString(ReadBytes(length));
         }
         public string ReadString(int length)

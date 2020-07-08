@@ -15,18 +15,17 @@ namespace Shockky.IO
             IsBigEndian = isBigEndian;
         }
 
-        public new int Read7BitEncodedInt()
+        public int ReadVarInt()
         {
-            int result = 0;
-            byte lastByte;
+            int value = 0;
+            byte b;
             do
             {
-                lastByte = ReadByte();
-                result |= lastByte & 0x7F;
-                result <<= 7;
+                b = ReadByte();
+                value = (value << 7) + (b & 0x7F);
             }
-            while ((lastByte & 0x80) >> 7 == 1);
-            return result >> 7;
+            while (b >> 7 != 0);
+            return value;
         }
 
         public string ReadNullString()

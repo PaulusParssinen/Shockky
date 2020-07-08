@@ -34,21 +34,25 @@ namespace Shockky.Chunks
             : this((ChunkKind)input.ReadBEInt32())
         {
             Length = IsVariableLength ? 
-                input.Read7BitEncodedInt() : input.ReadBEInt32();
+                input.ReadVarInt() : input.ReadBEInt32();
         }
 
         public override int GetBodySize()
         {
             int size = 0;
             size += sizeof(int);
-            size += sizeof(int); //TODO: VariableLength => GetByteCount() or somethingg
+            size += IsVariableLength ? ShockwaveWriter.GetVarIntSize(Length) : sizeof(int);
             return size;
         }
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.Write((int)Kind);
-            output.WriteBE(Length); //TODO: VariableLength
+            output.WriteBE((int)Kind);
+            if (IsVariableLength)
+            {
+                output.WriteVarInt(Length);
+            }
+            else output.WriteBE(Length);
         }
     }
 }

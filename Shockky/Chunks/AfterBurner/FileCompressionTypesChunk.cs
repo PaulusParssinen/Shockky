@@ -20,7 +20,7 @@ namespace Shockky.Chunks
         public FileCompressionTypesChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            using var decompressedInput = CreateDeflateReader(ref input);
+            using DeflateShockwaveReader decompressedInput = CreateDeflateReader(ref input);
 
             CompressionTypeId = decompressedInput.ReadInt16();
             ImageQuality = decompressedInput.ReadInt32();

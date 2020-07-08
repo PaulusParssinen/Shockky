@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 using Shockky.IO;
 
@@ -16,17 +15,15 @@ namespace Shockky.Chunks
         public int DecompressedLength { get; set; }
         public int CompressionType { get; set; }
 
-        public bool IsCompressed => (CompressionType == 0); 
+        public bool IsCompressed => (CompressionType == 0);
 
         public AfterBurnerMapEntry(DeflateShockwaveReader input)
         {
-            Id = input.Read7BitEncodedInt();
-            Offset = input.Read7BitEncodedInt();
-            Length = input.Read7BitEncodedInt();
-            DecompressedLength = input.Read7BitEncodedInt();
-            CompressionType = input.Read7BitEncodedInt();
-
-            Debug.Assert(CompressionType == 1 || CompressionType == 0);
+            Id = input.ReadVarInt();
+            Offset = input.ReadVarInt();
+            Length = input.ReadVarInt();
+            DecompressedLength = input.ReadVarInt();
+            CompressionType = input.ReadVarInt();
 
             Header = new ChunkHeader((ChunkKind)input.ReadBEInt32())
             {
@@ -36,17 +33,23 @@ namespace Shockky.Chunks
 
         public override int GetBodySize()
         {
-            throw new NotSupportedException();
+            int size = 0;
+            size += ShockwaveWriter.GetVarIntSize(Id);
+            size += ShockwaveWriter.GetVarIntSize(Offset);
+            size += ShockwaveWriter.GetVarIntSize(Length);
+            size += ShockwaveWriter.GetVarIntSize(DecompressedLength);
+            size += ShockwaveWriter.GetVarIntSize(CompressionType);
+            size += sizeof(int);
+            return size;
         }
 
         public override void WriteTo(ShockwaveWriter output)
         {
-            output.Write7BitEncodedInt(Id);
-            output.Write7BitEncodedInt(Offset);
-            output.Write7BitEncodedInt(Length);
-            output.Write7BitEncodedInt(DecompressedLength);
-            output.Write7BitEncodedInt(CompressionType);
-
+            output.WriteVarInt(Id);
+            output.WriteVarInt(Offset);
+            output.WriteVarInt(Length);
+            output.WriteVarInt(DecompressedLength);
+            output.WriteVarInt(CompressionType);
             output.WriteBE((int)Header.Kind);
         }
     }

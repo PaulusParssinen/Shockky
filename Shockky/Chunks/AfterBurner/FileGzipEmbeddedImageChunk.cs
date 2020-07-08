@@ -52,7 +52,7 @@ namespace Shockky.Chunks
 
             while (ilsReader.IsDataAvailable)
             {
-                int id = ilsReader.Read7BitEncodedInt();
+                int id = ilsReader.ReadVarInt();
 
                 AfterBurnerMapEntry entry = entries.FirstOrDefault(e => e.Id == id); //TODO: Chunk entries as dictionary
                 if (entry == null) break;

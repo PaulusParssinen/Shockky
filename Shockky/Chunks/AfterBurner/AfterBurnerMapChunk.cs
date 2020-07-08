@@ -13,13 +13,13 @@ namespace Shockky.Chunks
             : base(header)
         {
             input.ReadByte();
-            Remnants.Enqueue(input.Read7BitEncodedInt());
+            Remnants.Enqueue(input.ReadVarInt());
 
-            using var deflaterInput = CreateDeflateReader(ref input);
-            Remnants.Enqueue(deflaterInput.Read7BitEncodedInt());
-            Remnants.Enqueue(deflaterInput.Read7BitEncodedInt());
+            using DeflateShockwaveReader deflaterInput = CreateDeflateReader(ref input);
+            Remnants.Enqueue(deflaterInput.ReadVarInt());
+            Remnants.Enqueue(deflaterInput.ReadVarInt());
 
-            Entries = new AfterBurnerMapEntry[deflaterInput.Read7BitEncodedInt()];
+            Entries = new AfterBurnerMapEntry[deflaterInput.ReadVarInt()];
             for (int i = 0; i < Entries.Length; i++)
             {
                 Entries[i] = new AfterBurnerMapEntry(deflaterInput);
@@ -29,12 +29,12 @@ namespace Shockky.Chunks
         public override void WriteBodyTo(ShockwaveWriter output)
         {
             output.Write((byte)0);
-            output.Write7BitEncodedInt((int)Remnants.Dequeue());
+            output.WriteVarInt((int)Remnants.Dequeue());
             //TODO: Wrap dat compressor
-            output.Write7BitEncodedInt((int)Remnants.Dequeue());
-            output.Write7BitEncodedInt((int)Remnants.Dequeue());
+            output.WriteVarInt((int)Remnants.Dequeue());
+            output.WriteVarInt((int)Remnants.Dequeue());
 
-            output.Write7BitEncodedInt(Entries.Length);
+            output.WriteVarInt(Entries.Length);
             foreach (var entry in Entries)
             {
                 entry.WriteTo(output);
