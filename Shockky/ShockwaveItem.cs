@@ -13,7 +13,7 @@ namespace Shockky
 
         public byte[] ToArray()
         {
-            var arrayWriter = new ArrayBufferWriter<byte>();
+            var arrayWriter = new ArrayBufferWriter<byte>(GetBodySize());
             WriteTo(arrayWriter);
 
             return arrayWriter.WrittenSpan.ToArray();
@@ -22,7 +22,7 @@ namespace Shockky
         public void WriteTo(IBufferWriter<byte> output)
         {
             int size = GetBodySize();
-            var writer = new ShockwaveWriter(output.GetSpan(size), bigEndian: true); //TODO: How do we manage endianness when writing files
+            var writer = new ShockwaveWriter(output.GetSpan(size), isBigEndian: true); //TODO: Endianness
             
             WriteTo(writer);
             output.Advance(size);
