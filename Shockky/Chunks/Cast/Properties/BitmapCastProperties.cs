@@ -4,7 +4,7 @@ using Shockky.IO;
 
 namespace Shockky.Chunks.Cast
 {
-    public class BitmapCastProperties : ICastProperties
+    public class BitmapCastProperties : ShockwaveItem, ICastProperties
     {
         public int TotalWidth { get; set; }
 
@@ -47,7 +47,7 @@ namespace Shockky.Chunks.Cast
                 Palette &= 0x7FFF;
         }
         
-        public int GetBodySize()
+        public override int GetBodySize()
         {
             int size = 0;
             size += sizeof(short);
@@ -65,7 +65,7 @@ namespace Shockky.Chunks.Cast
             return size;
         }
 
-        public void WriteTo(ShockwaveWriter output)
+        public override void WriteTo(ShockwaveWriter output)
         {
             output.Write((ushort)TotalWidth | 0x8000); 
 

@@ -44,9 +44,10 @@ namespace Shockky.Chunks
                 case CastType.Movie:
                 case CastType.DigitalVideo:
                     return new VideoCastProperties(ref input);
-                case CastType.Button:
                 case CastType.Text:
                     return new TextCastProperties(ref input);
+                case CastType.Button:
+                    return new ButtonCastProperties(ref input);
                 case CastType.Script:
                     return new ScriptCastProperties(ref input);
                 default:

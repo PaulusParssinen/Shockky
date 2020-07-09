@@ -2,8 +2,8 @@
 {
     public enum TextAlignment
     {
-        Center,
-        Left,
-        Right
+        Right = -1,
+        Left = 0,
+        Center = 1
     }
 }
