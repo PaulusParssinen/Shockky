@@ -14,7 +14,7 @@
         public virtual void VisitVariableReferenceInstruction(VariableReference variableReference) => Default(variableReference);
         public virtual void VisitVariableAssignmentInstruction(VariableAssignment variableAssignment) => Default(variableAssignment);
 
-        public virtual void VisitIfTrueInstruction(IfTrueIns ifTrue) => Default(ifTrue);
+        public virtual void VisitIfTrueInstruction(IfFalseIns ifFalse) => Default(ifFalse);
         public virtual void VisitSymbolInstruction(PushSymbolIns symbol) => Default(symbol);
         public virtual void VisitWrapListInstrution(WrapListIns wrapList) => Default(wrapList);
         public virtual void VisitNewPropertyListInstruction(NewPropListIns newPropList) => Default(newPropList);
@@ -44,7 +44,7 @@
         public virtual void VisitVariableReferenceInstruction(VariableReference variableReference, TContext context) => Default(variableReference, context);
         public virtual void VisitVariableAssignmentInstruction(VariableAssignment variableAssignment, TContext context) => Default(variableAssignment, context);
 
-        public virtual void VisitIfTrueInstruction(IfTrueIns ifTrue, TContext context) => Default(ifTrue, context);
+        public virtual void VisitIfFalseInstruction(IfFalseIns ifFalse, TContext context) => Default(ifFalse, context);
         public virtual void VisitSymbolInstruction(PushSymbolIns symbol, TContext context) => Default(symbol, context);
         public virtual void VisitWrapListInstrution(WrapListIns wrapList, TContext context) => Default(wrapList, context);
         public virtual void VisitNewPropertyListInstruction(NewPropListIns newPropList, TContext context) => Default(newPropList, context);
@@ -74,7 +74,7 @@
         public virtual T VisitVariableReferenceInstruction(VariableReference variableReference, TContext context) => Default(variableReference, context);
         public virtual T VisitVariableAssignmentInstruction(VariableAssignment variableAssignment, TContext context) => Default(variableAssignment, context);
 
-        public virtual T VisitIfTrueInstruction(IfTrueIns ifTrue, TContext context) => Default(ifTrue, context);
+        public virtual T VisitIfFalseInstruction(IfFalseIns ifFalse, TContext context) => Default(ifFalse, context);
         public virtual T VisitSymbolInstruction(PushSymbolIns symbol, TContext context) => Default(symbol, context);
         public virtual T VisitWrapListInstrution(WrapListIns wrapList, TContext context) => Default(wrapList, context);
         public virtual T VisitNewPropertyListInstruction(NewPropListIns newPropList, TContext context) => Default(newPropList, context);

@@ -3,6 +3,7 @@
     public enum OPCode : byte
     {
         Return = 0x01,
+        //TODO: 0x02 has been spotted as another return instruction - ScummVM
         PushInt0 = 0x03,
         Multiple,
         Add,
@@ -37,7 +38,6 @@
         ExecuteJavascript = 0x26,
 
         //Multi
-
         PushInt = 0x41,
         NewArgList,
         NewList,
@@ -56,7 +56,7 @@
         SetLocal,
         Jump,
         EndRepeat,
-        IfTrue, //AVM2 spec would call this IfFalse
+        IfFalse,
         CallLocal,
         CallExternal,
         CallObjOld, //?
@@ -65,14 +65,15 @@
         DeleteString,
         Get,
         Set,
-        GetMovieProp = 0x5f,
+        Op_5d,
+        GetMovieProp,
         SetMovieProp,
         GetObjProp,
         SetObjProp,
-        Op_63,
+        Op_63, //seems to be scoped call
         Dup,
         Pop,
-        GetMovieInfo,
+        GetMovieInfo, //"push path"
         CallObj,
         Op_6d = 0x6d,
         PushInt2,

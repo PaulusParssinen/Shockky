@@ -18,13 +18,13 @@
 
         public abstract bool? RunCondition(LingoMachine machine);
 
-        public static bool IsConditional(OPCode op) => (op == OPCode.IfTrue);
+        public static bool IsConditional(OPCode op) => (op == OPCode.IfFalse);
 
         public static bool IsValid(OPCode op)
         {
             switch (op)
             {
-                case OPCode.IfTrue:
+                case OPCode.IfFalse:
                 case OPCode.Jump:
                 case OPCode.EndRepeat:
                     return true;

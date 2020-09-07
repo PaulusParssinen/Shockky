@@ -143,7 +143,7 @@ namespace Shockky.Lingo.Instructions
                 OPCode.SetLocal => new SetLocalIns(handler, operandValue),
                 OPCode.Jump => new JumpIns(handler, operandValue),
                 OPCode.EndRepeat => new EndRepeatIns(handler, operandValue),
-                OPCode.IfTrue => new IfTrueIns(handler, operandValue),
+                OPCode.IfFalse => new IfFalseIns(handler, operandValue),
                 OPCode.CallLocal => new CallLocalIns(handler, operandValue),
                 OPCode.CallExternal => new CallExternalIns(handler, operandValue),
                 //OPCode.CallObjOld:

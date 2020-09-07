@@ -1,12 +1,12 @@
 ﻿namespace Shockky.Lingo.Instructions
 {
-    public class IfTrueIns : Jumper
+    public class IfFalseIns : Jumper
     {
-        public IfTrueIns()
-            : base(OPCode.IfTrue)
+        public IfFalseIns()
+            : base(OPCode.IfFalse)
         { }
-        public IfTrueIns(LingoHandler handler, int offset)
-            : base(OPCode.IfTrue, handler, offset)
+        public IfFalseIns(LingoHandler handler, int offset)
+            : base(OPCode.IfFalse, handler, offset)
         { }
 
         public override void AcceptVisitor(InstructionVisitor visitor)
@@ -15,7 +15,7 @@
         }
         public override T AcceptVisitor<TContext, T>(InstructionVisitor<TContext, T> visitor, TContext context)
         {
-            return visitor.VisitIfTrueInstruction(this, context);
+            return visitor.VisitIfFalseInstruction(this, context);
         }
 
         public override bool? RunCondition(LingoMachine machine)

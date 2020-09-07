@@ -132,7 +132,7 @@ namespace Shockky.Lingo.Syntax
             return null;
         }
 
-        public override Statement VisitIfTrueInstruction(IfTrueIns ifTrue, Stack<Expression> expressionStack)
+        public override Statement VisitIfFalseInstruction(IfFalseIns ifTrue, Stack<Expression> expressionStack)
         {
             throw new NotImplementedException("Control Flow handling is still under construction.");
 
