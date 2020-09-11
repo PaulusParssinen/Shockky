@@ -12,8 +12,9 @@ namespace Shockky.Chunks.Cast
         public byte ForegroundColor { get; set; }
         public byte BackgroundColor { get; set; }
         public bool IsFilled { get; set; }
-        public int LineSize { get; set; }
-        public int LineDirection { get; set; }
+        public InkType Ink { get; set; }
+        public byte LineSize { get; set; }
+        public byte LineDirection { get; set; }
 
         public ShapeCastProperties()
         { }
@@ -25,9 +26,13 @@ namespace Shockky.Chunks.Cast
             Pattern = input.ReadInt16();
             ForegroundColor = input.ReadByte();
             BackgroundColor = input.ReadByte();
-            IsFilled = input.ReadBoolean(); //TODO:
-            LineSize = input.ReadByte(); //-1
-            LineDirection = input.ReadByte(); //-5
+
+            byte flags = input.ReadByte(); //TODO:
+            IsFilled = (flags << 1) == 1;
+            Ink = (InkType)(flags & 0x3F);
+
+            LineSize = (byte)(input.ReadByte() - 1);
+            LineDirection = (byte)(input.ReadByte() - 5);
         }
 
         public override int GetBodySize()
@@ -53,9 +58,9 @@ namespace Shockky.Chunks.Cast
             output.Write(ForegroundColor);
             output.Write(BackgroundColor);
 
-            output.Write(IsFilled);
-            output.Write(LineSize);
-            output.Write(LineDirection);
+            output.Write((byte)(IsFilled ? 1 : 0)); //TODO:
+            output.Write((byte)(LineSize + 1));
+            output.Write((byte)(LineDirection + 5));
         }
     }
 }
