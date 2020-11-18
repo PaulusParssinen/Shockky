@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,7 +10,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta*" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.2" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-*" />
   </ItemGroup>
 
