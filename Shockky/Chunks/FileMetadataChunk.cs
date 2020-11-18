@@ -8,7 +8,7 @@ namespace Shockky.Chunks
     {
         public CodecKind Codec { get; set; }
 
-        public int FileLength => IsBigEndian ? BinaryPrimitives.ReverseEndianness(Header.Length) : Header.Length;
+        public int FileLength => Header.Length;
         public bool IsBigEndian => (Kind == ChunkKind.XFIR);
 
         public FileMetadataChunk()
@@ -16,7 +16,10 @@ namespace Shockky.Chunks
         { }
         public FileMetadataChunk(ref ShockwaveReader input)
             : this(ref input, new ChunkHeader(ref input))
-        { }
+        {
+            Header.Length = IsBigEndian ? 
+                BinaryPrimitives.ReverseEndianness(Header.Length) : Header.Length;
+        }
         public FileMetadataChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
