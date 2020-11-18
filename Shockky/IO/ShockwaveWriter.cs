@@ -141,18 +141,16 @@ namespace Shockky.IO
             _position += size;
         }
 
-        public static int GetVarIntSize(int number)
+        public static int GetVarIntSize(int value)
         {
-            //TODO: C# 9.0 - Relational match pattern
-            if (number > 268435455)
-                return 5;
-            if (number > 2097151)
-                return 4;
-            if (number > 16383)
-                return 3;
-            if (number > 127)
-                return 2;
-            return 1;
+            return value switch
+            {
+                < 0x80 => 1,
+                < 0x4000 => 2,
+                < 0x200000 => 3,
+                < 0x10000000 => 4,
+                _ => 5,
+            };
         }
 
         public void Write(ReadOnlySpan<char> value)
