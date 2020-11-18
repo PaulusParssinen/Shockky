@@ -49,11 +49,8 @@ namespace Shockky.Chunks
         }
         public static ChunkItem Read(ref ShockwaveReader input, AfterBurnerMapEntry entry)
         {
-            if (entry.IsCompressed)
-            {
-                return input.ReadCompressedChunk(entry);
-            }
-            else return Read(ref input, entry.Header);
+            return entry.IsCompressed ? input.ReadCompressedChunk(entry) : 
+                Read(ref input, entry.Header);
         }
         public static ChunkItem Read(ref ShockwaveReader input, ChunkHeader header)
         {
@@ -75,13 +72,14 @@ namespace Shockky.Chunks
 
                 ChunkKind.VWCF => new ConfigChunk(ref chunkInput, header),
                 ChunkKind.DRCF => new ConfigChunk(ref chunkInput, header),
-                
+
                 //ChunkKind.VWSC => new ScoreChunk(ref chunkInput, header),
                 ChunkKind.VWLB => new ScoreLabelChunk(ref chunkInput, header),
                 ChunkKind.VWFI => new FileInfoChunk(ref chunkInput, header),
                 
                 ChunkKind.Lnam => new LingoNameChunk(ref chunkInput, header),
                 ChunkKind.Lscr => new LingoScriptChunk(ref chunkInput, header),
+                ChunkKind.Lctx => new LingoContextChunk(ref chunkInput, header), //TODO: StackHeight and other differences.
                 ChunkKind.LctX => new LingoContextChunk(ref chunkInput, header),
                 
                 ChunkKind.CASPtr => new CastAssociationTableChunk(ref chunkInput, header),

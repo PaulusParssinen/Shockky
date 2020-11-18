@@ -21,47 +21,20 @@ namespace Shockky.Chunks
         public FileInfoChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
-            /*
-             * def parseSubstrings(self, data, hasHeader=True):
-		if hasHeader:
-			ci_offset = read32(data)
-			unk2 = read32(data) # not int!
-			unk3 = read32(data) # not int!
-			entryType = read32(data)
-			data.seek(ci_offset)
-		else:
-			unk2 = 0
-			unk3 = 0
-			entryType = 0
+            input.IsBigEndian = true;
 
-		count = read16(data) + 1
-		entries = []
-		for i in range(count):
-			entries.append(read32(data))
-		rawdata = data.read(entries[-1])
-		assert entries[0] == 0
-		assert entries[-1] == len(rawdata)
-
-		strings = []
-		for i in range(count-1):
-			strings.append(rawdata[entries[i]:entries[i+1]])
-
-		return (strings, unk2, unk3, entryType)
-
-             * 
-             * */
-
+            //TODO: VList
             BitField = input.ReadBytes(input.ReadInt32()).ToArray();
-
+            
 	        Offsets = new List<int>(input.ReadInt16());
-
+            
             input.ReadByte();
-
+            
             for (short i = 0; i < Offsets.Capacity; i++)
             {
                 Offsets.Add(input.ReadInt32());
             }
-
+            
             input.ReadByte();
             CreatedBy = input.ReadString();
             input.ReadByte();

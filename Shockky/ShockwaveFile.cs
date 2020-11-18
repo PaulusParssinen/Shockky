@@ -17,13 +17,14 @@ namespace Shockky
         public DirectorVersion Version { get; set; }
         public FileMetadataChunk Metadata { get; set; }
 
+#nullable enable
         public ChunkItem? this[int id]
         {
             get
             {
-                Chunks.TryGetValue(id, out ChunkItem chunk);
+                Chunks.TryGetValue(id, out var chunk);
                 return chunk;
-            }
+            } 
         }
 
         public ShockwaveFile()
@@ -60,29 +61,33 @@ namespace Shockky
             }
             else if (Metadata.Codec == CodecKind.MV93)
             {
-                var imapChunk = ChunkItem.Read(ref input) as InitialMapChunk;
-                Version = imapChunk.Version;
-
-                foreach (int offset in imapChunk.MemoryMapOffsets)
+                if (ChunkItem.Read(ref input) is InitialMapChunk initialMap)
                 {
-                    input.Position = offset;
-                    if (ChunkItem.Read(ref input) is MemoryMapChunk mmapChunk)
+                    Version = initialMap.Version;
+
+                    foreach (int offset in initialMap.MemoryMapOffsets)
                     {
-                        foreach (ChunkEntry entry in mmapChunk.Entries)
+                        input.Position = offset;
+                        if (ChunkItem.Read(ref input) is MemoryMapChunk memoryMap)
                         {
-                            if (entry.Header.Kind == ChunkKind.RIFX) continue; //TODO: HACK
-
-                            if (entry.Flags.HasFlag(ChunkEntryFlags.Ignore))
+                            foreach (ChunkEntry entry in memoryMap.Entries)
                             {
-                                Chunks.Add(entry.Id, new UnknownChunk(ref input, entry.Header));
-                                continue;
-                            }
+                                if (entry.Header.Kind == ChunkKind.RIFX) continue; //TODO: HACK
 
-                            input.Position = entry.Offset;
-                            Chunks.Add(entry.Id, ChunkItem.Read(ref input));
+                                if (entry.Flags.HasFlag(ChunkEntryFlags.Ignore))
+                                {
+                                    Chunks.Add(entry.Id, new UnknownChunk(ref input, entry.Header));
+                                    continue;
+                                }
+
+                                input.Position = entry.Offset;
+                                Chunks.Add(entry.Id, ChunkItem.Read(ref input));
+                            }
                         }
+                        else throw new InvalidDataException($"Failed to read {nameof(MemoryMapChunk)} at offset {offset}.");
                     }
                 }
+                else throw new InvalidDataException($"Failed to read {nameof(InitialMapChunk)}");
             }
 
             //TODO:

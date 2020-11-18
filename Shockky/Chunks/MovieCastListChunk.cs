@@ -20,7 +20,7 @@ namespace Shockky.Chunks
         {
             input.IsBigEndian = true;
 
-            Remnants.Enqueue(input.ReadInt32());
+            input.ReadInt32();
             Entries = new List<CastListEntry>(input.ReadInt32());
             Remnants.Enqueue(input.ReadInt16());
 
@@ -39,7 +39,7 @@ namespace Shockky.Chunks
 
         public override void WriteBodyTo(ShockwaveWriter output)
         {
-            output.Write((int)Remnants.Dequeue());
+            output.Write(ENTRY_SIZE);
             output.Write(Entries.Count);
             output.Write((int)Remnants.Dequeue());
 
@@ -63,9 +63,9 @@ namespace Shockky.Chunks
             size += sizeof(int);
             size += sizeof(short);
             size += sizeof(int);
-            size += (Unknowns.Length * sizeof(int));
+            size += Unknowns.Length * sizeof(int);
             size += sizeof(int);
-            size += (Entries.Count * ENTRY_SIZE);
+            size += Entries.Count * ENTRY_SIZE;
             return size;
         }
     }

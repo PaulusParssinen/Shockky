@@ -22,7 +22,6 @@
         DRCF = 0x44524346,
         VWCF = 0x56574346,
 
-        // Afterburner
         Fver = 0x46766572,
         Fcdr = 0x46636472,
         ABMP = 0x41424D50,
@@ -44,8 +43,8 @@
         Cinf = 0x43696E66,
         CASt = 0x43415374,
 
-        CASPtr = 0x4341532A, // CAS*
-        KEYPtr = 0x4B45592A, // KEY*
+        CASPtr = 0x4341532A, //CAS*
+        KEYPtr = 0x4B45592A, //KEY*
 
         Thum = 0x5468756D,
 
@@ -59,13 +58,18 @@
         sndH = 0x736E6448,
         sndS = 0x736E6453,
 
-        // Lingo
         LctX = 0x4C637458,
         Lctx = 0x4C637478,
         Lnam = 0x4C6E616D,
         Lscr = 0x4C736372,
 
         STXT = 0x53545854,
+
+        RTE0 = 0x52544530,
+        RTE1 = 0x52544531,
+        RTE2 = 0x52544532,
+
+        OLED = 0x4F4C4544,
 
         XMED = 0x584D4544,
         ediM = 0x6564694D,
@@ -75,11 +79,12 @@
         VWSC = 0x56575343,
         VWLB = 0x56574C42,
         VWtk = 0x5657746B,
+        VWTL = 0x5657544C,
 
         ccl  = 0x63636C20,
         Sord = 0x536F7264,
         
         Chan = 0x4368616E,
-        MDFL = 0x4D44464C, //Wikipedia: "קובצי תלת־ממד, שבשימוש בתוכנות הפלאש. " -> MDFL - files 3-D , used by the Flash content
+        MDFL = 0x4D44464C
     }
 }

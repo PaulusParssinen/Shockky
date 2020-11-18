@@ -87,6 +87,9 @@ namespace Shockky.Chunks
             Remnants.Enqueue(input.ReadInt16()); //two bytes? - IDA
 
             Remnants.Enqueue(input.ReadInt16());
+
+            if (!input.IsDataAvailable) return;
+
             DownloadFramesBeforePlaying = input.ReadInt32(); //90
             //Zeros
             Remnants.Enqueue(input.ReadInt16());

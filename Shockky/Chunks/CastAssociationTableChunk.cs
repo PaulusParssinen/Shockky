@@ -12,6 +12,8 @@ namespace Shockky.Chunks
         public CastAssociationTableChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
+            input.IsBigEndian = true;
+
             Members = new int[header.Length / sizeof(int)];
             for (int i = 0; i < Members.Length; i++)
             {
