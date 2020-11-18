@@ -13,14 +13,16 @@ namespace Shockky.Chunks
         public int Type { get; set; }
         public short Flags { get; set; }
 
-        public int NameListChunkId { get; set; }
+        public int NameChunkId { get; set; }
 
         public short ValidCount { get; set; }
         public short FreeChunkId { get; set; }
 
         public LingoContextChunk()
             : base(ChunkKind.LctX)
-        { }
+        {
+            Sections = new List<LingoContextSection>();
+        }
         public LingoContextChunk(ref ShockwaveReader input, ChunkHeader header)
             : base(header)
         {
@@ -33,11 +35,11 @@ namespace Shockky.Chunks
             short entryOffset = input.ReadInt16();
             input.ReadInt16();
 
-            Remnants.Enqueue(input.ReadInt32()); //0
+            input.ReadInt32();
             Type = input.ReadInt32(); //TODO: Enum
             Remnants.Enqueue(input.ReadInt32());
 
-            NameListChunkId = input.ReadInt32();
+            NameChunkId = input.ReadInt32();
 
             ValidCount = input.ReadInt16(); 
             Flags = input.ReadInt16(); //TODO: 1, 5
@@ -57,17 +59,17 @@ namespace Shockky.Chunks
 
             output.Write(0);
             output.Write(0);
-            output.Write(Sections?.Count ?? 0); //TODO:
-            output.Write(Sections?.Count ?? 0); //TODO:
+            output.Write(Sections.Count);
+            output.Write(Sections.Count);
 
             output.Write(ENTRY_OFFSET);
             output.Write(SECTION_SIZE);
 
-            output.Write((int)Remnants.Dequeue());
+            output.Write(0);
             output.Write(Type);
             output.Write((int)Remnants.Dequeue());
 
-            output.Write(NameListChunkId);
+            output.Write(NameChunkId);
 
             output.Write(ValidCount);
             output.Write(Flags);

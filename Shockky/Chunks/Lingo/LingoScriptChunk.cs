@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-using Shockky.IO;
+﻿using Shockky.IO;
 using Shockky.Lingo;
 
 namespace Shockky.Chunks
@@ -10,9 +8,8 @@ namespace Shockky.Chunks
         public LingoValuePool Pool { get; }
 
         public short ScriptNumber { get; set; }
-        public int BehaviourScript { get; set; }
-
-        public List<LingoHandler> Handlers => Pool.Handlers;
+        public short CastMemberRef { get; set; }
+        public int Type { get; set; }
 
         public LingoScriptChunk()
             : base(ChunkKind.Lscr)
@@ -22,9 +19,9 @@ namespace Shockky.Chunks
         {
             input.IsBigEndian = true;
 
-            Remnants.Enqueue(input.ReadInt32());
-            Remnants.Enqueue(input.ReadInt32());
-
+            input.ReadInt32();
+            input.ReadInt32();
+            
             input.ReadInt32();
             input.ReadInt32();
 
@@ -32,17 +29,17 @@ namespace Shockky.Chunks
             ScriptNumber = input.ReadInt16();
 
             Remnants.Enqueue(input.ReadInt16());
-            Remnants.Enqueue(input.ReadBEInt32()); // -1
-            Remnants.Enqueue(input.ReadBEInt32()); // 0
+            input.ReadBEInt32();
+            input.ReadBEInt32();
             Remnants.Enqueue(input.ReadBEInt32());
-            Remnants.Enqueue(input.ReadBEInt32()); // 0
+            input.ReadBEInt32();
 
-            BehaviourScript = input.ReadInt32(); //enum, Behav=0, Global=2
+            Type = input.ReadInt32(); //TODO: enum, Behav=0, Global=2
 
             Remnants.Enqueue(input.ReadInt32());
-            Remnants.Enqueue(input.ReadInt16()); //scriptId
+            CastMemberRef = input.ReadInt16(); //scriptId
 
-            Remnants.Enqueue(input.ReadBEInt16());
+            Remnants.Enqueue(input.ReadBEInt16()); //factoryNameId?
             
             Pool = new LingoValuePool(this, ref input);
         }
@@ -86,8 +83,8 @@ namespace Shockky.Chunks
         {
             const short HEADER_LENGTH = 92;
 
-            output.Write((int)Remnants.Dequeue());
-            output.Write((int)Remnants.Dequeue());
+            output.Write(0);
+            output.Write(0);
 
             output.Write(HEADER_LENGTH + Pool.GetBodySize());
             output.Write(HEADER_LENGTH + Pool.GetBodySize());
@@ -96,15 +93,15 @@ namespace Shockky.Chunks
             output.Write(ScriptNumber);
 
             output.Write((short)Remnants.Dequeue());
+            output.WriteBE(-1);
+            output.WriteBE(0);
             output.WriteBE((int)Remnants.Dequeue());
-            output.WriteBE((int)Remnants.Dequeue());
-            output.WriteBE((int)Remnants.Dequeue());
-            output.WriteBE((int)Remnants.Dequeue());
+            output.WriteBE(0);
             
-            output.Write(BehaviourScript);
+            output.Write(Type);
             
             output.Write((int)Remnants.Dequeue());
-            output.Write((short)Remnants.Dequeue());
+            output.Write(CastMemberRef);
 
             output.WriteBE((short)Remnants.Dequeue());
 
