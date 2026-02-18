@@ -6,6 +6,7 @@
 // more info in ThirdPartyNotices.txt in the root of the project.
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -115,7 +116,7 @@ internal sealed class IndentedTextWriter : IDisposable
     /// Writes a block to the underlying buffer.
     /// </summary>
     /// <returns>A <see cref="Block"/> value to close the open block with.</returns>
-    public Block WriteBlock(string? clause = default, bool isExpression = false)
+    public Block WriteBlock([StringSyntax("C#")] string? clause = default, bool isExpression = false)
     {
         if (clause is not null)
         {
@@ -244,7 +245,7 @@ internal sealed class IndentedTextWriter : IDisposable
     /// </summary>
     /// <param name="content">The content to write.</param>
     /// <param name="isMultiline">Whether the input content is multiline.</param>
-    public void WriteLine(string content, bool isMultiline = false)
+    public void WriteLine([StringSyntax("C#")] string content, bool isMultiline = false)
     {
         WriteLine(content.AsSpan(), isMultiline);
     }
@@ -288,7 +289,7 @@ internal sealed class IndentedTextWriter : IDisposable
     /// <param name="condition">The condition to use to decide whether or not to write content.</param>
     /// <param name="content">The content to write.</param>
     /// <param name="isMultiline">Whether the input content is multiline.</param>
-    public void WriteLineIf(bool condition, string content, bool isMultiline = false)
+    public void WriteLineIf(bool condition, [StringSyntax("C#")] string content, bool isMultiline = false)
     {
         if (condition)
         {
