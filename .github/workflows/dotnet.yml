@@ -35,14 +35,14 @@ jobs:
       with:
         dotnet-version: 10.0.x
     - name: Restore
-      run: dotnet restore --verbosity normal
+      run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore --verbosity normal
+      run: dotnet build -c Release --no-restore
     - name: Test
-      run: dotnet test --configuration Release --no-restore --no-build --verbosity normal
+      run: dotnet test -c Release --no-restore --no-build
     - name: Pack
       if: startsWith(github.ref, 'refs/tags/')
-      run: dotnet pack -c Release --no-restore --no-build -v normal -p:Version='${{ steps.gitversion.outputs.SemVer }}'
+      run: dotnet pack -c Release --no-restore --no-build -p:Version='${{ steps.gitversion.outputs.SemVer }}'
     - name: NuGet push
       if: startsWith(github.ref, 'refs/tags/')
       run: dotnet nuget push ./artifacts/package/release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s ${{ env.NUGET_FEED }}
