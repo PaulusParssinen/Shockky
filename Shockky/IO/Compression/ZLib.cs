@@ -1,4 +1,4 @@
-﻿using System.IO.Compression;
+using System.IO.Compression;
 
 namespace Shockky.IO;
 
@@ -12,7 +12,7 @@ public static class ZLib
     //     🕯                               🕯
     // https://github.com/dotnet/runtime/issues/39327
     // 🕯                                       🕯 
-    //            
+    //
     //     🕯                               🕯
     //             🕯       🕯       🕯
     internal static unsafe void DecompressUnsafe(ReadOnlySpan<byte> input, Span<byte> output)

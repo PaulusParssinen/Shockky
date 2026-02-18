@@ -5,7 +5,6 @@
 // This file is ported and adapted from CommunityToolkit.Mvvm (CommunityToolkit/dotnet),
 // more info in ThirdPartyNotices.txt in the root of the project.
 
-using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
 namespace Shockky.SourceGeneration.Extensions;

@@ -1,22 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<TargetFramework>net8.0</TargetFramework>
-		
-		<IsPackable>false</IsPackable>
-	</PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Shockky\Shockky.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shockky\Shockky.csproj" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="SixLabors.ImageSharp" />
-		<PackageReference Include="System.CommandLine" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" />
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<None Include="Palettes\*" CopyToOutputDirectory="PreserveNewest" />
-	</ItemGroup>
+  <ItemGroup>
+    <None Include="Palettes\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

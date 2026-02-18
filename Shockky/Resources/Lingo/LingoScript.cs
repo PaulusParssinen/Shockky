@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using System.Runtime.InteropServices;
+using System.Diagnostics;
+
 using Shockky.IO;
 using Shockky.Lingo;
 

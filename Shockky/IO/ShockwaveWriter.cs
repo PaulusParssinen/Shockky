@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Drawing;
 using System.Numerics;
 using System.Buffers.Binary;

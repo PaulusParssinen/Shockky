@@ -5,7 +5,6 @@
 // This file is ported and adapted from ComputeSharp (Sergio0694/ComputeSharp),
 // more info in ThirdPartyNotices.txt in the root of the project.
 
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.CodeAnalysis;

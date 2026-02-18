@@ -1,13 +1,11 @@
-﻿using System.Text;
+using System.Text;
 using System.Drawing;
 using System.Diagnostics;
 using System.Buffers.Binary;
-using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 
 using Shockky.Resources;
 using System.Buffers;
-using System.Numerics;
 
 namespace Shockky.IO;
 

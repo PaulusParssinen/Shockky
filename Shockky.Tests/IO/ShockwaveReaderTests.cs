@@ -1,4 +1,4 @@
-﻿using Shockky.IO;
+using Shockky.IO;
 
 using Xunit;
 
@@ -11,7 +11,7 @@ public class ShockwaveReaderTests
     [Fact]
     public void Read_ValidVarInts()
     {
-        Span<byte> encodedValueBuffer = stackalloc byte[] {
+        Span<byte> encodedValueBuffer = [
             0x00,                     // 0
             0x01,                     // 1 
             0x7F,                     // 127
@@ -25,7 +25,7 @@ public class ShockwaveReaderTests
             0xFF, 0xFF, 0xFF, 0x7F,   // 268435455
             0xC0, 0x00,               // 8192
             0x86, 0xB0, 0x8F, 0x49    // 13371337
-        };
+        ];
 
         ShockwaveReader input = new(encodedValueBuffer);
 

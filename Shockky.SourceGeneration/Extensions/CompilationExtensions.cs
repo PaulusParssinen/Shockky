@@ -5,10 +5,9 @@
 // This file is ported and adapted from CommunityToolkit.Mvvm (CommunityToolkit/dotnet),
 // more info in ThirdPartyNotices.txt in the root of the project.
 
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 

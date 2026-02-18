@@ -1,11 +1,11 @@
-﻿using Shockky.IO;
+using Shockky.IO;
 
 using System.Diagnostics;
 
 namespace Shockky.Resources;
 
 [DebuggerDisplay("{Kind}")]
-public readonly ref struct ResourceHeader
+public readonly ref struct ResourceHeader(OsType kind)
 {
     public bool IsVariableLength => Kind switch
     {
@@ -17,13 +17,9 @@ public readonly ref struct ResourceHeader
         _ => false
     };
 
-    public OsType Kind { get; }
+    public OsType Kind { get; } = kind;
     public int Length { get; }
 
-    public ResourceHeader(OsType kind)
-    {
-        Kind = kind;
-    }
     public ResourceHeader(ref ShockwaveReader input)
         : this((OsType)input.ReadInt32BigEndian())
     {

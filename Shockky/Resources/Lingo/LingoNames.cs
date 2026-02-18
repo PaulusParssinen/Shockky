@@ -1,4 +1,4 @@
-﻿using Shockky.IO;
+using Shockky.IO;
 
 namespace Shockky.Resources;
 
@@ -6,7 +6,7 @@ public sealed class LingoNames : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.Lnam;
 
-    public List<string> Names { get; set; }
+    public List<string> Names { get; set; } = [];
 
     public LingoNames()
     { }

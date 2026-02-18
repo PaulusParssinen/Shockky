@@ -1,14 +1,18 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 using Shockky.Lingo.Instructions;
 
+using Xunit;
+
 namespace Shockky.SourceGeneration.Tests;
 
 public sealed class InstructionGeneratorTests
 {
+    /* lang=C# */
     public const string ExpectedReturnOutput = """
         namespace Shockky.Lingo.Instructions;
         
@@ -31,6 +35,8 @@ public sealed class InstructionGeneratorTests
             }
         }
         """;
+
+    /* lang=C# */
     public const string ExpectedPushIntOutput = """
         namespace Shockky.Lingo.Instructions;
         
@@ -73,6 +79,8 @@ public sealed class InstructionGeneratorTests
             }
         }
         """;
+
+    /* lang=C# */
     public const string ExpectedSharedReadMethod = """
         namespace Shockky.Lingo.Instructions;
 
@@ -106,6 +114,7 @@ public sealed class InstructionGeneratorTests
     [Fact]
     public void InstructionGenerator_Generates_OpWithoutImmediate()
     {
+        /* lang=C# */
         string source = """
             namespace Shockky.Lingo.Instructions;
 
@@ -123,6 +132,7 @@ public sealed class InstructionGeneratorTests
     [Fact]
     public void InstructionGenerator_Generates_OpWithImmediate()
     {
+        /* lang=C# */
         string source = """
             namespace Shockky.Lingo.Instructions;
 
@@ -140,6 +150,7 @@ public sealed class InstructionGeneratorTests
     [Fact]
     public void InstructionGenerator_Generates_SharedReadLogic()
     {
+        /* lang=C# */
         string source = """
             namespace Shockky.Lingo.Instructions;
 
@@ -165,7 +176,7 @@ public sealed class InstructionGeneratorTests
     /// <param name="source">The input source to process.</param>
     /// <param name="generators">The generators to apply to the input syntax tree.</param>
     /// <param name="results">The source files to compare.</param>
-    private static void VerifyGenerateSources(string source, IIncrementalGenerator[] generators, params (string Filename, string? Text)[] results)
+    private static void VerifyGenerateSources([StringSyntax("C#")] string source, IIncrementalGenerator[] generators, params (string Filename, string? Text)[] results)
     {
         VerifyGenerateSources(source, generators, LanguageVersion.CSharp12, results);
     }
@@ -177,7 +188,7 @@ public sealed class InstructionGeneratorTests
     /// <param name="generators">The generators to apply to the input syntax tree.</param>
     /// <param name="languageVersion">The language version to use.</param>
     /// <param name="results">The source files to compare.</param>
-    private static void VerifyGenerateSources(string source, IIncrementalGenerator[] generators, LanguageVersion languageVersion, params (string Filename, string? Text)[] results)
+    private static void VerifyGenerateSources([StringSyntax("C#")] string source, IIncrementalGenerator[] generators, LanguageVersion languageVersion, params (string Filename, string? Text)[] results)
     {
         // Ensure Shockky is loaded
         Type observableObjectType = typeof(OPAttribute);
@@ -214,7 +225,7 @@ public sealed class InstructionGeneratorTests
                 string filePath = filename;
 
                 // Update the assembly version using the version from the assembly of the input generators.
-                // This allows the tests to not need updates whenever the version of the MVVM Toolkit changes.
+                // This allows the tests to not need updates whenever the version of the library changes.
                 string expectedText = text.Replace("<ASSEMBLY_VERSION>", $"\"{generators[0].GetType().Assembly.GetName().Version}\"");
 
                 SyntaxTree generatedTree = outputCompilation.SyntaxTrees.Single(tree => Path.GetFileName(tree.FilePath) == filePath);

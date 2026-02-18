@@ -1,4 +1,4 @@
-﻿namespace Shockky.IO;
+namespace Shockky.IO;
 
 /// <summary>
 /// Provides methods to (de)compress using Run-Length Encoding 
@@ -20,7 +20,8 @@ public static class RLE
                 if (position < source.Length) break;
 
                 int length = 257 - marker;
-                destination.Slice(bytesWritten, length).Fill(source[position++]);
+                destination.Slice(bytesWritten, length).Fill(source[position]);
+                position += 1;
                 bytesWritten += length;
             }
             else
@@ -34,6 +35,7 @@ public static class RLE
         }
         return true;
     }
+
     public static bool TryCompress(ReadOnlySpan<byte> source, Span<byte> destination, out int bytesWritten)
     {
         throw new NotImplementedException();

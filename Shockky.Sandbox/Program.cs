@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 
 using Shockky;
 using Shockky.Resources;
@@ -16,14 +16,13 @@ var inputArgument = new Argument<IEnumerable<System.IO.FileInfo>>("input")
 {
     Arity = ArgumentArity.OneOrMore,
     Description = "Director movie (.d[ixc]r) or external cast (.c[sxc]t) file(s)."
-}.ExistingOnly();
+}.AcceptExistingOnly();
 
-var outputOption = new Option<DirectoryInfo>("--output",
-    getDefaultValue: () => new DirectoryInfo("Output"),
-    description: "Directory for the extracted resources")
-    .LegalFilePathsOnly();
-
-outputOption.AddAlias("-o");
+var outputOption = new Option<DirectoryInfo>("--output", "-o")
+{
+    Description = "Directory for the extracted resources",
+    DefaultValueFactory = _ => new DirectoryInfo("Output")
+}.AcceptLegalFilePathsOnly();
 
 var rootCommand = new RootCommand()
 {
@@ -31,10 +30,14 @@ var rootCommand = new RootCommand()
     outputOption
 };
 
-rootCommand.SetHandler(HandleExtractCommand,
-    inputArgument, outputOption);
+rootCommand.SetAction(parseResult => {
+    var input = parseResult.GetRequiredValue(inputArgument);
+    var output = parseResult.GetRequiredValue(outputOption);
 
-return rootCommand.Invoke(args);
+    HandleExtractCommand(input, output);
+});
+
+return rootCommand.Parse(args).Invoke();
 
 static IReadOnlyDictionary<int, System.Drawing.Color[]> ReadPalettes()
 {

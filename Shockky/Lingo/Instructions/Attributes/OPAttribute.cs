@@ -5,10 +5,9 @@
 /// of the Lingo instruction.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field)]
-public sealed class OPAttribute : Attribute
+public sealed class OPAttribute() : Attribute
 {
-    public OPAttribute()
-    { }
     public OPAttribute(ImmediateKind kind)
+        : this()
     { }
 }

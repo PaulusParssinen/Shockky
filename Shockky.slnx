@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="Shockky.Sandbox/Shockky.Sandbox.csproj" />
+  <Project Path="Shockky.SourceGeneration.Tests/Shockky.SourceGeneration.Tests.csproj" />
+  <Project Path="Shockky.SourceGeneration/Shockky.SourceGeneration.csproj" />
+  <Project Path="Shockky.Tests/Shockky.Tests.csproj" />
+  <Project Path="Shockky/Shockky.csproj" />
+</Solution>

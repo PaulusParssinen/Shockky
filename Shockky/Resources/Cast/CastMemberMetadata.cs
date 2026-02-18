@@ -1,4 +1,3 @@
-﻿using System.Text;
 using System.Diagnostics;
 
 using Shockky.IO;

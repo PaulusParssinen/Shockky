@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
-
 		<IsPackable>true</IsPackable>
 		<IsTrimmable>true</IsTrimmable>
-		<ImplicitUsings>enable</ImplicitUsings>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
@@ -17,23 +14,21 @@
 	</PropertyGroup>
 
 	<PropertyGroup Label="NuGet Metadata">
-		<Version>0.1.0</Version>
+		<Version>0.1.1</Version>
 		<Title>Shockky</Title>
 		<PackageId>Shockky</PackageId>
 		<Authors>Paulus Pärssinen</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<RepositoryUrl>https://github.com/PaulusParssinen/Shockky</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/PaulusParssinen/Shockky</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/PaulusParssinen/Shockky.git</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\README.md">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
-	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+	<PropertyGroup Condition="'$(CI)' == 'true'">
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 	</PropertyGroup>
 	
