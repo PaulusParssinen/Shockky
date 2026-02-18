@@ -7,10 +7,10 @@
 
 using System.Collections.Immutable;
 
-using Shockky.SourceGeneration.Helpers;
-
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+
+using Shockky.SourceGeneration.Helpers;
 
 namespace Shockky.SourceGeneration.Models;
 

@@ -1,6 +1,6 @@
-using Shockky.IO;
-
 using System.Diagnostics;
+
+using Shockky.IO;
 
 namespace Shockky.Resources;
 

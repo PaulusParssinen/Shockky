@@ -1,4 +1,4 @@
-﻿using Shockky.IO;
+using Shockky.IO;
 
 using Xunit;
 
@@ -51,30 +51,30 @@ public class ShockwaveWriterTests
         var input = new ShockwaveReader(buffer, reverseEndianness);
 
         output.WriteByte(42);
-        
+
         output.WriteInt16LittleEndian(4242);
         output.WriteInt16BigEndian(4242);
-        
+
         output.WriteUInt16LittleEndian(4242);
         output.WriteUInt16BigEndian(4242);
-        
+
         output.WriteInt32LittleEndian(123456789);
         output.WriteInt32BigEndian(123456789);
-        
+
         output.WriteUInt32LittleEndian(123456789);
         output.WriteUInt32BigEndian(123456789);
 
         Assert.Equal(42, input.ReadByte());
-        
+
         Assert.Equal(4242, input.ReadInt16LittleEndian());
         Assert.Equal(4242, input.ReadInt16BigEndian());
-        
+
         Assert.Equal((ushort)4242, input.ReadUInt16LittleEndian());
         Assert.Equal((ushort)4242, input.ReadUInt16BigEndian());
-        
+
         Assert.Equal(123456789, input.ReadInt32LittleEndian());
         Assert.Equal(123456789, input.ReadInt32BigEndian());
-        
+
         Assert.Equal((uint)123456789, input.ReadUInt32LittleEndian());
         Assert.Equal((uint)123456789, input.ReadUInt32BigEndian());
     }

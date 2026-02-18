@@ -10,8 +10,8 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using Shockky.SourceGeneration.Helpers;
 using Shockky.SourceGeneration.Extensions;
+using Shockky.SourceGeneration.Helpers;
 
 namespace Shockky.SourceGeneration.Models;
 

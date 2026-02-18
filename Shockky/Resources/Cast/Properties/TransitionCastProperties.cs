@@ -1,4 +1,4 @@
-﻿using Shockky.IO;
+using Shockky.IO;
 
 #nullable enable
 namespace Shockky.Resources.Cast.Properties;

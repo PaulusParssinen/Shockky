@@ -1,4 +1,4 @@
-﻿namespace Shockky.Resources.Types;
+namespace Shockky.Resources.Types;
 
 /// <summary>
 /// Represents a 

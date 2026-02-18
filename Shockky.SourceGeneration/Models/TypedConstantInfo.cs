@@ -7,8 +7,8 @@
 
 using System.Globalization;
 
-using Shockky.SourceGeneration.Helpers;
 using Shockky.SourceGeneration.Extensions;
+using Shockky.SourceGeneration.Helpers;
 
 namespace Shockky.SourceGeneration.Models;
 

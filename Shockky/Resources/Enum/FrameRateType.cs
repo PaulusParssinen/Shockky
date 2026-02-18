@@ -1,4 +1,4 @@
-﻿namespace Shockky.Resources.Enum;
+namespace Shockky.Resources.Enum;
 
 public enum FrameRateType
 {

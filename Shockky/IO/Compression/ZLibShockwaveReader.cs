@@ -1,6 +1,6 @@
-﻿using System.Text;
 using System.Buffers.Binary;
 using System.IO.Compression;
+using System.Text;
 
 namespace Shockky.IO;
 

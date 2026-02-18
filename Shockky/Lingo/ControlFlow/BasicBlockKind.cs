@@ -1,4 +1,4 @@
-﻿namespace Shockky.Lingo.ControlFlow;
+namespace Shockky.Lingo.ControlFlow;
 
 public enum BasicBlockKind
 {

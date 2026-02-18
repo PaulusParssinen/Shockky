@@ -1,4 +1,4 @@
-﻿using Shockky.IO;
+using Shockky.IO;
 using Shockky.Resources.Types;
 
 namespace Shockky.Resources;

@@ -4,10 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using Shockky.SourceGeneration.Models;
-using Shockky.SourceGeneration.Helpers;
-using Shockky.SourceGeneration.Extensions;
 using Shockky.SourceGeneration.Diagnostics;
+using Shockky.SourceGeneration.Extensions;
+using Shockky.SourceGeneration.Helpers;
+using Shockky.SourceGeneration.Models;
 
 namespace Shockky.SourceGeneration;
 

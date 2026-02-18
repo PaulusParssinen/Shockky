@@ -7,11 +7,11 @@
 
 using System.Collections.Immutable;
 
-using Shockky.SourceGeneration.Helpers;
-
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
+
+using Shockky.SourceGeneration.Helpers;
 
 namespace Shockky.SourceGeneration.Models;
 

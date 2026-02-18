@@ -1,4 +1,4 @@
-﻿namespace Shockky.Lingo;
+namespace Shockky.Lingo;
 
 [Flags]
 public enum LingoEventFlags : int

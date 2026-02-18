@@ -1,4 +1,4 @@
-﻿namespace Shockky.Lingo;
+namespace Shockky.Lingo;
 
 public enum VariantKind : int
 {

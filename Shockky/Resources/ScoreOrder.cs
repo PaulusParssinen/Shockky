@@ -1,4 +1,4 @@
-﻿using Shockky.IO;
+using Shockky.IO;
 using Shockky.Resources.Cast;
 
 namespace Shockky.Resources;
@@ -39,7 +39,7 @@ public sealed class ScoreOrder : IShockwaveItem, IResource
     {
         int size = 0;
         size += sizeof(int);
-        
+
         size += sizeof(int);
 
         size += sizeof(int);

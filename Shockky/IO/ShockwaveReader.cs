@@ -1,11 +1,11 @@
-using System.Text;
-using System.Drawing;
-using System.Diagnostics;
+using System.Buffers;
 using System.Buffers.Binary;
+using System.Diagnostics;
+using System.Drawing;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 using Shockky.Resources;
-using System.Buffers;
 
 namespace Shockky.IO;
 
@@ -226,7 +226,7 @@ public ref struct ShockwaveReader
 
         return Rectangle.FromLTRB(left, top, right, bottom);
     }
-    
+
     public Point ReadPointBigEndian()
     {
         return new(ReadInt16BigEndian(), ReadInt16BigEndian());

@@ -1,8 +1,8 @@
-using System.Text;
+using System.Buffers.Binary;
 using System.Drawing;
 using System.Numerics;
-using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 using Shockky.Resources.Cast;
 
@@ -168,7 +168,7 @@ public ref struct ShockwaveWriter
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int GetVarIntSize(int value) => GetVarUIntSize((uint)value);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int GetVarUIntSize(uint value)
     {
@@ -191,7 +191,7 @@ public ref struct ShockwaveWriter
         int len = Encoding.UTF8.GetBytes(value, _data.Slice(_position));
         _position += len;
     }
-    
+
     /// <summary>
     /// Writes a null-terminated UTF-8 string.
     /// </summary>
@@ -220,7 +220,7 @@ public ref struct ShockwaveWriter
 
         Advance(6);
     }
-    
+
     // TODO: Endianness
     public void WritePoint(Point value)
     {

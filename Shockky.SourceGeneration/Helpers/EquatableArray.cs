@@ -7,8 +7,8 @@
 
 using System.Collections;
 using System.Collections.Immutable;
-using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Shockky.SourceGeneration.Helpers;
 

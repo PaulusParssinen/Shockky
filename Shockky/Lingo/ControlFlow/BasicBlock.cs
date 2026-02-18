@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using System.Collections;
+using System.Diagnostics;
 
 using Shockky.Lingo.Instructions;
 

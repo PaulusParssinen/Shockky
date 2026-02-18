@@ -1,4 +1,4 @@
-﻿namespace Shockky.SourceGeneration.Models;
+namespace Shockky.SourceGeneration.Models;
 
 /// <summary>
 /// A model representing all necessary info for full generation of instruction definition.

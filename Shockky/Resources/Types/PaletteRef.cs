@@ -1,4 +1,4 @@
-﻿using Shockky.Resources.Cast;
+using Shockky.Resources.Cast;
 
 namespace Shockky.Resources.Types;
 

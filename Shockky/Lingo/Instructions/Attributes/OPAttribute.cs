@@ -1,4 +1,4 @@
-﻿namespace Shockky.Lingo.Instructions;
+namespace Shockky.Lingo.Instructions;
 
 /// <summary>
 /// Instructs Shockky source generator to generate source to serialize and deserialize instances

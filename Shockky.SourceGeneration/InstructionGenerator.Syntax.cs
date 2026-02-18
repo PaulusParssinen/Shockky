@@ -1,8 +1,8 @@
-﻿using System.Collections.Immutable;
+using System.Collections.Immutable;
 
-using Shockky.SourceGeneration.Models;
-using Shockky.SourceGeneration.Helpers;
 using Shockky.SourceGeneration.Extensions;
+using Shockky.SourceGeneration.Helpers;
+using Shockky.SourceGeneration.Models;
 
 namespace Shockky.SourceGeneration;
 

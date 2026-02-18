@@ -1,4 +1,4 @@
-﻿namespace Shockky.Resources.Cast;
+namespace Shockky.Resources.Cast;
 
 /// <summary>
 /// Represents 

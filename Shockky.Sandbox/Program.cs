@@ -1,3 +1,4 @@
+using System.CommandLine;
 using System.Runtime.InteropServices;
 
 using Shockky;
@@ -5,7 +6,6 @@ using Shockky.Resources;
 using Shockky.Resources.Cast;
 using Shockky.Resources.Types;
 
-using System.CommandLine;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -30,7 +30,8 @@ var rootCommand = new RootCommand()
     outputOption
 };
 
-rootCommand.SetAction(parseResult => {
+rootCommand.SetAction(parseResult =>
+{
     var input = parseResult.GetRequiredValue(inputArgument);
     var output = parseResult.GetRequiredValue(outputOption);
 
@@ -59,8 +60,8 @@ static IReadOnlyDictionary<int, System.Drawing.Color[]> ReadPalettes()
         for (int i = 0; i < colors.Length; i++)
         {
             colors[i] = System.Drawing.Color.FromArgb(
-                red: input.ReadByte(), 
-                green: input.ReadByte(), 
+                red: input.ReadByte(),
+                green: input.ReadByte(),
                 blue: input.ReadByte());
 
             input.ReadByte();

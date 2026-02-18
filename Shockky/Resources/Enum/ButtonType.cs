@@ -1,4 +1,4 @@
-﻿namespace Shockky.Resources;
+namespace Shockky.Resources;
 
 public enum ButtonType : short
 {

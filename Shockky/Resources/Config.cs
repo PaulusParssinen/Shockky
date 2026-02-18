@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Drawing;
 
 using Shockky.IO;
@@ -127,7 +127,7 @@ public sealed class Config : IShockwaveItem, IResource
         Field5E = input.ReadInt16BigEndian();
         Field60 = input.ReadInt16BigEndian();
         Field62 = input.ReadInt16BigEndian();
-        
+
         Debug.Assert(Checksum == CalculateChecksum(), "Config checksum mismatch!");
     }
 

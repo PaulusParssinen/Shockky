@@ -1,4 +1,4 @@
-﻿namespace Shockky.Lingo.Instructions;
+namespace Shockky.Lingo.Instructions;
 
 public enum OPCode : byte
 {

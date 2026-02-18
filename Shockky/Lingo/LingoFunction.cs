@@ -1,4 +1,4 @@
-﻿using Shockky.IO;
+using Shockky.IO;
 
 namespace Shockky.Lingo;
 
@@ -6,13 +6,13 @@ public class LingoFunction : IShockwaveItem
 {
     public short EnvironmentIndex { get; set; }
     public LingoEventFlags EventFlags { get; set; }
-    
+
     public byte[] Bytecode { get; set; }
     public List<short> Arguments { get; set; }
     public List<short> Locals { get; set; }
     public List<short> Globals { get; set; }
     public byte[] BytesPerLine { get; set; }
-    
+
     public int ParserBytesRead { get; set; }
     public int BodyLineNumber { get; set; }
 
@@ -75,7 +75,7 @@ public class LingoFunction : IShockwaveItem
         {
             Globals.Add(input.ReadInt16BigEndian());
         }
-        
+
         input.Position = lineOffset;
         for (int i = 0; i < BytesPerLine.Length; i++)
         {

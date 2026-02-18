@@ -1,4 +1,4 @@
-﻿using Shockky.IO;
+using Shockky.IO;
 
 namespace Shockky.Lingo.Instructions;
 

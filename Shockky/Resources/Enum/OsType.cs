@@ -1,4 +1,4 @@
-﻿namespace Shockky.Resources;
+namespace Shockky.Resources;
 
 /// <summary>
 /// Represents the resource types that Director authored Shockwave movies/casts can contain.
