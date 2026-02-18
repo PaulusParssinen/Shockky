@@ -2,7 +2,7 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public sealed class AfterburnerMap : IShockwaveItem, IResource
+public sealed class AfterburnerMapResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.ABMP;
 
@@ -11,7 +11,7 @@ public sealed class AfterburnerMap : IShockwaveItem, IResource
     public int LastIndex { get; set; }
     public Dictionary<int, AfterburnerMapEntry> Entries { get; set; }
 
-    public AfterburnerMap(ref ShockwaveReader input, ReaderContext context)
+    public AfterburnerMapResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReadByte();
         Unknown = input.Read7BitEncodedInt();

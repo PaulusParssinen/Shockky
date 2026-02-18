@@ -2,7 +2,7 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public sealed class LingoContext : IShockwaveItem, IResource
+public sealed class LingoContextResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.LctX;
 
@@ -21,11 +21,11 @@ public sealed class LingoContext : IShockwaveItem, IResource
     public short ValidCount { get; set; }
     public short FreeChunkIndex { get; set; }
 
-    public LingoContext()
+    public LingoContextResource()
     {
         Items = new List<LingoContextItem>();
     }
-    public LingoContext(ref ShockwaveReader input, ReaderContext context)
+    public LingoContextResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReverseEndianness = false;
 

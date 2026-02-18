@@ -2,13 +2,13 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public class Score : IShockwaveItem, IResource
+public class ScoreResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.VWSC;
 
-    public Score()
+    public ScoreResource()
     { }
-    public Score(ref ShockwaveReader input)
+    public ScoreResource(ref ShockwaveReader input)
     {
         input.ReverseEndianness = false;
 

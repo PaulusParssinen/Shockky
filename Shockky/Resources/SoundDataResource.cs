@@ -2,12 +2,12 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public class SoundData : IResource, IBinaryData
+public class SoundDataResource : IResource, IBinaryDataResource
 {
     public OsType Kind => OsType.snd;
 
     public byte[] Data { get; set; }
 
-    public SoundData(ref ShockwaveReader input)
+    public SoundDataResource(ref ShockwaveReader input)
     { }
 }

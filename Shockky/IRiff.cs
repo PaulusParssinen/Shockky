@@ -5,6 +5,6 @@ namespace Shockky;
 
 public interface IRiff
 {
-    MemoryMap MemoryMap { get; }
+    MemoryMapResource MemoryMap { get; }
     IDictionary<ResourceId, int> ResourceMap { get; }
 }

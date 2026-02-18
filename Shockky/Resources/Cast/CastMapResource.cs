@@ -2,15 +2,15 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public sealed class CastMap : IResource, IShockwaveItem
+public sealed class CastMapResource : IResource, IShockwaveItem
 {
     public OsType Kind => OsType.CASPtr;
 
     public int[] Members { get; set; }
 
-    public CastMap()
+    public CastMapResource()
     { }
-    public CastMap(ref ShockwaveReader input, ReaderContext context)
+    public CastMapResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReverseEndianness = false;
 

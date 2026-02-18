@@ -1,6 +1,6 @@
 namespace Shockky.Resources;
 
-public interface IBinaryData
+public interface IBinaryDataResource
 {
     byte[] Data { get; set; }
 }

@@ -4,7 +4,7 @@ using Shockky.Resources.Cast.Properties;
 
 namespace Shockky.Resources;
 
-public sealed class CastMemberProperties : IResource, IShockwaveItem
+public sealed class CastMemberPropertiesResource : IResource, IShockwaveItem
 {
     public OsType Kind => OsType.CASt;
 
@@ -12,7 +12,7 @@ public sealed class CastMemberProperties : IResource, IShockwaveItem
     public CastMemberMetadata Metadata { get; set; }
     public IMemberProperties Properties { get; set; }
 
-    public CastMemberProperties(ref ShockwaveReader input, ReaderContext context)
+    public CastMemberPropertiesResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReverseEndianness = false;
 

@@ -5,7 +5,7 @@ namespace Shockky.Resources;
 /// <summary>
 /// Represents the guide grid in the Director.
 /// </summary>
-public sealed class Grid : IShockwaveItem, IResource
+public sealed class GridResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.GRID;
 
@@ -18,7 +18,7 @@ public sealed class Grid : IShockwaveItem, IResource
     public short GuideColor { get; set; }
     public Guide[] Guides { get; set; }
 
-    public Grid(ref ShockwaveReader input, ReaderContext context)
+    public GridResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReverseEndianness = true;
 

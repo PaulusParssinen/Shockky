@@ -4,15 +4,15 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public sealed class Palette : IShockwaveItem, IResource
+public sealed class PaletteResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.CLUT;
 
     public Color[] Colors { get; set; }
 
-    public Palette()
+    public PaletteResource()
     { }
-    public Palette(ref ShockwaveReader input, ReaderContext context)
+    public PaletteResource(ref ShockwaveReader input, ReaderContext context)
     {
         Colors = new Color[input.Length / 6];
         for (int i = 0; i < Colors.Length; i++)

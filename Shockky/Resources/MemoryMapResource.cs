@@ -2,7 +2,7 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public sealed class MemoryMap : IShockwaveItem, IResource
+public sealed class MemoryMapResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.mmap;
 
@@ -17,7 +17,7 @@ public sealed class MemoryMap : IShockwaveItem, IResource
 
     public ResourceEntry this[int index] => Entries[index];
 
-    public MemoryMap(ref ShockwaveReader input)
+    public MemoryMapResource(ref ShockwaveReader input)
     {
         input.ReadInt16BigEndian();
         input.ReadInt16BigEndian();

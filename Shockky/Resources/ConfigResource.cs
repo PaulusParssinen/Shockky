@@ -6,7 +6,7 @@ using Shockky.Resources.Cast;
 
 namespace Shockky.Resources;
 
-public sealed class Config : IShockwaveItem, IResource
+public sealed class ConfigResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.DRCF;
 
@@ -64,7 +64,7 @@ public sealed class Config : IShockwaveItem, IResource
     public short Field60 { get; set; }
     public short Field62 { get; set; }
 
-    public Config(ref ShockwaveReader input, ReaderContext context)
+    public ConfigResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReverseEndianness = false;
 

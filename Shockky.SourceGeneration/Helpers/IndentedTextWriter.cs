@@ -355,13 +355,13 @@ internal sealed class IndentedTextWriter : IDisposable
     /// <summary>
     /// Represents an indented block that needs to be closed.
     /// </summary>
-    /// <param name="_writer">The input <see cref="IndentedTextWriter"/> instance to wrap.</param>
-    public readonly struct Block(IndentedTextWriter _writer, bool isExpression = false) : IDisposable
+    /// <param name="writer">The input <see cref="IndentedTextWriter"/> instance to wrap.</param>
+    public readonly struct Block(IndentedTextWriter writer, bool isExpression = false) : IDisposable
     {
         /// <summary>
         /// The <see cref="IndentedTextWriter"/> instance to write to.
         /// </summary>
-        private readonly IndentedTextWriter? _writer = _writer;
+        private readonly IndentedTextWriter? _writer = writer;
 
         /// <summary>
         /// Indicates whether the indented block is an expression and requires a semicolon to close the block.

@@ -2,7 +2,7 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public sealed class FileInfo : IShockwaveItem, IResource
+public sealed class FileInfoResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.VWFI;
 
@@ -10,7 +10,7 @@ public sealed class FileInfo : IShockwaveItem, IResource
     public string ModifiedBy { get; set; }
     public string FilePath { get; set; }
 
-    public FileInfo(ref ShockwaveReader input, ReaderContext context)
+    public FileInfoResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReverseEndianness = true;
 

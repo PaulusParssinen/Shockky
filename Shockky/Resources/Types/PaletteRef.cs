@@ -7,9 +7,9 @@ namespace Shockky.Resources.Types;
 /// </summary>
 public record struct PaletteRef(CastMemberId MemberId) //TODO: memNum 1-indexed
 {
-    public bool IsSystemPalette => MemberId.MemberNum < 1;
+    public readonly bool IsSystemPalette => MemberId.MemberNum < 1;
 
-    public PaletteType Palette => (PaletteType)MemberId.MemberNum;
+    public readonly PaletteType Palette => (PaletteType)MemberId.MemberNum;
 }
 
 /// <summary>

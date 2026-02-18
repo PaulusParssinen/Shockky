@@ -2,16 +2,16 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public sealed class ScoreReference : IShockwaveItem, IResource
+public sealed class ScoreReferenceResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.SCRF;
 
     public int Unknown { get; set; }
     public Dictionary<short, int> Entries { get; }
 
-    public ScoreReference()
+    public ScoreReferenceResource()
     { }
-    public ScoreReference(ref ShockwaveReader input, ReaderContext context)
+    public ScoreReferenceResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReadInt32LittleEndian();
         input.ReadInt32LittleEndian();

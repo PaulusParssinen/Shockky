@@ -14,7 +14,7 @@ public sealed class AfterburnerMapEntry : IShockwaveItem
     public int DecompressedLength { get; set; }
 
     /// <summary>
-    /// Represents an index in <see cref="FileCompressionTypes.CompressionTypes"/> array.
+    /// Represents an index in <see cref="FileCompressionTypesResource.CompressionTypes"/> array.
     /// </summary>
     public int CompressionTypeIndex { get; set; }
 

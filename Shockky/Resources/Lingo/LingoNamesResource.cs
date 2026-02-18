@@ -2,15 +2,15 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public sealed class LingoNames : IShockwaveItem, IResource
+public sealed class LingoNamesResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.Lnam;
 
     public List<string> Names { get; set; } = [];
 
-    public LingoNames()
+    public LingoNamesResource()
     { }
-    public LingoNames(ref ShockwaveReader input, ReaderContext context)
+    public LingoNamesResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReverseEndianness = false;
 

@@ -18,39 +18,39 @@ public interface IResource
 
         return kind switch
         {
-            OsType.Fver => new FileVersion(ref bodyInput, context),
-            OsType.Fcdr => new FileCompressionTypes(ref bodyInput, context),
-            OsType.ABMP => new AfterburnerMap(ref bodyInput, context),
+            OsType.Fver => new FileVersionResource(ref bodyInput, context),
+            OsType.Fcdr => new FileCompressionTypesResource(ref bodyInput, context),
+            OsType.ABMP => new AfterburnerMapResource(ref bodyInput, context),
 
-            OsType.imap => new IndexMap(ref bodyInput),
-            OsType.mmap => new MemoryMap(ref bodyInput),
-            OsType.KEYPtr => new KeyMap(ref bodyInput, context),
-            OsType.VWCF or OsType.DRCF => new Config(ref bodyInput, context),
+            OsType.imap => new IndexMapResource(ref bodyInput),
+            OsType.mmap => new MemoryMapResource(ref bodyInput),
+            OsType.KEYPtr => new KeyMapResource(ref bodyInput, context),
+            OsType.VWCF or OsType.DRCF => new ConfigResource(ref bodyInput, context),
 
             // TODO: handle V1850
             //OsType.VWLB => new ScoreLabels(ref chunkInput, context),
-            OsType.VWFI => new FileInfo(ref bodyInput, context),
+            OsType.VWFI => new FileInfoResource(ref bodyInput, context),
 
-            OsType.Lnam => new LingoNames(ref bodyInput, context),
-            OsType.Lscr => new LingoScript(ref bodyInput),
-            OsType.Lctx or OsType.LctX => new LingoContext(ref bodyInput, context),
+            OsType.Lnam => new LingoNamesResource(ref bodyInput, context),
+            OsType.Lscr => new LingoScriptResource(ref bodyInput),
+            OsType.Lctx or OsType.LctX => new LingoContextResource(ref bodyInput, context),
 
-            OsType.CASPtr => new CastMap(ref bodyInput, context),
-            OsType.CASt => new CastMemberProperties(ref bodyInput, context),
+            OsType.CASPtr => new CastMapResource(ref bodyInput, context),
+            OsType.CASt => new CastMemberPropertiesResource(ref bodyInput, context),
 
-            OsType.SCRF => new ScoreReference(ref bodyInput, context),
-            OsType.Sord => new ScoreOrder(ref bodyInput, context),
-            OsType.CLUT => new Palette(ref bodyInput, context),
-            OsType.STXT => new StyledText(ref bodyInput, context),
+            OsType.SCRF => new ScoreReferenceResource(ref bodyInput, context),
+            OsType.Sord => new ScoreOrderResource(ref bodyInput, context),
+            OsType.CLUT => new PaletteResource(ref bodyInput, context),
+            OsType.STXT => new StyledTextResource(ref bodyInput, context),
 
-            OsType.snd => new SoundData(ref bodyInput),
+            OsType.snd => new SoundDataResource(ref bodyInput),
 
-            OsType.Fmap => new FontMap(ref bodyInput, context),
+            OsType.Fmap => new FontMapResource(ref bodyInput, context),
 
-            OsType.GRID => new Grid(ref bodyInput, context),
-            OsType.FCOL => FavoriteColors.Read(ref bodyInput, context),
+            OsType.GRID => new GridResource(ref bodyInput, context),
+            OsType.FCOL => FavoriteColorsResource.Read(ref bodyInput, context),
 
-            OsType.BITD => new BitmapData(ref bodyInput, context),
+            OsType.BITD => new BitmapDataResource(ref bodyInput, context),
 
             _ => new UnknownResource(ref bodyInput, context, kind)
         };

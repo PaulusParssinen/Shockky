@@ -5,22 +5,22 @@ using Shockky.Lingo;
 
 namespace Shockky.Resources;
 
-public sealed class LingoScript : IShockwaveItem, IResource
+public sealed class LingoScriptResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.Lscr;
 
     /// <summary>
-    /// The index of the script within its owner <see cref="LingoContext">Context</see>.
+    /// The index of the script within its owner <see cref="LingoContextResource">Context</see>.
     /// </summary>
     public short ContextIndex { get; set; }
 
     /// <summary>
-    /// The index of the <see cref="LingoEnvironment">Environment</see> that owns the <see cref="LingoContext">Context</see> that owns this script.
+    /// The index of the <see cref="LingoEnvironment">Environment</see> that owns the <see cref="LingoContextResource">Context</see> that owns this script.
     /// </summary>
     public short EnvironmentIndex { get; set; }
 
     /// <summary>
-    /// For factory scripts, the index of the parent script within its owner <see cref="LingoContext"/>
+    /// For factory scripts, the index of the parent script within its owner <see cref="LingoContextResource"/>
     /// </summary>
     public short ParentContextIndex { get; set; }
 
@@ -45,7 +45,7 @@ public sealed class LingoScript : IShockwaveItem, IResource
 
     public List<LingoLiteral> Literals { get; }
 
-    public LingoScript()
+    public LingoScriptResource()
     {
         EventHandlerIndices = new List<short>();
         Properties = new List<short>();
@@ -53,7 +53,7 @@ public sealed class LingoScript : IShockwaveItem, IResource
         Functions = new List<LingoFunction>();
         Literals = new List<LingoLiteral>();
     }
-    public LingoScript(ref ShockwaveReader input)
+    public LingoScriptResource(ref ShockwaveReader input)
     {
         input.ReverseEndianness = false;
 

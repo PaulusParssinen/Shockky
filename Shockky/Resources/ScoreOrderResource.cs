@@ -6,17 +6,17 @@ namespace Shockky.Resources;
 /// <summary>
 /// Represents list of all cast members in the movie, sorted by the order they appear in the Score.
 /// </summary>
-public sealed class ScoreOrder : IShockwaveItem, IResource
+public sealed class ScoreOrderResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.Sord;
 
     public CastMemberId[] Entries { get; set; }
 
-    public ScoreOrder()
+    public ScoreOrderResource()
     {
         Entries = [];
     }
-    public ScoreOrder(ref ShockwaveReader input, ReaderContext context)
+    public ScoreOrderResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReverseEndianness = false;
 

@@ -3,7 +3,7 @@ using Shockky.Resources.Types;
 
 namespace Shockky.Resources;
 
-public sealed class KeyMap : IShockwaveItem, IResource
+public sealed class KeyMapResource : IShockwaveItem, IResource
 {
     private const short ENTRY_SIZE = 12;
 
@@ -11,11 +11,11 @@ public sealed class KeyMap : IShockwaveItem, IResource
 
     public Dictionary<ResourceId, int> ResourceMap { get; set; }
 
-    public KeyMap()
+    public KeyMapResource()
     {
         ResourceMap = new Dictionary<ResourceId, int>();
     }
-    public KeyMap(ref ShockwaveReader input, ReaderContext context)
+    public KeyMapResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReadInt16BigEndian();
         input.ReadInt16BigEndian();

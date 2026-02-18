@@ -6,7 +6,7 @@ using Shockky.Resources.Cast;
 namespace Shockky.Resources;
 
 //TODO: v5 = memberNum or MemberId
-public record Tile(CastMemberId Id, Rectangle Rect) : IShockwaveItem
+public sealed record Tile(CastMemberId Id, Rectangle Rect) : IShockwaveItem
 {
     public Tile(ref ShockwaveReader input, ReaderContext context)
         : this(new CastMemberId(input.ReadInt16LittleEndian(), input.ReadInt16LittleEndian()), input.ReadRectLittleEndian())
@@ -29,13 +29,13 @@ public record Tile(CastMemberId Id, Rectangle Rect) : IShockwaveItem
     }
 }
 
-public sealed class Tiles : IShockwaveItem, IResource
+public sealed class TilesResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.VWTL;
 
     public Tile[] Items { get; } = new Tile[8];
 
-    public Tiles(ref ShockwaveReader input, ReaderContext context)
+    public TilesResource(ref ShockwaveReader input, ReaderContext context)
     {
         for (int i = 0; i < Items.Length; i++)
         {

@@ -2,14 +2,14 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public class StyledText : IShockwaveItem, IResource
+public class StyledTextResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.STXT;
 
     public string Text { get; set; }
     public TextFormat[] Formats { get; set; } = Array.Empty<TextFormat>();
 
-    public StyledText(ref ShockwaveReader input, ReaderContext context)
+    public StyledTextResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReverseEndianness = true;
 

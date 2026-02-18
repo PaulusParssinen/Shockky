@@ -5,13 +5,13 @@ using Shockky.Resources.Cast;
 
 namespace Shockky.Resources;
 
-public sealed partial class BitmapData : IShockwaveItem, IResource
+public sealed partial class BitmapDataResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.BITD;
 
     public byte[] Data { get; set; }
 
-    public BitmapData(ref ShockwaveReader input, ReaderContext context)
+    public BitmapDataResource(ref ShockwaveReader input, ReaderContext context)
     {
         Data = new byte[input.Length];
         input.ReadBytes(Data);

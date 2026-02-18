@@ -5,11 +5,11 @@ namespace Shockky.Resources;
 /// <summary>
 /// The global cast library numbers and their paths are specified in this resource.
 /// </summary>
-public sealed class CrossCastLinks : IShockwaveItem, IResource
+public sealed class CrossCastLinksResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.ccl;
 
-    public CrossCastLinks(ref ShockwaveReader input, ReaderContext context)
+    public CrossCastLinksResource(ref ShockwaveReader input, ReaderContext context)
     {
         //TODO: VList<CrossCastLink>
     }

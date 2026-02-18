@@ -2,13 +2,13 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public sealed class FavoriteColors : IShockwaveItem, IResource
+public sealed class FavoriteColorsResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.FCOL;
 
     public (int R, int G, int B)[] Colors { get; } = new (int R, int G, int B)[16];
 
-    public FavoriteColors()
+    public FavoriteColorsResource()
     {
         Colors = new (int R, int G, int B)[16]
         {
@@ -54,9 +54,9 @@ public sealed class FavoriteColors : IShockwaveItem, IResource
         }
     }
 
-    public static FavoriteColors Read(ref ShockwaveReader input, ReaderContext context)
+    public static FavoriteColorsResource Read(ref ShockwaveReader input, ReaderContext context)
     {
-        FavoriteColors favoriteColors = new();
+        FavoriteColorsResource favoriteColors = new();
 
         input.ReadInt32LittleEndian();
         input.ReadInt32LittleEndian();

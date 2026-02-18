@@ -102,15 +102,15 @@ static void HandleExtractCommand(IEnumerable<System.IO.FileInfo> input, Director
         var shockwaveFile = ShockwaveFile.Read(file.FullName);
 
         if (shockwaveFile.Resources.Values
-            .FirstOrDefault(c => c.Kind == OsType.KEYPtr) is not KeyMap associationTable)
+            .FirstOrDefault(c => c.Kind == OsType.KEYPtr) is not KeyMapResource associationTable)
         {
-            Console.WriteLine(nameof(KeyMap) + " was not found!");
+            Console.WriteLine(nameof(KeyMapResource) + " was not found!");
             continue;
         }
         if (shockwaveFile.Resources.Values
-            .FirstOrDefault(c => c.Kind == OsType.CASPtr) is not CastMap castAssociationTable)
+            .FirstOrDefault(c => c.Kind == OsType.CASPtr) is not CastMapResource castAssociationTable)
         {
-            Console.WriteLine(nameof(CastMap) + " was not found!");
+            Console.WriteLine(nameof(CastMapResource) + " was not found!");
             continue;
         }
         Console.Write("Extracting bitmaps..");
@@ -120,8 +120,8 @@ static void HandleExtractCommand(IEnumerable<System.IO.FileInfo> input, Director
         {
             if (resourceId.Kind != OsType.BITD) continue;
 
-            var member = shockwaveFile.Resources[resourceId.Id] as CastMemberProperties;
-            var bitmapData = shockwaveFile.Resources[index] as BitmapData;
+            var member = shockwaveFile.Resources[resourceId.Id] as CastMemberPropertiesResource;
+            var bitmapData = shockwaveFile.Resources[index] as BitmapDataResource;
 
             if (member?.Properties is not BitmapCastProperties bitmapProperties)
                 continue;
@@ -169,7 +169,7 @@ static void HandleExtractCommand(IEnumerable<System.IO.FileInfo> input, Director
 
 static bool TryExtractBitmapResource(string outputFilePath,
     BitmapCastProperties properties,
-    BitmapData bitmapData,
+    BitmapDataResource bitmapData,
     System.Drawing.Color[] palette)
 {
     static int CalcStride(int width, int bitdepth)

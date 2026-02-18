@@ -37,10 +37,10 @@ public sealed class LingoLiteral : IShockwaveItem, IEquatable<LingoLiteral>
         throw new NotImplementedException();
     }
 
-    public bool Equals(LingoLiteral literal)
-        => literal.Kind == Kind && literal.Value == Value;
+    public bool Equals(LingoLiteral? literal)
+        => literal is not null && literal.Kind == Kind && literal.Value == Value;
 
-    public override bool Equals(object obj) => Equals(obj as LingoLiteral);
+    public override bool Equals(object? obj) => Equals(obj as LingoLiteral);
 
     public static LingoLiteral Read(ref ShockwaveReader input, VariantKind entryKind, int entryOffset)
     {

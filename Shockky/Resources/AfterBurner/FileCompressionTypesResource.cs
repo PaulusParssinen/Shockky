@@ -2,15 +2,15 @@ using Shockky.IO;
 
 namespace Shockky.Resources;
 
-public sealed class FileCompressionTypes : IShockwaveItem, IResource
+public sealed class FileCompressionTypesResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.Fcdr;
 
     public (Guid Id, string Description)[] CompressionTypes { get; set; }
 
-    public FileCompressionTypes()
+    public FileCompressionTypesResource()
     { }
-    public FileCompressionTypes(ref ShockwaveReader input, ReaderContext context)
+    public FileCompressionTypesResource(ref ShockwaveReader input, ReaderContext context)
     {
         using ZLibShockwaveReader decompressedInput = ZLib.CreateDeflateReaderUnsafe(ref input);
 
