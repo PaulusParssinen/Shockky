@@ -5,10 +5,11 @@ namespace Shockky.Resources;
 // Contains logic to read embedded Zlib compressed resources from the FGEI resource
 public static class FileGzipEmbeddedImageResource
 {
-    // TODO: Tidy up more.
     public static IDictionary<int, IResource> ReadResources(
-        ref ShockwaveReader input, ReaderContext context,
-        AfterburnerMapResource afterburnerMap, FileCompressionTypesResource compressionTypes)
+        ref ShockwaveReader input,
+        ReaderContext context,
+        AfterburnerMapResource afterburnerMap,
+        FileCompressionTypesResource compressionTypes)
     {
         int chunkStart = input.Position;
         var resources = new Dictionary<int, IResource>(afterburnerMap.Entries.Count);
@@ -32,8 +33,10 @@ public static class FileGzipEmbeddedImageResource
     }
 
     private static bool TryReadInitialLoadSegment(
-        ref ShockwaveReader input, ReaderContext context,
-        AfterburnerMapResource afterburnerMap, Dictionary<int, IResource> resources)
+        ref ShockwaveReader input, 
+        ReaderContext context,
+        AfterburnerMapResource afterburnerMap, 
+        Dictionary<int, IResource> resources)
     {
         // First entry in the AfterburnerMap must be ILS.
         AfterburnerMapEntry ilsEntry = afterburnerMap.Entries.First().Value;

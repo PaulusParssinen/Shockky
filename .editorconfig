@@ -219,9 +219,9 @@ dotnet_naming_rule.local_variables_should_be_camelcase.severity = suggestion
 dotnet_naming_rule.local_variables_should_be_camelcase.symbols = local_variables
 dotnet_naming_rule.local_variables_should_be_camelcase.style = camelcase
 
-dotnet_naming_rule.local_constants_should_be_camelcase.severity = suggestion
-dotnet_naming_rule.local_constants_should_be_camelcase.symbols = local_constants
-dotnet_naming_rule.local_constants_should_be_camelcase.style = camelcase
+dotnet_naming_rule.local_constants_should_be_pascalcase.severity = suggestion
+dotnet_naming_rule.local_constants_should_be_pascalcase.symbols = local_constants
+dotnet_naming_rule.local_constants_should_be_pascalcase.style = pascalcase
 
 dotnet_naming_rule.parameters_should_be_camelcase.severity = suggestion
 dotnet_naming_rule.parameters_should_be_camelcase.symbols = parameters

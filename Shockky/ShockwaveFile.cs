@@ -62,7 +62,7 @@ public class ShockwaveFile
             {
                 var entry = memoryMap.Entries[i];
 
-                if (entry.Flags.HasFlag(ChunkEntryFlags.Invalid))
+                if (entry.Flags.HasFlag(ResourceEntryFlags.Invalid))
                     continue;
 
                 input.Position = entry.Offset;

@@ -62,7 +62,7 @@ internal struct ImmutableArrayBuilder<T> : IDisposable
     /// No other data should be written to the builder while the returned <see cref="Span{T}"/>
     /// is in use, as it could invalidate the memory area wrapped by it, if resizing occurs.
     /// </remarks>
-    public readonly Span<T> Advance(int requestedSize) => _writer!.Advance(requestedSize);
+    public readonly Span<T?> Advance(int requestedSize) => _writer!.Advance(requestedSize);
 
     /// <inheritdoc cref="ImmutableArray{T}.Builder.Add(T)"/>
     public readonly void Add(T item) => _writer!.Add(item);

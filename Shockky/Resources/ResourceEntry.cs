@@ -10,7 +10,7 @@ public sealed class ResourceEntry : IShockwaveItem
     public OsType Kind { get; set; }
     public int Length { get; set; }
     public int Offset { get; set; }
-    public ChunkEntryFlags Flags { get; set; }
+    public ResourceEntryFlags Flags { get; set; }
     public short Unknown { get; set; }
     public int Link { get; set; }
 
@@ -19,7 +19,7 @@ public sealed class ResourceEntry : IShockwaveItem
         Kind = (OsType)input.ReadInt32BigEndian();
         Length = input.ReadInt32BigEndian();
         Offset = input.ReadInt32BigEndian();
-        Flags = (ChunkEntryFlags)input.ReadInt16BigEndian();
+        Flags = (ResourceEntryFlags)input.ReadInt16BigEndian();
         Unknown = input.ReadInt16BigEndian();
         Link = input.ReadInt32BigEndian();
     }

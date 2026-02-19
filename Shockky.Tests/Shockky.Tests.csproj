@@ -11,4 +11,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Shockky\Shockky.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="Data\d101_empty.dcr" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Data\d101_empty.dir" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

@@ -13,8 +13,8 @@ public interface IResource
     }
     public static IResource Read(scoped ref ShockwaveReader input, ReaderContext context, OsType kind, int length)
     {
-        ReadOnlySpan<byte> chunkSpan = input.ReadBytes(length);
-        var bodyInput = new ShockwaveReader(chunkSpan, input.ReverseEndianness);
+        ReadOnlySpan<byte> resourceSpan = input.ReadBytes(length);
+        var bodyInput = new ShockwaveReader(resourceSpan, input.ReverseEndianness);
 
         return kind switch
         {
@@ -27,8 +27,8 @@ public interface IResource
             OsType.KEYPtr => new KeyMapResource(ref bodyInput, context),
             OsType.VWCF or OsType.DRCF => new ConfigResource(ref bodyInput, context),
 
-            // TODO: handle V1850
-            //OsType.VWLB => new ScoreLabels(ref chunkInput, context),
+            // TODO: handle D9
+            //OsType.VWLB => new ScoreLabels(ref bodyInput, context),
             OsType.VWFI => new FileInfoResource(ref bodyInput, context),
 
             OsType.Lnam => new LingoNamesResource(ref bodyInput, context),

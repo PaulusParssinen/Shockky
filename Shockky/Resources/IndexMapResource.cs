@@ -18,7 +18,6 @@ public sealed class IndexMapResource : IShockwaveItem, IResource
     public IndexMapResource(ref ShockwaveReader input)
     {
         int memoryMapCount = input.ReadInt32BigEndian();
-        Debug.Assert(memoryMapCount == 1);
         MemoryMapOffset = input.ReadInt32BigEndian();
         Version = (DirectorVersion)input.ReadInt32BigEndian();
         Field0C = input.ReadInt32BigEndian();

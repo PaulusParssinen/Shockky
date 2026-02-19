@@ -6,7 +6,7 @@ public sealed class FileCompressionTypesResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.Fcdr;
 
-    public (Guid Id, string Description)[] CompressionTypes { get; set; }
+    public (Guid Id, string Description)[] CompressionTypes { get; set; } = [];
 
     public FileCompressionTypesResource()
     { }

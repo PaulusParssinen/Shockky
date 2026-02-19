@@ -148,7 +148,7 @@ static void HandleExtractCommand(IEnumerable<System.IO.FileInfo> input, Director
                 //
                 //if (associationTable.ResourceMap.TryGetValue(paletterResId, out int paletteChunkIndex))
                 //{
-                //    var palette = shockwaveFile[paletteChunkIndex] as Palette;
+                //    var palette = shockwaveFile[paletteResourceIndex] as Palette;
                 //    bitmapData.PopulateMedia(bitmapProperties);
                 //    if (!TryExtractBitmapResource(fileOutputDirectory, outputFileName, bitmapData, palette.Colors))
                 //        continue;

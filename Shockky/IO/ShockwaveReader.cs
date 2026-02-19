@@ -241,7 +241,7 @@ public ref struct ShockwaveReader
         return Rectangle.FromLTRB(left, top, right, bottom);
     }
 
-    public unsafe IResource ReadCompressedResource(AfterburnerMapEntry entry, ReaderContext context)
+    public IResource ReadCompressedResource(AfterburnerMapEntry entry, ReaderContext context)
     {
         const int StackallocThreshold = 512;
 

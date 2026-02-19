@@ -27,7 +27,7 @@ public sealed class CastMapResource : IResource, IShockwaveItem
     {
         for (int i = 0; i < Members.Length; i++)
         {
-            output.WriteInt32LittleEndian(Members[i]);
+            output.WriteInt32BigEndian(Members[i]);
         }
     }
 }

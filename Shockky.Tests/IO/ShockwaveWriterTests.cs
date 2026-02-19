@@ -40,13 +40,13 @@ public class ShockwaveWriterTests
 
     private void Write_NumericValues_AreEqual(bool reverseEndianness)
     {
-        const int OUTPUT_SIZE = sizeof(byte)
+        const int OutputSize = sizeof(byte)
             + sizeof(short) * 2
             + sizeof(ushort) * 2
             + sizeof(int) * 2
             + sizeof(uint) * 2;
 
-        Span<byte> buffer = stackalloc byte[OUTPUT_SIZE];
+        Span<byte> buffer = stackalloc byte[OutputSize];
         var output = new ShockwaveWriter(buffer, reverseEndianness);
         var input = new ShockwaveReader(buffer, reverseEndianness);
 
