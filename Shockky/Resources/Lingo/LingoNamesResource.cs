@@ -25,7 +25,7 @@ public sealed class LingoNamesResource : IShockwaveItem, IResource
         input.Position = nameOffset;
         for (int i = 0; i < Names.Capacity; i++)
         {
-            Names.Add(input.ReadString());
+            Names.Add(input.ReadPString());
         }
     }
 

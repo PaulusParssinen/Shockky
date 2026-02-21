@@ -3,8 +3,6 @@ using Shockky.Resources;
 
 namespace Shockky;
 
-#nullable enable
-
 public class ShockwaveFile
 {
     public FileMetadataResource? Metadata { get; set; }

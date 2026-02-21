@@ -24,7 +24,7 @@ public sealed class ScoreLabels : IShockwaveItem, IResource
 
         int length = input.ReadInt32BigEndian();
 
-        string labels = input.ReadString();
+        string labels = input.ReadPString();
 
         for (int i = 0; i < offsetMap.Length; i++)
         {

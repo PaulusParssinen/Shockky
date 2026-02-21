@@ -33,9 +33,9 @@ public static class FileGzipEmbeddedImageResource
     }
 
     private static bool TryReadInitialLoadSegment(
-        ref ShockwaveReader input, 
+        ref ShockwaveReader input,
         ReaderContext context,
-        AfterburnerMapResource afterburnerMap, 
+        AfterburnerMapResource afterburnerMap,
         Dictionary<int, IResource> resources)
     {
         // First entry in the AfterburnerMap must be ILS.

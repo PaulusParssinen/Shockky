@@ -18,10 +18,9 @@ namespace Shockky.SourceGeneration.Models;
 internal sealed record TypeInfo(string QualifiedName, TypeKind Kind, bool IsRecord)
 {
     /// <summary>
-    /// Gets the keyword for the current type kind.
+    /// The keyword for the current type kind.
     /// </summary>
-    /// <returns>The keyword for the current type kind.</returns>
-    public string GetTypeKeyword() => Kind switch
+    public string TypeKeyword => Kind switch
     {
         TypeKind.Struct when IsRecord => "record struct",
         TypeKind.Struct => "struct",

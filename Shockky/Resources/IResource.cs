@@ -29,7 +29,7 @@ public interface IResource
 
             // TODO: handle D9
             //OsType.VWLB => new ScoreLabels(ref bodyInput, context),
-            OsType.VWFI => new FileInfoResource(ref bodyInput, context),
+            OsType.VWFI => FileInfoResource.Read(ref bodyInput, context),
 
             OsType.Lnam => new LingoNamesResource(ref bodyInput, context),
             OsType.Lscr => new LingoScriptResource(ref bodyInput),

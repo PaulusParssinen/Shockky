@@ -1,7 +1,7 @@
 namespace Shockky.Resources;
 
 [Flags]
-public enum FileInfoFlags
+public enum FileInfoFlags : uint
 {
     None,
     /// <summary>

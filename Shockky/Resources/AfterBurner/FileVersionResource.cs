@@ -17,7 +17,7 @@ public sealed class FileVersionResource : IResource, IShockwaveItem
         Version = (DirectorVersion)input.Read7BitEncodedInt();
 
         if (versionMaybeTooForgot < 0x501) return;
-        VersionString = input.ReadString();
+        VersionString = input.ReadPString();
     }
 
     public int GetBodySize(WriterOptions options)

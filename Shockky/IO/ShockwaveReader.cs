@@ -9,8 +9,6 @@ using Shockky.Resources;
 
 namespace Shockky.IO;
 
-#nullable enable
-
 // TODO: Use extensions on ROS<byte> with ReaderContext
 public ref struct ShockwaveReader
 {
@@ -176,7 +174,7 @@ public ref struct ShockwaveReader
         return value;
     }
 
-    public string ReadString()
+    public string ReadPString()
     {
         int length = Read7BitEncodedInt();
         return Encoding.UTF8.GetString(ReadBytes(length));
@@ -185,7 +183,7 @@ public ref struct ShockwaveReader
     {
         return Encoding.UTF8.GetString(ReadBytes(length));
     }
-    public string ReadNullString()
+    public string ReadCString()
     {
         int length = CurrentSpan.IndexOf((byte)0);
         Debug.Assert(length != -1);

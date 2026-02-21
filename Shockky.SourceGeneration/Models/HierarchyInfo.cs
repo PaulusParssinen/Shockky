@@ -78,7 +78,7 @@ internal sealed partial record HierarchyInfo(string FilenameHint, string Metadat
         for (int i = Hierarchy.Length - 1; i >= 0; i--)
         {
             writer.WriteLine($$"""/// <inheritdoc cref="{{Hierarchy[i].QualifiedName}}"/>""");
-            writer.Write($$"""partial {{Hierarchy[i].GetTypeKeyword()}} {{Hierarchy[i].QualifiedName}}""");
+            writer.Write($$"""partial {{Hierarchy[i].TypeKeyword}} {{Hierarchy[i].QualifiedName}}""");
 
             // Add any base types, if needed
             if (i == 0 && !baseTypes.IsEmpty)
@@ -92,7 +92,7 @@ internal sealed partial record HierarchyInfo(string FilenameHint, string Metadat
                 writer.WriteLine();
             }
 
-            writer.WriteLine($$"""{""");
+            writer.WriteLine("{");
             writer.IncreaseIndent();
         }
 

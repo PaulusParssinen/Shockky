@@ -12,7 +12,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Shockky.SourceGeneration.Extensions;
 
 /// <summary>
-/// Extension methods for the <see cref="SyntaxNode"/> type.
+/// Extension methods for the <see cref="TypeDeclarationSyntax"/> type.
 /// </summary>
 internal static class TypeDeclarationSyntaxExtensions
 {

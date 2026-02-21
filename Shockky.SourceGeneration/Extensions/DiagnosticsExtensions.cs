@@ -13,7 +13,7 @@ using Shockky.SourceGeneration.Models;
 namespace Shockky.SourceGeneration.Extensions;
 
 /// <summary>
-/// Extension methods for <see cref="GeneratorExecutionContext"/>, specifically for reporting diagnostics.
+/// Extension methods for reporting diagnostics.
 /// </summary>
 internal static class DiagnosticsExtensions
 {

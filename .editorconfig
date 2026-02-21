@@ -115,7 +115,7 @@ csharp_style_prefer_readonly_struct_member = true:suggestion
 # Code-block preferences
 csharp_prefer_braces = true:silent
 csharp_prefer_simple_using_statement = true:suggestion
-csharp_style_namespace_declarations = file_scoped:silent
+csharp_style_namespace_declarations = file_scoped:error
 csharp_style_prefer_method_group_conversion = true:silent
 csharp_style_prefer_primary_constructors = true:suggestion
 csharp_style_prefer_top_level_statements = true:silent
@@ -125,7 +125,7 @@ csharp_prefer_simple_default_expression = true:suggestion
 csharp_style_deconstructed_variable_declaration = true:suggestion
 csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
 csharp_style_inlined_variable_declaration = true:suggestion
-csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_index_operator = false:silent
 csharp_style_prefer_local_over_anonymous_function = true:suggestion
 csharp_style_prefer_null_check_over_type_check = true:suggestion
 csharp_style_prefer_range_operator = false:suggestion
@@ -187,7 +187,6 @@ csharp_preserve_single_line_statements = true
 csharp_prefer_system_threading_lock = true:suggestion
 
 #### Naming styles ####
-[*.{cs,vb}]
 
 # Naming rules
 
@@ -376,3 +375,8 @@ dotnet_naming_style.s_camelcase.required_prefix = s_
 dotnet_naming_style.s_camelcase.required_suffix = 
 dotnet_naming_style.s_camelcase.word_separator = 
 dotnet_naming_style.s_camelcase.capitalization = camel_case
+
+
+# Diagnostics
+dotnet_diagnostic.IDE0056.severity = none # IL bloat
+dotnet_diagnostic.IDE0305.severity = none # Prefer To[...] instead spread syntax

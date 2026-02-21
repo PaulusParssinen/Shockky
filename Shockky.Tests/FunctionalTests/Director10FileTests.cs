@@ -1,4 +1,5 @@
 using Shockky.Resources;
+
 using Xunit;
 
 namespace Shockky.Tests.FunctionalTests;

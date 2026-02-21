@@ -19,8 +19,8 @@ public sealed class CastListEntry : IShockwaveItem
     { }
     public CastListEntry(ref ShockwaveReader input, ReaderContext context)
     {
-        Name = input.ReadString();
-        FilePath = input.ReadString();
+        Name = input.ReadPString();
+        FilePath = input.ReadPString();
         PreloadSettings = input.ReadInt16LittleEndian();
         MemberMin = input.ReadInt16LittleEndian();
         MemberCount = input.ReadInt16LittleEndian();

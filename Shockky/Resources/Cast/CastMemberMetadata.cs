@@ -87,7 +87,7 @@ public sealed class CastMemberMetadata : IResource, IShockwaveItem
                     ScriptText = input.ReadString(length);
                     break;
                 case 1:
-                    Name = input.ReadString();
+                    Name = input.ReadPString();
                     break;
                 case 2:
                     FilePath = input.ReadString(length);
@@ -108,7 +108,7 @@ public sealed class CastMemberMetadata : IResource, IShockwaveItem
                     //XtraGUID = input.Read<Guid>();
                     break;
                 case 10:
-                    XtraName = input.ReadNullString();
+                    XtraName = input.ReadCString();
                     break;
                 case 11: //TODO:
                     break;
@@ -131,7 +131,7 @@ public sealed class CastMemberMetadata : IResource, IShockwaveItem
                     ModifiedDate = input.ReadInt32BigEndian() * 1000;
                     break;
                 case 19:
-                    ModifiedBy = input.ReadNullString();
+                    ModifiedBy = input.ReadCString();
                     break;
                 case 20:
                     Comments = input.ReadString(length);

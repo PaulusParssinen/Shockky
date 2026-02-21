@@ -81,6 +81,56 @@ internal static class AttributeDataExtensions
         return false;
     }
 
+
+    /// <summary>
+    /// Gets a given named argument array value from an <see cref="AttributeData"/> instance, or a fallback value.
+    /// </summary>
+    /// <typeparam name="T">The type of argument to check.</typeparam>
+    /// <param name="attributeData">The target <see cref="AttributeData"/> instance to check.</param>
+    /// <param name="name">The name of the argument to check.</param>
+    /// <param name="fallback">The fallback value to use if the named argument is not present.</param>
+    /// <returns>The array argument named <paramref name="name"/>, or a fallback value.</returns>
+    public static T[]? GetNamedArrayArgument<T>(this AttributeData attributeData, string name, T[]? fallback = default)
+    {
+        if (attributeData.TryGetNamedArrayArgument(name, out T[]? value))
+        {
+            return value;
+        }
+
+        return fallback;
+    }
+
+    /// <summary>
+    /// Tries to get a given named argument array value from an <see cref="AttributeData"/> instance, if present.
+    /// </summary>
+    /// <typeparam name="T">The type of argument to check.</typeparam>
+    /// <param name="attributeData">The target <see cref="AttributeData"/> instance to check.</param>
+    /// <param name="name">The name of the argument to check.</param>
+    /// <param name="value">The resulting argument value, if present.</param>
+    /// <returns>Whether or not <paramref name="attributeData"/> contains an argument named <paramref name="name"/> with a valid array value.</returns>
+    public static bool TryGetNamedArrayArgument<T>(this AttributeData attributeData, string name, out T[]? value)
+    {
+        foreach (KeyValuePair<string, TypedConstant> properties in attributeData.NamedArguments)
+        {
+            if (properties.Key == name)
+            {
+                if (properties.Value is not { Kind: TypedConstantKind.Array, Values: [{ Value: T }] })
+                {
+                    value = default;
+                    return false;
+                }
+
+                value = (T[]?)properties.Value.Values.Select(x => (T)x.Value!).ToArray();
+
+                return true;
+            }
+        }
+
+        value = default;
+
+        return false;
+    }
+
     /// <summary>
     /// Enumerates all items in a flattened sequence of constructor arguments for a given <see cref="AttributeData"/> instance.
     /// </summary>
