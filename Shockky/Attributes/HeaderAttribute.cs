@@ -9,5 +9,5 @@ internal sealed class HeaderAttribute : Attribute
     /// <summary>
     /// Expected header size values for validation.
     /// </summary>
-    public int[] ExpectedSizes { get; init; } = [];
+    public int[] ExpectedSizes { get; set; } = [];
 }

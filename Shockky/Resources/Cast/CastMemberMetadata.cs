@@ -1,153 +1,84 @@
-using System.Diagnostics;
-
 using Shockky.IO;
 
 namespace Shockky.Resources.Cast;
 
 // TODO: Generalize VList parsing logic
-public sealed class CastMemberMetadata : IResource, IShockwaveItem
+[ShockwaveItem]
+public sealed partial class CastMemberMetadata : IResource, IShockwaveItem
 {
     public OsType Kind => OsType.VWCI;
 
-    public MetadataHeader Header { get; set; }
-    public MetadataEntries Entries { get; set; }
-
-    public CastMemberMetadata(ref ShockwaveReader input, ReaderContext context)
+    [Header]
+    public sealed partial class MetadataHeader
     {
-        Header = new MetadataHeader(ref input, context);
-        Entries = new MetadataEntries(ref input, context);
-    }
+        [PadBefore(4)] // Skip garbage script pointer
+        public int LegacyFlags { get; set; }
 
-    public sealed class MetadataHeader
-    {
         public CastMemberInfoFlags Flags { get; set; }
 
         /// <summary>
-        /// The script number of the Lingo script for this cast member in
+        /// The Lingo script number for this cast member in 
         /// the cast library’s Lingo environment.
         /// </summary>
+        [Condition("headerSize >= 20")]
         public int? ScriptContextNum { get; set; }
-
-        public MetadataHeader(ref ShockwaveReader input, ReaderContext context)
-        {
-            int headerSize = input.ReadInt32BigEndian();
-            Debug.Assert(headerSize == 16 || headerSize == 20);
-
-            int scriptGarbagePtr = input.ReadInt32BigEndian();
-            int legacyFlags = input.ReadInt32BigEndian();
-            Flags = (CastMemberInfoFlags)input.ReadInt32BigEndian();
-            if (headerSize >= 20)
-            {
-                ScriptContextNum = input.ReadInt32BigEndian();
-            }
-        }
     }
 
-    public sealed class MetadataEntries
-    {
-        public MetadataEntries(ref ShockwaveReader input, ReaderContext context)
-        {
-            int[] propertyOffsets = new int[input.ReadInt16BigEndian() + 1];
-            for (int i = 0; i < propertyOffsets.Length; i++)
-            {
-                propertyOffsets[i] = input.ReadInt32BigEndian();
-            }
+    /// <summary>Header section.</summary>
+    public MetadataHeader Header { get; set; } = null!;
 
-            // TODO: Serialize the values
-        }
+    /// <summary>Offset table for entries.</summary>
+    [OffsetTable]
+    private OffsetTable Offsets { get; set; }
 
-        public string ScriptText { get; set; }
-        public string Name { get; set; }
+    [Entry(0), ParseStringAs(StringParseKind.FixedBytes)]
+    public string? ScriptText { get; set; }
+    [Entry(1), ParseStringAs(StringParseKind.PString)]
+    public string? Name { get; set; }
 
-        public string FilePath { get; set; }
-        public string FileName { get; set; }
-        public string FileType { get; set; }
+    [Entry(2), ParseStringAs(StringParseKind.FixedBytes)]
+    public string? FilePath { get; set; }
+    [Entry(3), ParseStringAs(StringParseKind.FixedBytes)]
+    public string? FileName { get; set; }
+    [Entry(4), ParseStringAs(StringParseKind.FixedBytes)]
+    public string? FileType { get; set; }
 
-        public Guid XtraGUID { get; set; }
-        public string XtraName { get; set; }
+    // TODO: 5 = string, prop 44, script related?
 
-        public int[] RegistrationPoints { get; set; }
+    [Entry(7), ParseStringAs(StringParseKind.FixedBytes)]
+    public string? UnknownProp45 { get; set; }
 
-        public string ClipboardFormat { get; set; }
+    // TODO: [Entry(9)]
+    // public Guid? XtraGUID { get; set; }
 
-        public int CreationDate { get; set; }
-        public int ModifiedDate { get; set; }
+    [Entry(10), ParseStringAs(StringParseKind.CString)]
+    public string? XtraName { get; set; }
 
-        public string ModifiedBy { get; set; }
-        public string Comments { get; set; }
+    // TODO: [Entry(12)]
+    // public int[]? RegistrationPoints { get; set; }
 
-        public int ImageCompression { get; set; }
-        public int ImageQuality { get; set; }
+    // TODO: 15 - MoA ID?
 
-        private void ReadProperty(ref ShockwaveReader input, int index, int length)
-        {
-            switch (index)
-            {
-                case 0:
-                    ScriptText = input.ReadString(length);
-                    break;
-                case 1:
-                    Name = input.ReadPString();
-                    break;
-                case 2:
-                    FilePath = input.ReadString(length);
-                    break;
-                case 3:
-                    FileName = input.ReadString(length);
-                    break;
-                case 4:
-                    FileType = input.ReadString(length);
-                    break;
-                case 5: // TODO: script rel? - string - prop 44
-                    break;
-                case 7: // TODO: prop 45 - string
-                    string prop45 = input.ReadString(length);
-                    break;
-                case 9:
-                    XtraGUID = new Guid(input.ReadBytes(length));
-                    //XtraGUID = input.Read<Guid>();
-                    break;
-                case 10:
-                    XtraName = input.ReadCString();
-                    break;
-                case 11: //TODO:
-                    break;
-                case 12:
-                    //TODO: MoaRect - TLBR
-                    RegistrationPoints = new int[length / 4];
-                    for (int i = 0; i < RegistrationPoints.Length; i++)
-                    {
-                        RegistrationPoints[i] = input.ReadInt32BigEndian();
-                    }
-                    break;
-                //15 - MoA ID?
-                case 16:
-                    ClipboardFormat = input.ReadString(length);
-                    break;
-                case 17:
-                    CreationDate = input.ReadInt32BigEndian() * 1000;
-                    break;
-                case 18:
-                    ModifiedDate = input.ReadInt32BigEndian() * 1000;
-                    break;
-                case 19:
-                    ModifiedBy = input.ReadCString();
-                    break;
-                case 20:
-                    Comments = input.ReadString(length);
-                    break;
-                case 21:
-                    ReadOnlySpan<byte> imageFlags = input.ReadBytes(length); //4
+    [Entry(16), ParseStringAs(StringParseKind.FixedBytes)]
+    public string? ClipboardFormat { get; set; }
 
-                    ImageCompression = imageFlags[0] >> 4;
-                    ImageQuality = imageFlags[1];
-                    break;
-                default:
-                    ReadOnlySpan<byte> unknown = input.ReadBytes(length);
-                    break;
-            }
-        }
-    }
+    [Entry(17)]
+    public int? CreationDate { get; set; }
+
+    [Entry(18)]
+    public int? ModifiedDate { get; set; }
+
+    [Entry(19), ParseStringAs(StringParseKind.CString)]
+    public string? ModifiedBy { get; set; }
+
+    [Entry(20), ParseStringAs(StringParseKind.FixedBytes)]
+    public string? Comments { get; set; }
+
+    // TODO: 21
+    // ReadOnlySpan<byte> imageFlags = input.ReadBytes(length); //4
+    // 
+    // ImageCompression = imageFlags[0] >> 4;
+    // ImageQuality = imageFlags[1];
 
     public int GetBodySize(WriterOptions options)
     {
