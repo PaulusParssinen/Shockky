@@ -133,7 +133,7 @@ static void HandleExtractCommand(IEnumerable<System.IO.FileInfo> input, Director
             if (bitmapProperties.Rectangle.IsEmpty)
                 continue;
 
-            string outputFilePath = Path.Combine(fileOutputDirectory.FullName, member.Metadata?.Entries.Name ?? resourceId.Id.ToString());
+            string outputFilePath = Path.Combine(fileOutputDirectory.FullName, member.Metadata?.Name ?? resourceId.Id.ToString());
 
             if (bitmapProperties.PaletteRef.MemberNum > 0 && bitmapProperties.PaletteRef.MemberNum < castAssociationTable.Members.Length)
             {
@@ -159,7 +159,7 @@ static void HandleExtractCommand(IEnumerable<System.IO.FileInfo> input, Director
                 if (!TryExtractBitmapResource(outputFilePath, bitmapProperties, bitmapData, palette))
                     continue;
             }
-            Console.WriteLine($"({bitmapProperties.PaletteRef.CastLib}, {bitmapProperties.PaletteRef.MemberNum}) {member.Metadata?.Entries.Name}:");
+            Console.WriteLine($"({bitmapProperties.PaletteRef.CastLib}, {bitmapProperties.PaletteRef.MemberNum}) {member.Metadata?.Name}:");
             Console.WriteLine($"    BitDepth: {bitmapProperties.BitDepth}");
         }
         Console.WriteLine();
