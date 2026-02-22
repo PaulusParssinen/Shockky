@@ -35,6 +35,8 @@ public interface IResource
             OsType.Lscr => new LingoScriptResource(ref bodyInput),
             OsType.Lctx or OsType.LctX => new LingoContextResource(ref bodyInput, context),
 
+            OsType.MCsL => new MovieCastListResource(ref bodyInput, context),
+
             OsType.CASPtr => new CastMapResource(ref bodyInput, context),
             OsType.CASt => new CastMemberPropertiesResource(ref bodyInput, context),
 
