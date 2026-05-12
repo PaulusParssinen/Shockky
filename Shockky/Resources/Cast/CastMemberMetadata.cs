@@ -3,12 +3,12 @@ using Shockky.IO;
 namespace Shockky.Resources.Cast;
 
 // TODO: Generalize VList parsing logic
-[ShockwaveItem]
+[ShockwaveItem(GenerateSerialization = true, IgnoreContainerEndianness = true)]
 public sealed partial class CastMemberMetadata : IResource, IShockwaveItem
 {
     public OsType Kind => OsType.VWCI;
 
-    [Header]
+    [ShockwaveItem(SizePrefixed = true, GenerateSerialization = true, ExpectedSizes = [16, 20])]
     public sealed partial class MetadataHeader
     {
         [PadBefore(4)] // Skip garbage script pointer
@@ -20,16 +20,12 @@ public sealed partial class CastMemberMetadata : IResource, IShockwaveItem
         /// The Lingo script number for this cast member in 
         /// the cast library’s Lingo environment.
         /// </summary>
-        [Condition("headerSize >= 20")]
+        [Condition("bodySize >= 20")]
         public int? ScriptContextNum { get; set; }
     }
 
     /// <summary>Header section.</summary>
-    public MetadataHeader Header { get; set; } = null!;
-
-    /// <summary>Offset table for entries.</summary>
-    [OffsetTable]
-    private OffsetTable Offsets { get; set; }
+    public required MetadataHeader Header { get; set; }
 
     [Entry(0), ParseStringAs(StringParseKind.FixedBytes)]
     public string? ScriptText { get; set; }
@@ -80,12 +76,4 @@ public sealed partial class CastMemberMetadata : IResource, IShockwaveItem
     // ImageCompression = imageFlags[0] >> 4;
     // ImageQuality = imageFlags[1];
 
-    public int GetBodySize(WriterOptions options)
-    {
-        throw new NotImplementedException();
-    }
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
-    {
-        throw new NotImplementedException();
-    }
 }

@@ -85,7 +85,7 @@ static IReadOnlyDictionary<int, System.Drawing.Color[]> ReadPalettes()
     };
 }
 
-static void HandleExtractCommand(IEnumerable<System.IO.FileInfo> input, DirectoryInfo output)
+static void HandleExtractCommand(IEnumerable<FileInfo> input, DirectoryInfo output)
 {
     output.Create();
 

@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 
 using Microsoft.CodeAnalysis;
 
+using Shockky.SourceGeneration.Diagnostics;
 using Shockky.SourceGeneration.Extensions;
 using Shockky.SourceGeneration.Helpers;
 using Shockky.SourceGeneration.Models;
@@ -24,10 +25,14 @@ public sealed partial class ShockwaveItemGenerator
         }
 
         bool bigEndian = attributeData.GetNamedArgument("BigEndian", true);
+        bool ignoreContainerEndianness = attributeData.GetNamedArgument("IgnoreContainerEndianness", false);
+        bool generateSerialization = attributeData.GetNamedArgument("GenerateSerialization", false);
+        bool sizePrefixed = attributeData.GetNamedArgument("SizePrefixed", false);
+        int[]? expectedSizes = attributeData.GetNamedArrayArgument<int>("ExpectedSizes");
 
-        using ImmutableArrayBuilder<PropertyReadInfo> properties = ImmutableArrayBuilder<PropertyReadInfo>.Rent();
-        string? offsetTableProperty = null;
+        using ImmutableArrayBuilder<PropertySerializationInfo> properties = ImmutableArrayBuilder<PropertySerializationInfo>.Rent();
         int? maxEntryIndex = null;
+        HashSet<int> entryIndexes = [];
 
         foreach (IPropertySymbol property in typeSymbol.GetMembers().OfType<IPropertySymbol>())
         {
@@ -37,69 +42,41 @@ public sealed partial class ShockwaveItemGenerator
             var propInfo = GetPropertyInfo(property);
             properties.Add(propInfo);
 
-            if (propInfo.Kind is PropertyKind.OffsetTable)
+            if (propInfo.Kind is PropertyKind.Entry)
             {
-                offsetTableProperty = property.Name;
-            }
-            else if (propInfo.Kind is PropertyKind.Entry)
-            {
+                if (propInfo.EntryIndex < 0)
+                {
+                    diagnostics.Add(DiagnosticDescriptors.DuplicateEntryIndex, property, typeSymbol.Name, property.Name, propInfo.EntryIndex);
+                }
+                else if (!entryIndexes.Add(propInfo.EntryIndex))
+                {
+                    diagnostics.Add(DiagnosticDescriptors.DuplicateEntryIndex, property, typeSymbol.Name, property.Name, propInfo.EntryIndex);
+                }
+
                 maxEntryIndex = maxEntryIndex.HasValue ? Math.Max(maxEntryIndex.Value, propInfo.EntryIndex) : propInfo.EntryIndex;
             }
+
+            AddPropertyDiagnostics(diagnostics, typeSymbol, property, propInfo, generateSerialization);
         }
+
+        PropertySerializationInfo[] propertyArray = properties.ToArray();
 
         var info = new ShockwaveItemInfo(
             HierarchyInfo.From(typeSymbol),
             bigEndian,
+            ignoreContainerEndianness,
+            generateSerialization,
+            sizePrefixed,
+            expectedSizes.ToImmutableArray(),
             properties.ToImmutable(),
-            offsetTableProperty,
-            maxEntryIndex);
+            maxEntryIndex,
+            HasGetBodySizeMethod(typeSymbol),
+            HasWriteToMethod(typeSymbol));
 
         return new Result<ShockwaveItemInfo?>(info, diagnostics.ToImmutable());
     }
 
-    private static Result<HeaderInfo?> GetHeaderInfo(
-        GeneratorAttributeSyntaxContext context,
-        CancellationToken token)
-    {
-        using ImmutableArrayBuilder<DiagnosticInfo> diagnostics = ImmutableArrayBuilder<DiagnosticInfo>.Rent();
-
-        var typeSymbol = (INamedTypeSymbol)context.TargetSymbol;
-
-        if (!typeSymbol.TryGetAttributeWithFullyQualifiedMetadataName(HeaderAttributeName, out AttributeData? attrData))
-        {
-            return new Result<HeaderInfo?>(null, diagnostics.ToImmutable());
-        }
-
-        int[]? expectedSizes = attrData.GetNamedArrayArgument<int>("ExpectedSizes");
-
-        // Inherit endianness from containing type if it has [ShockwaveItem]
-        bool bigEndian = true;
-        if (typeSymbol.ContainingType is { } containingType &&
-            containingType.TryGetAttributeWithFullyQualifiedMetadataName(ShockwaveItemAttributeName, out var parentAttr))
-        {
-            bigEndian = parentAttr.GetNamedArgument("BigEndian", true);
-        }
-
-        using ImmutableArrayBuilder<PropertyReadInfo> properties = ImmutableArrayBuilder<PropertyReadInfo>.Rent();
-
-        foreach (IPropertySymbol prop in typeSymbol.GetMembers().OfType<IPropertySymbol>())
-        {
-            token.ThrowIfCancellationRequested();
-            if (prop.IsStatic || prop.SetMethod is null) continue;
-
-            properties.Add(GetPropertyInfo(prop));
-        }
-
-        var info = new HeaderInfo(
-            HierarchyInfo.From(typeSymbol),
-            bigEndian,
-            expectedSizes.ToImmutableArray(),
-            properties.ToImmutable());
-
-        return new Result<HeaderInfo?>(info, diagnostics.ToImmutable());
-    }
-
-    private static PropertyReadInfo GetPropertyInfo(IPropertySymbol property)
+    private static PropertySerializationInfo GetPropertyInfo(IPropertySymbol property)
     {
         int padBefore = 0;
         int padAfter = 0;
@@ -124,11 +101,8 @@ public sealed partial class ShockwaveItemGenerator
                 case ConditionAttributeName when attrData.ConstructorArguments is [{ Value: string value }]:
                     condition = value;
                     break;
-                case ParseAsAttributeName when attrData.ConstructorArguments is [{ Value: int value }]:
+                case ParseStringAsAttributeName when attrData.ConstructorArguments is [{ Value: int value }]:
                     parseKind = (ParseKind)value;
-                    break;
-                case OffsetTableAttributeName:
-                    kind = PropertyKind.OffsetTable;
                     break;
                 case EntryAttributeName when attrData.ConstructorArguments is [{ Value: int value }]:
                     kind = PropertyKind.Entry;
@@ -137,18 +111,24 @@ public sealed partial class ShockwaveItemGenerator
             }
         }
 
-        // Check if property type has [Header] attribute
+        // Check if property type is a SizePrefixed ShockwaveItem
+        bool isSizePrefixed = false;
         if (kind is PropertyKind.Sequential &&
             property.Type is INamedTypeSymbol typeSymbol &&
-            typeSymbol.HasAttributeWithFullyQualifiedMetadataName(HeaderAttributeName))
+            typeSymbol.TryGetAttributeWithFullyQualifiedMetadataName(ShockwaveItemAttributeName, out var itemAttr))
         {
-            kind = PropertyKind.Header;
+            isSizePrefixed = itemAttr.GetNamedArgument("SizePrefixed", false);
         }
 
         bool isNullable = property.Type is { NullableAnnotation: NullableAnnotation.Annotated } or
             INamedTypeSymbol { IsGenericType: true, ConstructedFrom.SpecialType: SpecialType.System_Nullable_T };
 
-        return new PropertyReadInfo(
+        ITypeSymbol serializationType = GetSerializationType(property.Type);
+        TypeSerializationKind serializationKind = GetSerializationKind(serializationType);
+        string? enumUnderlyingTypeFullName = serializationType is INamedTypeSymbol { TypeKind: TypeKind.Enum } enumType ?
+            enumType.EnumUnderlyingType?.GetFullyQualifiedNameWithNullabilityAnnotations() : null;
+
+        return new PropertySerializationInfo(
             property.Name,
             property.Type.GetFullyQualifiedNameWithNullabilityAnnotations(),
             padBefore,
@@ -157,6 +137,108 @@ public sealed partial class ShockwaveItemGenerator
             parseKind,
             isNullable,
             kind,
-            entryIndex);
+            entryIndex,
+            serializationKind,
+            enumUnderlyingTypeFullName,
+            isSizePrefixed);
+    }
+
+    private static ITypeSymbol GetSerializationType(ITypeSymbol type)
+    {
+        if (type is INamedTypeSymbol { IsGenericType: true, ConstructedFrom.SpecialType: SpecialType.System_Nullable_T } namedType)
+        {
+            return namedType.TypeArguments[0];
+        }
+
+        return type;
+    }
+
+    private static TypeSerializationKind GetSerializationKind(ITypeSymbol type)
+    {
+        if (type.TypeKind is TypeKind.Enum) return TypeSerializationKind.Enum;
+
+        if (type.HasInterfaceWithFullyQualifiedMetadataName(FullyQualifiedIShockwaveItemName)) return TypeSerializationKind.ShockwaveItem;
+
+        if (type.TryGetAttributeWithFullyQualifiedMetadataName(ShockwaveItemAttributeName, out _)) return TypeSerializationKind.ShockwaveItem;
+
+        return type.SpecialType switch
+        {
+            SpecialType.System_Byte => TypeSerializationKind.Byte,
+            SpecialType.System_Boolean => TypeSerializationKind.Boolean,
+            SpecialType.System_Int16 => TypeSerializationKind.Int16,
+            SpecialType.System_UInt16 => TypeSerializationKind.UInt16,
+            SpecialType.System_Int32 => TypeSerializationKind.Int32,
+            SpecialType.System_UInt32 => TypeSerializationKind.UInt32,
+            SpecialType.System_UInt64 => TypeSerializationKind.UInt64,
+            SpecialType.System_Double => TypeSerializationKind.Double,
+            SpecialType.System_String => TypeSerializationKind.String,
+            _ => TypeSerializationKind.Unsupported,
+        };
+    }
+
+    private static void AddPropertyDiagnostics(
+        ImmutableArrayBuilder<DiagnosticInfo> diagnostics,
+        INamedTypeSymbol typeSymbol,
+        IPropertySymbol property,
+        PropertySerializationInfo propInfo,
+        bool generateSerialization)
+    {
+        if (propInfo.ParseKind is not ParseKind.Default && propInfo.SerializationKind is not TypeSerializationKind.String)
+        {
+            diagnostics.Add(DiagnosticDescriptors.ParseStringAsRequiresString, property, typeSymbol.Name, property.Name, propInfo.TypeFullName);
+        }
+
+        if (propInfo.SerializationKind is TypeSerializationKind.ShockwaveItem) return;
+
+        if (propInfo.SerializationKind is TypeSerializationKind.Unsupported)
+        {
+            diagnostics.Add(DiagnosticDescriptors.UnsupportedShockwaveItemPropertyType, property, typeSymbol.Name, property.Name, propInfo.TypeFullName);
+        }
+
+        if (!generateSerialization) return;
+
+        if (propInfo.Kind is PropertyKind.Sequential && propInfo.IsNullable && propInfo.Condition is null)
+        {
+            diagnostics.Add(DiagnosticDescriptors.NullableSequentialPropertyRequiresCondition, property, typeSymbol.Name, property.Name);
+        }
+
+        if (propInfo.Kind is PropertyKind.Sequential && propInfo.Condition is not null && !propInfo.IsNullable)
+        {
+            diagnostics.Add(DiagnosticDescriptors.ConditionalPropertyCannotBeSized, property, typeSymbol.Name, property.Name);
+        }
+
+        if (propInfo.Kind is PropertyKind.Entry && !propInfo.IsNullable)
+        {
+            diagnostics.Add(DiagnosticDescriptors.NonNullableEntryMayBeAbsent, property, typeSymbol.Name, property.Name);
+        }
+    }
+
+    private static bool HasGetBodySizeMethod(INamedTypeSymbol typeSymbol)
+    {
+        foreach (ISymbol symbol in typeSymbol.GetMembers("GetBodySize"))
+        {
+            if (symbol is IMethodSymbol { IsStatic: false, Parameters.Length: 1 } method &&
+                method.Parameters[0].Type.HasFullyQualifiedMetadataName(FullyQualifiedWriterOptionsMetadataName))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool HasWriteToMethod(INamedTypeSymbol typeSymbol)
+    {
+        foreach (ISymbol symbol in typeSymbol.GetMembers("WriteTo"))
+        {
+            if (symbol is IMethodSymbol { IsStatic: false, Parameters.Length: 2 } method &&
+                method.Parameters[0].Type.HasFullyQualifiedMetadataName(FullyQualifiedShockwaveWriterMetadataName) &&
+                method.Parameters[1].Type.HasFullyQualifiedMetadataName(FullyQualifiedWriterOptionsMetadataName))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

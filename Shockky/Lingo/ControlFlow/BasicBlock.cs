@@ -24,7 +24,7 @@ public class BasicBlock : IEnumerable<IInstruction>
     {
         Kind = kind;
 
-        Predecessors = new List<BasicBlock>();
+        Predecessors = [];
     }
 
     public IEnumerator<IInstruction> GetEnumerator() => Body.GetEnumerator();

@@ -1,16 +1,16 @@
-﻿using Shockky.IO;
+using Shockky.IO;
 
 namespace Shockky.Resources;
 
 /// <summary>
 /// The list of cast libraries used by a movie.
 /// </summary>
-[ShockwaveItem(BigEndian = true)]
+[ShockwaveItem(BigEndian = true, IgnoreContainerEndianness = true, GenerateSerialization = true)]
 public sealed partial class MovieCastListResource : IResource, IShockwaveItem
 {
     public OsType Kind => OsType.MCsL;
 
-    [Header]
+    [ShockwaveItem(SizePrefixed = true, GenerateSerialization = true)]
     public sealed partial class HeaderData
     {
         public short Field4 { get; set; }
@@ -19,18 +19,5 @@ public sealed partial class MovieCastListResource : IResource, IShockwaveItem
         public short FieldA { get; set; }
     }
 
-    public HeaderData Header { get; set; } = null!;
-
-    [OffsetTable]
-    private OffsetTable Offsets { get; set; }
-
-    public int GetBodySize(WriterOptions options)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
-    {
-        throw new NotImplementedException();
-    }
+    public required HeaderData Header { get; set; }
 }

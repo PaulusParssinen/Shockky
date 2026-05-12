@@ -133,7 +133,7 @@ internal sealed class IndentedTextWriter : IDisposable
     /// </summary>
     /// <param name="content">The content to write.</param>
     /// <param name="isMultiline">Whether the input content is multiline.</param>
-    public void Write(string content, bool isMultiline = false)
+    public void Write([StringSyntax("C#")] string content, bool isMultiline = false)
     {
         Write(content.AsSpan(), isMultiline);
     }

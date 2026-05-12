@@ -72,6 +72,7 @@ internal sealed partial record HierarchyInfo(string FilenameHint, string Metadat
         if (Namespace.Length > 0)
         {
             writer.WriteLine($"namespace {Namespace};");
+            writer.WriteLine();
         }
 
         // Declare all the opening types until the inner-most one

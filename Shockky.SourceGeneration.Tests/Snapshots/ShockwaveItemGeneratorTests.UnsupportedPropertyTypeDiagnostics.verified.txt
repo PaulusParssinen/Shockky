@@ -1,0 +1,23 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    public object Value { get; set; } = new();
+                  ^^^^^
+}
+*/
+ : (5,18)-(5,23),
+      Message: The property UnsupportedItem.Value has unsupported type object for generated Shockwave item serialization,
+      Severity: Error,
+      Descriptor: {
+        Id: SHCK0100,
+        Title: Unsupported property type for Shockwave item source generation,
+        MessageFormat: The property {0}.{1} has unsupported type {2} for generated Shockwave item serialization,
+        Category: Shockky.SourceGeneration.ShockwaveItemGenerator,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

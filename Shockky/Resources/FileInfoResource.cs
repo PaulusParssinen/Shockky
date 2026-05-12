@@ -5,7 +5,7 @@ namespace Shockky.Resources;
 /// <summary>
 /// Information about a movie file (VWFI chunk).
 /// </summary>
-[ShockwaveItem]
+[ShockwaveItem(GenerateSerialization = true, IgnoreContainerEndianness = true)]
 public sealed partial class FileInfoResource : IShockwaveItem, IResource
 {
     public OsType Kind => OsType.VWFI;
@@ -13,7 +13,7 @@ public sealed partial class FileInfoResource : IShockwaveItem, IResource
     /// <summary>
     /// The header section, containing fixed-size fields.
     /// </summary>
-    [Header(ExpectedSizes = [16, 20])]
+    [ShockwaveItem(SizePrefixed = true, GenerateSerialization = true, ExpectedSizes = [16, 20])]
     public sealed partial class HeaderData
     {
         /// <summary>
@@ -30,16 +30,12 @@ public sealed partial class FileInfoResource : IShockwaveItem, IResource
         /// <summary>
         /// Script context number.
         /// </summary>
-        [Condition("headerSize >= 20")]
+        [Condition("bodySize >= 20")]
         public int? ScriptContextNum { get; set; }
     }
 
     /// <summary>Header section.</summary>
-    public HeaderData Header { get; set; } = null!;
-
-    /// <summary>Offset table for entries.</summary>
-    [OffsetTable]
-    private OffsetTable Offsets { get; set; }
+    public required HeaderData Header { get; set; }
 
     /// <summary>The movie script text. Not used by D4+.</summary>
     [Entry(0), ParseStringAs(StringParseKind.FixedBytes)]
@@ -71,7 +67,4 @@ public sealed partial class FileInfoResource : IShockwaveItem, IResource
     [Entry(7)]
     public short? NewSharedMinCast { get; set; }
 
-    // Write methods remain manual
-    public int GetBodySize(WriterOptions options) => throw new NotImplementedException();
-    public void WriteTo(ShockwaveWriter output, WriterOptions options) => throw new NotImplementedException();
 }

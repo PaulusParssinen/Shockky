@@ -38,13 +38,62 @@ public class ShockwaveWriterTests
     [Fact]
     public void Write_LittleEndian_NumericValues_AreEqual() => Write_NumericValues_AreEqual(reverseEndianness: false);
 
+    [Fact]
+    public void Write_PString_UsesUtf8ByteCount()
+    {
+        const string Value = "A\u00E9";
+
+        int size = ShockwaveWriter.GetPStringSize(Value);
+        Span<byte> buffer = stackalloc byte[size];
+
+        var output = new ShockwaveWriter(buffer, reverseEndianness: false);
+        output.WritePString(Value);
+
+        Assert.Equal(4, size);
+        Assert.Equal(size, output.Position);
+        Assert.Equal([0x03, 0x41, 0xC3, 0xA9], buffer.ToArray());
+    }
+
+    [Fact]
+    public void Write_String_IsPStringAlias()
+    {
+        const string Value = "Alias";
+
+        Span<byte> pStringBuffer = stackalloc byte[ShockwaveWriter.GetPStringSize(Value)];
+        Span<byte> aliasBuffer = stackalloc byte[ShockwaveWriter.GetPStringSize(Value)];
+
+        var pStringOutput = new ShockwaveWriter(pStringBuffer, reverseEndianness: false);
+        var aliasOutput = new ShockwaveWriter(aliasBuffer, reverseEndianness: false);
+
+        pStringOutput.WritePString(Value);
+        aliasOutput.WriteString(Value);
+
+        Assert.Equal(pStringBuffer.ToArray(), aliasBuffer.ToArray());
+    }
+
+    [Fact]
+    public void Write_Zeroes_ClearsPadding()
+    {
+        Span<byte> buffer = stackalloc byte[4];
+        buffer.Fill(0xFF);
+
+        var output = new ShockwaveWriter(buffer, reverseEndianness: false);
+        output.WriteByte(0x11);
+        output.WriteZeroes(2);
+        output.WriteByte(0x22);
+
+        Assert.Equal(4, output.Position);
+        Assert.Equal([0x11, 0x00, 0x00, 0x22], buffer.ToArray());
+    }
+
     private void Write_NumericValues_AreEqual(bool reverseEndianness)
     {
         const int OutputSize = sizeof(byte)
             + sizeof(short) * 2
             + sizeof(ushort) * 2
             + sizeof(int) * 2
-            + sizeof(uint) * 2;
+            + sizeof(uint) * 2
+            + sizeof(double) * 2;
 
         Span<byte> buffer = stackalloc byte[OutputSize];
         var output = new ShockwaveWriter(buffer, reverseEndianness);
@@ -64,6 +113,9 @@ public class ShockwaveWriterTests
         output.WriteUInt32LittleEndian(123456789);
         output.WriteUInt32BigEndian(123456789);
 
+        output.WriteDoubleLittleEndian(1234.5);
+        output.WriteDoubleBigEndian(1234.5);
+
         Assert.Equal(42, input.ReadByte());
 
         Assert.Equal(4242, input.ReadInt16LittleEndian());
@@ -77,5 +129,8 @@ public class ShockwaveWriterTests
 
         Assert.Equal((uint)123456789, input.ReadUInt32LittleEndian());
         Assert.Equal((uint)123456789, input.ReadUInt32BigEndian());
+
+        Assert.Equal(1234.5, input.ReadDoubleLittleEndian());
+        Assert.Equal(1234.5, input.ReadDoubleBigEndian());
     }
 }

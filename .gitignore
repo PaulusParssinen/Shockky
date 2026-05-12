@@ -263,6 +263,9 @@ paket-files/
 # FAKE - F# Make
 .fake/
 
+# Verify
+*.received.*
+
 # JetBrains Rider
 .idea/
 *.sln.iml

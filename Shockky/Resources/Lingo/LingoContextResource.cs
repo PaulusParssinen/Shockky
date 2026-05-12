@@ -15,8 +15,8 @@ public sealed class LingoContextResource : IShockwaveItem, IResource
     public int Type { get; set; }
     public LingoContextFlags Flags { get; set; }
 
-    public int ValuesChunkIndex { get; set; }
-    public int NameChunkIndex { get; set; }
+    public int ValuesResourceIndex { get; set; }
+    public int NameResourceIndex { get; set; }
 
     public short ValidCount { get; set; }
     public short FreeChunkIndex { get; set; }
@@ -41,8 +41,8 @@ public sealed class LingoContextResource : IShockwaveItem, IResource
         int unk4 = input.ReadInt32BigEndian();
         Type = input.ReadInt32BigEndian(); //TODO: ??
 
-        ValuesChunkIndex = input.ReadInt32BigEndian();
-        NameChunkIndex = input.ReadInt32BigEndian();
+        ValuesResourceIndex = input.ReadInt32BigEndian();
+        NameResourceIndex = input.ReadInt32BigEndian();
 
         ValidCount = input.ReadInt16BigEndian();
         Flags = (LingoContextFlags)input.ReadInt16BigEndian();
@@ -100,8 +100,8 @@ public sealed class LingoContextResource : IShockwaveItem, IResource
         output.WriteInt32BigEndian(0);
         output.WriteInt32BigEndian(Type);
 
-        output.WriteInt32BigEndian(ValuesChunkIndex);
-        output.WriteInt32BigEndian(NameChunkIndex);
+        output.WriteInt32BigEndian(ValuesResourceIndex);
+        output.WriteInt32BigEndian(NameResourceIndex);
 
         output.WriteInt16BigEndian(ValidCount);
         output.WriteInt16BigEndian((short)Flags);

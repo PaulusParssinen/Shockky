@@ -8,14 +8,19 @@ namespace Shockky.SourceGeneration.Models;
 internal sealed record ShockwaveItemInfo(
     HierarchyInfo Hierarchy,
     bool BigEndian,
-    EquatableArray<PropertyReadInfo> Properties,
-    string? OffsetTablePropertyName,
-    int? MaxEntryIndex) : IEquatable<ShockwaveItemInfo?>;
+    bool IgnoreContainerEndianness,
+    bool GenerateSerialization,
+    bool SizePrefixed,
+    EquatableArray<int> ExpectedSizes,
+    EquatableArray<PropertySerializationInfo> Properties,
+    int? MaxEntryIndex,
+    bool HasExistingGetBodySize,
+    bool HasExistingWriteTo) : IEquatable<ShockwaveItemInfo?>;
 
 /// <summary>
-/// Model for a property to be read.
+/// Model for a property to be serialized.
 /// </summary>
-internal sealed record PropertyReadInfo(
+internal sealed record PropertySerializationInfo(
     string Name,
     string TypeFullName,
     int PadBefore,
@@ -24,7 +29,30 @@ internal sealed record PropertyReadInfo(
     ParseKind ParseKind,
     bool IsNullable,
     PropertyKind Kind,
-    int EntryIndex) : IEquatable<PropertyReadInfo>;
+    int EntryIndex,
+    TypeSerializationKind SerializationKind,
+    string? EnumUnderlyingTypeFullName,
+    bool IsSizePrefixed) : IEquatable<PropertySerializationInfo>;
+
+/// <summary>
+/// Serializable type shape for generated binary I/O.
+/// </summary>
+internal enum TypeSerializationKind
+{
+    Unsupported,
+    Byte,
+    SByte,
+    Boolean,
+    Int16,
+    UInt16,
+    Int32,
+    UInt32,
+    UInt64,
+    Double,
+    String,
+    Enum,
+    ShockwaveItem,
+}
 
 /// <summary>
 /// Kind of property in the read sequence.
@@ -33,10 +61,6 @@ internal enum PropertyKind
 {
     /// <summary>Regular sequential property.</summary>
     Sequential,
-    /// <summary>Nested type marked with [Header].</summary>
-    Header,
-    /// <summary>Offset table property.</summary>
-    OffsetTable,
     /// <summary>Entry indexed by offset table.</summary>
     Entry,
 }

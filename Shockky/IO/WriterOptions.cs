@@ -2,12 +2,7 @@ using Shockky.Resources;
 
 namespace Shockky.IO;
 
-public readonly ref struct WriterOptions
+public readonly ref struct WriterOptions(DirectorVersion version)
 {
-    public DirectorVersion Version { get; }
-
-    public WriterOptions(DirectorVersion version)
-    {
-        Version = version;
-    }
+    public DirectorVersion Version { get; } = version;
 }

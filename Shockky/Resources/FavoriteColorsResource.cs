@@ -10,8 +10,8 @@ public sealed class FavoriteColorsResource : IShockwaveItem, IResource
 
     public FavoriteColorsResource()
     {
-        Colors = new (int R, int G, int B)[16]
-        {
+        Colors =
+        [
             (0, 0, 0),
             (17, 17, 17),
             (34, 34, 34),
@@ -28,7 +28,7 @@ public sealed class FavoriteColorsResource : IShockwaveItem, IResource
             (221, 221, 221),
             (238, 238, 238),
             (255, 255, 255)
-        };
+        ];
     }
 
     public int GetBodySize(WriterOptions options)

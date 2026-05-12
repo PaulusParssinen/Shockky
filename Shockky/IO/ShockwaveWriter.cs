@@ -14,6 +14,7 @@ public ref struct ShockwaveWriter
     private readonly bool _reverseEndianness;
     private readonly Span<byte> _data;
 
+    public readonly int Position => _position;
     public readonly Span<byte> CurrentSpan => _data.Slice(_position);
 
     public ShockwaveWriter(Span<byte> data, bool reverseEndianness)
@@ -28,6 +29,12 @@ public ref struct ShockwaveWriter
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Advance(int count) => _position += count;
+
+    public void WriteZeroes(int count)
+    {
+        _data.Slice(_position, count).Clear();
+        _position += count;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteByte(byte value) => _data[_position++] = value;
@@ -149,6 +156,33 @@ public ref struct ShockwaveWriter
         _position += sizeof(ulong);
     }
 
+    public void WriteDoubleLittleEndian(double value)
+    {
+        if (_reverseEndianness)
+        {
+            BinaryPrimitives.WriteDoubleBigEndian(_data.Slice(_position), value);
+        }
+        else
+        {
+            BinaryPrimitives.WriteDoubleLittleEndian(_data.Slice(_position), value);
+        }
+
+        _position += sizeof(double);
+    }
+    public void WriteDoubleBigEndian(double value)
+    {
+        if (_reverseEndianness)
+        {
+            BinaryPrimitives.WriteDoubleLittleEndian(_data.Slice(_position), value);
+        }
+        else
+        {
+            BinaryPrimitives.WriteDoubleBigEndian(_data.Slice(_position), value);
+        }
+
+        _position += sizeof(double);
+    }
+
     public void Write7BitEncodedInt(int value) => Write7BitEncodedUInt((uint)value);
     public void Write7BitEncodedUInt(uint value)
     {
@@ -184,10 +218,27 @@ public ref struct ShockwaveWriter
     /// Writes length-prefixed UTF-8 string. 
     /// </summary>
     /// <param name="value">The UTF-8 string to write.</param>
-    public void WriteString(ReadOnlySpan<char> value)
-    {
-        Write7BitEncodedUInt((uint)value.Length);
+    public void WriteString(ReadOnlySpan<char> value) => WritePString(value);
 
+    /// <summary>
+    /// Writes a 7-bit-length-prefixed UTF-8 string.
+    /// </summary>
+    /// <param name="value">The string to write.</param>
+    public void WritePString(ReadOnlySpan<char> value)
+    {
+        int byteCount = Encoding.UTF8.GetByteCount(value);
+        Write7BitEncodedUInt((uint)byteCount);
+
+        int len = Encoding.UTF8.GetBytes(value, _data.Slice(_position));
+        _position += len;
+    }
+
+    /// <summary>
+    /// Writes UTF-8 bytes without a prefix or terminator.
+    /// </summary>
+    /// <param name="value">The string to write.</param>
+    public void WriteFixedString(ReadOnlySpan<char> value)
+    {
         int len = Encoding.UTF8.GetBytes(value, _data.Slice(_position));
         _position += len;
     }
@@ -202,6 +253,22 @@ public ref struct ShockwaveWriter
         _data[_position + len] = 0;
         _position += len + 1;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int GetUtf8ByteCount(ReadOnlySpan<char> value) => Encoding.UTF8.GetByteCount(value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int GetPStringSize(ReadOnlySpan<char> value)
+    {
+        int byteCount = GetUtf8ByteCount(value);
+        return GetVarUIntSize((uint)byteCount) + byteCount;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int GetCStringSize(ReadOnlySpan<char> value) => GetUtf8ByteCount(value) + 1;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int GetFixedStringSize(ReadOnlySpan<char> value) => GetUtf8ByteCount(value);
 
     public void WriteColor(Color color) => WriteColor(color.R, color.G, color.B);
     public void WriteColor(byte r, byte g, byte b)

@@ -21,9 +21,9 @@ public class LingoFunction : IShockwaveItem
     public LingoFunction()
     {
         Bytecode = [];
-        Arguments = new List<short>();
-        Locals = new List<short>();
-        Globals = new List<short>();
+        Arguments = [];
+        Locals = [];
+        Globals = [];
         BytesPerLine = [];
     }
     public LingoFunction(ref ShockwaveReader input)
