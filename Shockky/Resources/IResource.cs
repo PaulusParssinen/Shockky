@@ -23,7 +23,7 @@ public interface IResource
             OsType.ABMP => new AfterburnerMapResource(ref bodyInput, context),
 
             OsType.imap => new IndexMapResource(ref bodyInput),
-            OsType.mmap => new MemoryMapResource(ref bodyInput),
+            OsType.mmap => new MemoryMapResource(ref bodyInput, context),
             OsType.KEYPtr => new KeyMapResource(ref bodyInput, context),
             OsType.VWCF or OsType.DRCF => new ConfigResource(ref bodyInput, context),
 

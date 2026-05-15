@@ -17,7 +17,7 @@ public sealed class MemoryMapResource : IShockwaveItem, IResource
 
     public ResourceEntry this[int index] => Entries[index];
 
-    public MemoryMapResource(ref ShockwaveReader input)
+    public MemoryMapResource(ref ShockwaveReader input, ReaderContext context)
     {
         input.ReadInt16BigEndian();
         input.ReadInt16BigEndian();
@@ -31,7 +31,7 @@ public sealed class MemoryMapResource : IShockwaveItem, IResource
 
         for (int i = 0; i < Entries.Length; i++)
         {
-            Entries[i] = new ResourceEntry(ref input);
+            Entries[i] = new ResourceEntry(ref input, context);
         }
     }
 
