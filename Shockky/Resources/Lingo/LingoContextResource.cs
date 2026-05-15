@@ -58,7 +58,7 @@ public sealed class LingoContextResource : IShockwaveItem, IResource
 
         for (int i = 0; i < Items.Capacity; i++)
         {
-            Items.Add(new LingoContextItem(ref input));
+            Items.Add(new LingoContextItem(ref input, context));
         }
     }
 
