@@ -29,4 +29,18 @@ public class Director10FileTests(Director10FileTests.Fixture fixture) : IClassFi
         Assert.True(found);
         Assert.IsType<KeyMapResource>(resource);
     }
+
+    [Fact]
+    public void EmptyFile_ConfigChecksumMatchesStoredValue()
+    {
+        var config = fixture.EmptyFile.Resources.Values.OfType<ConfigResource>().Single();
+        Assert.Equal(config.Checksum, config.CalculateChecksum());
+    }
+
+    [Fact]
+    public void EmptyFileAfterburned_ConfigChecksumMatchesStoredValue()
+    {
+        var config = fixture.EmptyFileAfterburned.Resources.Values.OfType<ConfigResource>().Single();
+        Assert.Equal(config.Checksum, config.CalculateChecksum());
+    }
 }

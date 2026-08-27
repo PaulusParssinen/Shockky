@@ -301,6 +301,13 @@ public ref struct ShockwaveWriter
         WriteInt16LittleEndian((short)value.Bottom);
         WriteInt16LittleEndian((short)value.Right);
     }
+    public void WriteRectBigEndian(Rectangle value)
+    {
+        WriteInt16BigEndian((short)value.Top);
+        WriteInt16BigEndian((short)value.Left);
+        WriteInt16BigEndian((short)value.Bottom);
+        WriteInt16BigEndian((short)value.Right);
+    }
     public void WriteMemberIdLittleEndian(CastMemberId memberId)
     {
         WriteInt16LittleEndian(memberId.CastLib);

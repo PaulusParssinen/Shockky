@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Drawing;
 
@@ -67,9 +68,10 @@ public sealed class ConfigResource : IShockwaveItem, IResource
     public short DefaultColorDepth { get; set; }
 
     /// <summary>
-    /// If <see langword="true"/>, the system must support color.
+    /// The default image compression method for bitmap cast members (field 0x1E).
     /// </summary>
-    public bool ColorRequired { get; set; }
+    /// <remarks>Corresponds to Lingo <c>the movieImageCompression</c> / <c>the imageCompression of movie</c>.</remarks>
+    public ImageCompression ImageCompression { get; set; }
 
     public byte Field1F { get; set; }
 
@@ -106,7 +108,11 @@ public sealed class ConfigResource : IShockwaveItem, IResource
     /// </summary>
     public bool Trial { get; set; }
 
-    public byte Field34 { get; set; }
+    /// <summary>
+    /// The default JPEG quality percentage (0-100) used for bitmap compression (field 0x35).
+    /// </summary>
+    /// <remarks>Corresponds to Lingo <c>the movieImageQuality</c> / <c>the imageQuality of movie</c>. Default is 80.</remarks>
+    public byte ImageQuality { get; set; } = 80;
 
     /// <summary>
     /// The initial score tempo.
@@ -196,7 +202,7 @@ public sealed class ConfigResource : IShockwaveItem, IResource
         // D2 -> D3 did not update the version apparently
         if (!input.IsDataAvailable) return;
 
-        ColorRequired = input.ReadBoolean();
+        ImageCompression = (ImageCompression)input.ReadByte();
         Field1F = input.ReadByte();
         DataSize = input.ReadInt32BigEndian();
 
@@ -206,7 +212,7 @@ public sealed class ConfigResource : IShockwaveItem, IResource
         ScoreUsedChannelsMask = input.ReadUInt64BigEndian();
 
         Trial = input.ReadBoolean();
-        Field34 = input.ReadByte();
+        ImageQuality = input.ReadByte();
 
         Tempo = input.ReadInt16BigEndian();
         Platform = (Platform)input.ReadInt16BigEndian();
@@ -239,16 +245,15 @@ public sealed class ConfigResource : IShockwaveItem, IResource
         Field60 = input.ReadInt16BigEndian();
         Field62 = input.ReadInt16BigEndian();
 
-        // var calculatedChecksum = CalculateChecksum();
-        // TODO: Debug.Assert(Checksum == calculatedChecksum, "Config checksum mismatch!");
+        Debug.Assert(Checksum == CalculateChecksum(), "Config checksum mismatch!");
     }
 
     public uint CalculateChecksum()
     {
-        uint checksum = Length + 1;
+        uint checksum = (uint)Length + 1;
         unchecked
         {
-            checksum *= ((uint)Version + 2);
+            checksum *= (uint)Version + 2;
             checksum /= (uint)Rect.Top + 3;
             checksum *= (uint)Rect.Left + 4;
             checksum /= (uint)Rect.Bottom + 5;
@@ -257,13 +262,13 @@ public sealed class ConfigResource : IShockwaveItem, IResource
             checksum *= (uint)MaxMemberNum + 8;
             checksum -= (uint)LegacyTempo + 9;
             checksum -= (uint)(LightSwitch ? 1 : 0) + 10;
-            checksum += (uint)StageColor.G + 11;
+            checksum += (uint)(short)(StageColor.G | (StageColor.B << 8)) + 11;
             checksum *= (uint)CommentFont + 12;
             checksum += (uint)CommentSize + 13;
-            checksum *= (uint)CommentStyle + 14;
-            checksum += (uint)StagePalette + 15;
+            checksum *= (uint)(ushort)CommentStyle + 14;
+            checksum += (uint)(byte)(StagePalette >> 8) + 15;
             checksum += (uint)DefaultColorDepth + 16;
-            checksum += (uint)(ColorRequired ? 1 : 0) + 17;
+            checksum += (uint)(byte)ImageCompression + 17;
             checksum *= (uint)Field1F + 18;
             checksum += (uint)DataSize + 19;
             checksum *= (uint)OriginalVersion + 20;
@@ -274,7 +279,7 @@ public sealed class ConfigResource : IShockwaveItem, IResource
             checksum *= (uint)(Trial ? 1 : 0) + 25;
             checksum += (uint)Tempo + 26;
             checksum *= (uint)Platform + 27;
-            checksum *= (uint)((SaveSeed * 0xE06) + 0xFFF450000); // - 0xBB000
+            checksum *= (uint)(SaveSeed * 3590 - 0xBB0000);
             checksum ^= 0x72616C66;
         }
         return checksum;
@@ -286,7 +291,7 @@ public sealed class ConfigResource : IShockwaveItem, IResource
     {
         output.WriteInt16BigEndian(Length);
         output.WriteInt16BigEndian((short)Version);
-        output.WriteRect(Rect);
+        output.WriteRectBigEndian(Rect);
         output.WriteInt16BigEndian(MinMemberNum);
         output.WriteInt16BigEndian(MaxMemberNum);
         output.WriteByte(LegacyTempo);
@@ -298,10 +303,10 @@ public sealed class ConfigResource : IShockwaveItem, IResource
         output.WriteInt16BigEndian(CommentSize);
         output.WriteInt16BigEndian(CommentStyle);
 
-        output.WriteInt16BigEndian(StagePalette);
+        output.WriteInt16LittleEndian(StagePalette);
         output.WriteInt16BigEndian(DefaultColorDepth);
 
-        output.WriteBoolean(ColorRequired);
+        output.WriteByte((byte)ImageCompression);
         output.WriteByte(Field1F);
         output.WriteInt32BigEndian(DataSize);
 
@@ -310,7 +315,7 @@ public sealed class ConfigResource : IShockwaveItem, IResource
         output.WriteInt32BigEndian((int)Flags);
         output.WriteUInt64BigEndian(ScoreUsedChannelsMask);
         output.WriteBoolean(Trial);
-        output.WriteByte(Field34);
+        output.WriteByte(ImageQuality);
         output.WriteInt16BigEndian(Tempo);
         output.WriteInt16BigEndian((short)Platform);
         output.WriteInt16BigEndian(SaveSeed);
