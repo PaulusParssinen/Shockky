@@ -56,7 +56,7 @@ public sealed class BitmapCastProperties : IMemberProperties
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         if (BitDepth != 1)
             Stride |= 0x8000;

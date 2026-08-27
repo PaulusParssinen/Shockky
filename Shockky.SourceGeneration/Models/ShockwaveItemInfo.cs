@@ -15,7 +15,8 @@ internal sealed record ShockwaveItemInfo(
     EquatableArray<PropertySerializationInfo> Properties,
     int? MaxEntryIndex,
     bool HasExistingGetBodySize,
-    bool HasExistingWriteTo) : IEquatable<ShockwaveItemInfo?>;
+    bool HasExistingWriteTo,
+    bool HasPrimaryConstructor) : IEquatable<ShockwaveItemInfo?>;
 
 /// <summary>
 /// Model for a property to be serialized.
@@ -32,7 +33,15 @@ internal sealed record PropertySerializationInfo(
     int EntryIndex,
     TypeSerializationKind SerializationKind,
     string? EnumUnderlyingTypeFullName,
-    bool IsSizePrefixed) : IEquatable<PropertySerializationInfo>;
+    bool IsSizePrefixed,
+    bool IsArray = false,
+    bool IsList = false,
+    string? CountPropertyName = null,
+    int FixedCount = -1,
+    TypeSerializationKind ArrayElementSerializationKind = TypeSerializationKind.Unsupported,
+    string? ArrayElementTypeFullName = null,
+    string? ArrayElementEnumUnderlyingTypeFullName = null,
+    bool IsArrayElementSizePrefixed = false) : IEquatable<PropertySerializationInfo>;
 
 /// <summary>
 /// Serializable type shape for generated binary I/O.
@@ -50,6 +59,7 @@ internal enum TypeSerializationKind
     UInt64,
     Double,
     String,
+    Color,
     Enum,
     ShockwaveItem,
 }

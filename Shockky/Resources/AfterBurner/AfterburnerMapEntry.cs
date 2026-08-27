@@ -40,7 +40,7 @@ public sealed class AfterburnerMapEntry : IShockwaveItem
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.Write7BitEncodedInt(Index);
         output.Write7BitEncodedInt(Offset);

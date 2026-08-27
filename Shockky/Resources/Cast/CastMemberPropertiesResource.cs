@@ -61,13 +61,13 @@ public sealed class CastMemberPropertiesResource : IResource, IShockwaveItem
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteInt32LittleEndian((int)Type);
         output.WriteInt32LittleEndian(Metadata.GetBodySize(options));
         output.WriteInt32LittleEndian(Properties.GetBodySize(options));
 
-        Metadata.WriteTo(output, options);
-        Properties.WriteTo(output, options);
+        Metadata.WriteTo(ref output, options);
+        Properties.WriteTo(ref output, options);
     }
 }

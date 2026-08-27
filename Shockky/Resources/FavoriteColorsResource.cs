@@ -41,7 +41,7 @@ public sealed class FavoriteColorsResource : IShockwaveItem, IResource
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteInt32LittleEndian(1);
         output.WriteInt32LittleEndian(1);

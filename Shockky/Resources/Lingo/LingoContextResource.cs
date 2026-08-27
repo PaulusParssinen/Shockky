@@ -85,7 +85,7 @@ public sealed class LingoContextResource : IShockwaveItem, IResource
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         const short ENTRY_OFFSET = 96;
 
@@ -117,7 +117,7 @@ public sealed class LingoContextResource : IShockwaveItem, IResource
 
         foreach (LingoContextItem section in Items)
         {
-            section.WriteTo(output, options);
+            section.WriteTo(ref output, options);
         }
     }
 }

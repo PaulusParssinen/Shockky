@@ -49,7 +49,7 @@ public sealed class MemoryMapResource : IShockwaveItem, IResource
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteInt16BigEndian(ENTRIES_OFFSET);
         output.WriteInt16BigEndian(ENTRY_SIZE);
@@ -62,7 +62,7 @@ public sealed class MemoryMapResource : IShockwaveItem, IResource
         output.WriteInt32BigEndian(LastFreeIndex);
         foreach (var entry in Entries)
         {
-            entry.WriteTo(output, options);
+            entry.WriteTo(ref output, options);
         }
     }
 }

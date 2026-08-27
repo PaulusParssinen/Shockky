@@ -18,7 +18,7 @@ public sealed record Tile(CastMemberId Id, Rectangle Rect) : IShockwaveItem
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         throw new NotImplementedException();
     }
@@ -51,7 +51,7 @@ public sealed class TilesResource : IShockwaveItem, IResource
         throw new NotImplementedException();
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         throw new NotImplementedException();
     }

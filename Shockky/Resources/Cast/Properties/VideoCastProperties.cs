@@ -51,7 +51,7 @@ public class VideoCastProperties : IMemberProperties
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         throw new NotImplementedException(nameof(VideoCastProperties));
     }

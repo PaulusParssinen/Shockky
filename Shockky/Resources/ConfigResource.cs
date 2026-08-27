@@ -287,7 +287,7 @@ public sealed class ConfigResource : IShockwaveItem, IResource
 
     public int GetBodySize(WriterOptions options) => Length;
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteInt16BigEndian(Length);
         output.WriteInt16BigEndian((short)Version);

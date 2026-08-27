@@ -20,6 +20,7 @@ public sealed partial class ShockwaveItemGenerator : IIncrementalGenerator
     private const string PadBeforeAttributeName = "Shockky.PadBeforeAttribute";
     private const string PadAfterAttributeName = "Shockky.PadAfterAttribute";
     private const string ConditionAttributeName = "Shockky.ConditionAttribute";
+    private const string CountAttributeName = "Shockky.CountAttribute";
     private const string ParseStringAsAttributeName = "Shockky.ParseStringAsAttribute";
     private const string FullyQualifiedIShockwaveItemName = "Shockky.IShockwaveItem";
     private const string FullyQualifiedWriterOptionsMetadataName = "Shockky.IO.WriterOptions";

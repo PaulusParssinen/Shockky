@@ -23,7 +23,7 @@ public sealed class PaletteResource : IShockwaveItem, IResource
 
     public int GetBodySize(WriterOptions options) => Colors.Length * 6;
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         foreach (Color color in Colors)
         {

@@ -20,7 +20,7 @@ public class ScriptCastProperties : IMemberProperties
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteInt16BigEndian((short)Kind);
     }

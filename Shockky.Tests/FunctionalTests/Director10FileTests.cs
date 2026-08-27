@@ -43,4 +43,24 @@ public class Director10FileTests(Director10FileTests.Fixture fixture) : IClassFi
         var config = fixture.EmptyFileAfterburned.Resources.Values.OfType<ConfigResource>().Single();
         Assert.Equal(config.Checksum, config.CalculateChecksum());
     }
+
+    [Fact]
+    public void EmptyFile_ScoreOrderResource_HasValidEntries()
+    {
+        var sord = fixture.EmptyFile.Resources.Values.OfType<ScoreOrderResource>().FirstOrDefault();
+        if (sord is not null)
+        {
+            Assert.NotNull(sord.Entries);
+        }
+    }
+
+    [Fact]
+    public void EmptyFileAfterburned_ScoreOrderResource_HasValidEntries()
+    {
+        var sord = fixture.EmptyFileAfterburned.Resources.Values.OfType<ScoreOrderResource>().FirstOrDefault();
+        if (sord is not null)
+        {
+            Assert.NotNull(sord.Entries);
+        }
+    }
 }

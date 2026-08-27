@@ -196,7 +196,7 @@ public sealed class LingoScriptResource : IShockwaveItem, IResource
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteInt32BigEndian(0);
         output.WriteInt32BigEndian(0);

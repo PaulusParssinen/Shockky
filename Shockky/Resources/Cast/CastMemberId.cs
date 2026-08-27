@@ -1,6 +1,7 @@
 namespace Shockky.Resources.Cast;
 
 /// <summary>
-/// Represents 
+/// Represents a reference to a cast member by library number and member number.
 /// </summary>
-public readonly record struct CastMemberId(short CastLib = 0, short MemberNum = 0);
+[ShockwaveItem(BigEndian = true, GenerateSerialization = true)]
+public readonly partial record struct CastMemberId(short CastLib = 0, short MemberNum = 0) : IShockwaveItem<CastMemberId>;

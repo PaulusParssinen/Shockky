@@ -55,7 +55,7 @@ public sealed class GridResource : IShockwaveItem, IResource
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteInt32LittleEndian(Unknown);
 
@@ -68,7 +68,7 @@ public sealed class GridResource : IShockwaveItem, IResource
         output.WriteInt16LittleEndian(GuideColor);
         foreach (Guide guide in Guides)
         {
-            guide.WriteTo(output, options);
+            guide.WriteTo(ref output, options);
         }
     }
 }

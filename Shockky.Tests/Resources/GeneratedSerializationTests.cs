@@ -77,6 +77,51 @@ public class GeneratedSerializationTests
         Assert.Equal(resource.Comments, roundTripped.Comments);
     }
 
+    [Fact]
+    public void ScoreOrderResource_RoundTrips()
+    {
+        var resource = new ScoreOrderResource
+        {
+            Entries =
+            [
+                new CastMemberId(1, 10),
+                new CastMemberId(1, 20),
+                new CastMemberId(2, 5),
+            ]
+        };
+
+        ScoreOrderResource roundTripped = WriteAndRead(resource, ScoreOrderResource.Read);
+
+        Assert.Equal(3, roundTripped.Entries.Count);
+        Assert.Equal(resource.Entries[0], roundTripped.Entries[0]);
+        Assert.Equal(resource.Entries[1], roundTripped.Entries[1]);
+        Assert.Equal(resource.Entries[2], roundTripped.Entries[2]);
+    }
+
+    [Fact]
+    public void ScoreOrderResource_ReadsBinaryChunk()
+    {
+        byte[] data =
+        [
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // dummy Rc
+            0x00, 0x00, 0x00, 0x02,                         // Used = 2
+            0x00, 0x00, 0x00, 0x05,                         // Capacity = 5
+            0x00, 0x14,                                     // HeaderSize = 20
+            0x00, 0x04,                                     // ItemSize = 4
+            0x00, 0x01, 0x00, 0x64,                         // Entry 0: CastLib=1, MemberNum=100
+            0x00, 0x02, 0x00, 0xC8                          // Entry 1: CastLib=2, MemberNum=200
+        ];
+
+        var reader = new ShockwaveReader(data, reverseEndianness: false);
+        var sord = ScoreOrderResource.Read(ref reader, new ReaderContext(DirectorVersion.V1201));
+
+        Assert.Equal(2, sord.Entries.Count);
+        Assert.Equal(1, sord.Entries[0].CastLib);
+        Assert.Equal(100, sord.Entries[0].MemberNum);
+        Assert.Equal(2, sord.Entries[1].CastLib);
+        Assert.Equal(200, sord.Entries[1].MemberNum);
+    }
+
     private delegate T ReadDelegate<T>(ref ShockwaveReader input, ReaderContext context);
 
     private static T WriteAndRead<T>(T resource, ReadDelegate<T> read) where T : IShockwaveItem
@@ -88,7 +133,7 @@ public class GeneratedSerializationTests
         byte[] buffer = new byte[size];
         var output = new ShockwaveWriter(buffer, reverseEndianness: false);
 
-        resource.WriteTo(output, writerOptions);
+        resource.WriteTo(ref output, writerOptions);
 
         var input = new ShockwaveReader(buffer, reverseEndianness: false);
         T roundTripped = read(ref input, readerContext);

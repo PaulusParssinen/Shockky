@@ -47,7 +47,7 @@ public sealed class ScoreLabels : IShockwaveItem, IResource
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         int offset = 0;
         var builder = new StringBuilder();

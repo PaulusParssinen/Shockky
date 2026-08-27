@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Shockky.SourceGeneration.Diagnostics;
 using Shockky.SourceGeneration.Extensions;
@@ -37,7 +38,7 @@ public sealed partial class ShockwaveItemGenerator
         foreach (IPropertySymbol property in typeSymbol.GetMembers().OfType<IPropertySymbol>())
         {
             token.ThrowIfCancellationRequested();
-            if (property.IsStatic || property.SetMethod is null) continue;
+            if (property.IsStatic || property.SetMethod is null || !property.ExplicitInterfaceImplementations.IsEmpty) continue;
 
             var propInfo = GetPropertyInfo(property);
             properties.Add(propInfo);
@@ -61,6 +62,12 @@ public sealed partial class ShockwaveItemGenerator
 
         PropertySerializationInfo[] propertyArray = properties.ToArray();
 
+        IMethodSymbol? primaryConstructor = typeSymbol.Constructors
+            .FirstOrDefault(static c => c.DeclaringSyntaxReferences
+                .Any(static r => r.GetSyntax() is TypeDeclarationSyntax));
+
+        bool hasPrimaryConstructor = primaryConstructor is not null && primaryConstructor.Parameters.Length > 0;
+
         var info = new ShockwaveItemInfo(
             HierarchyInfo.From(typeSymbol),
             bigEndian,
@@ -71,7 +78,8 @@ public sealed partial class ShockwaveItemGenerator
             properties.ToImmutable(),
             maxEntryIndex,
             HasGetBodySizeMethod(typeSymbol),
-            HasWriteToMethod(typeSymbol));
+            HasWriteToMethod(typeSymbol),
+            hasPrimaryConstructor);
 
         return new Result<ShockwaveItemInfo?>(info, diagnostics.ToImmutable());
     }
@@ -81,6 +89,8 @@ public sealed partial class ShockwaveItemGenerator
         int padBefore = 0;
         int padAfter = 0;
         string? condition = null;
+        string? countPropertyName = null;
+        int fixedCount = -1;
         ParseKind parseKind = ParseKind.Default;
         PropertyKind kind = PropertyKind.Sequential;
         int entryIndex = -1;
@@ -101,6 +111,12 @@ public sealed partial class ShockwaveItemGenerator
                 case ConditionAttributeName when attrData.ConstructorArguments is [{ Value: string value }]:
                     condition = value;
                     break;
+                case CountAttributeName when attrData.ConstructorArguments is [{ Value: string value }]:
+                    countPropertyName = value;
+                    break;
+                case CountAttributeName when attrData.ConstructorArguments is [{ Value: int value }]:
+                    fixedCount = value;
+                    break;
                 case ParseStringAsAttributeName when attrData.ConstructorArguments is [{ Value: int value }]:
                     parseKind = (ParseKind)value;
                     break;
@@ -108,6 +124,44 @@ public sealed partial class ShockwaveItemGenerator
                     kind = PropertyKind.Entry;
                     entryIndex = value;
                     break;
+            }
+        }
+
+        bool isArray = false;
+        bool isList = false;
+        ITypeSymbol? elementType = null;
+
+        if (property.Type is IArrayTypeSymbol arrayType)
+        {
+            isArray = true;
+            elementType = arrayType.ElementType;
+        }
+        else if (property.Type is INamedTypeSymbol namedListType &&
+                 namedListType.IsGenericType &&
+                 namedListType.ConstructedFrom.HasFullyQualifiedMetadataName("System.Collections.Generic.List`1"))
+        {
+            isList = true;
+            elementType = namedListType.TypeArguments[0];
+        }
+
+        TypeSerializationKind arrayElementSerializationKind = TypeSerializationKind.Unsupported;
+        string? arrayElementTypeFullName = null;
+        string? arrayElementEnumUnderlyingTypeFullName = null;
+        bool isArrayElementSizePrefixed = false;
+
+        if (elementType is not null)
+        {
+            ITypeSymbol serElemType = GetSerializationType(elementType);
+            arrayElementSerializationKind = GetSerializationKind(serElemType);
+            arrayElementTypeFullName = serElemType.GetFullyQualifiedNameWithNullabilityAnnotations();
+            if (serElemType is INamedTypeSymbol { TypeKind: TypeKind.Enum } enumElemType)
+            {
+                arrayElementEnumUnderlyingTypeFullName = enumElemType.EnumUnderlyingType?.GetFullyQualifiedNameWithNullabilityAnnotations();
+            }
+            if (serElemType is INamedTypeSymbol elemNamedType &&
+                elemNamedType.TryGetAttributeWithFullyQualifiedMetadataName(ShockwaveItemAttributeName, out var elemItemAttr))
+            {
+                isArrayElementSizePrefixed = elemItemAttr.GetNamedArgument("SizePrefixed", false);
             }
         }
 
@@ -124,7 +178,9 @@ public sealed partial class ShockwaveItemGenerator
             INamedTypeSymbol { IsGenericType: true, ConstructedFrom.SpecialType: SpecialType.System_Nullable_T };
 
         ITypeSymbol serializationType = GetSerializationType(property.Type);
-        TypeSerializationKind serializationKind = GetSerializationKind(serializationType);
+        TypeSerializationKind serializationKind = isArray || isList
+            ? TypeSerializationKind.Unsupported
+            : GetSerializationKind(serializationType);
         string? enumUnderlyingTypeFullName = serializationType is INamedTypeSymbol { TypeKind: TypeKind.Enum } enumType ?
             enumType.EnumUnderlyingType?.GetFullyQualifiedNameWithNullabilityAnnotations() : null;
 
@@ -140,7 +196,15 @@ public sealed partial class ShockwaveItemGenerator
             entryIndex,
             serializationKind,
             enumUnderlyingTypeFullName,
-            isSizePrefixed);
+            isSizePrefixed,
+            isArray,
+            isList,
+            countPropertyName,
+            fixedCount,
+            arrayElementSerializationKind,
+            arrayElementTypeFullName,
+            arrayElementEnumUnderlyingTypeFullName,
+            isArrayElementSizePrefixed);
     }
 
     private static ITypeSymbol GetSerializationType(ITypeSymbol type)
@@ -161,9 +225,12 @@ public sealed partial class ShockwaveItemGenerator
 
         if (type.TryGetAttributeWithFullyQualifiedMetadataName(ShockwaveItemAttributeName, out _)) return TypeSerializationKind.ShockwaveItem;
 
+        if (type.HasFullyQualifiedMetadataName("System.Drawing.Color")) return TypeSerializationKind.Color;
+
         return type.SpecialType switch
         {
             SpecialType.System_Byte => TypeSerializationKind.Byte,
+            SpecialType.System_SByte => TypeSerializationKind.SByte,
             SpecialType.System_Boolean => TypeSerializationKind.Boolean,
             SpecialType.System_Int16 => TypeSerializationKind.Int16,
             SpecialType.System_UInt16 => TypeSerializationKind.UInt16,
@@ -186,6 +253,20 @@ public sealed partial class ShockwaveItemGenerator
         if (propInfo.ParseKind is not ParseKind.Default && propInfo.SerializationKind is not TypeSerializationKind.String)
         {
             diagnostics.Add(DiagnosticDescriptors.ParseStringAsRequiresString, property, typeSymbol.Name, property.Name, propInfo.TypeFullName);
+        }
+
+        if (propInfo.IsArray || propInfo.IsList)
+        {
+            if (propInfo.CountPropertyName is null && propInfo.FixedCount < 0)
+            {
+                diagnostics.Add(DiagnosticDescriptors.MissingCountAttributeOnCollection, property, typeSymbol.Name, property.Name);
+            }
+
+            if (propInfo.ArrayElementSerializationKind is TypeSerializationKind.Unsupported)
+            {
+                diagnostics.Add(DiagnosticDescriptors.UnsupportedShockwaveItemPropertyType, property, typeSymbol.Name, property.Name, propInfo.ArrayElementTypeFullName ?? propInfo.TypeFullName);
+            }
+            return;
         }
 
         if (propInfo.SerializationKind is TypeSerializationKind.ShockwaveItem) return;

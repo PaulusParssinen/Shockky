@@ -48,7 +48,20 @@ public partial class ShockwaveItemGenerator
             {
                 if (prop.Kind is not PropertyKind.Sequential) continue;
 
-                if (prop.SerializationKind is TypeSerializationKind.ShockwaveItem)
+                if (prop.IsArray || prop.IsList)
+                {
+                    int fixedSize = TryGetFixedPropertySizeContribution(prop);
+                    if (fixedSize > 0)
+                    {
+                        pendingFixed += fixedSize;
+                    }
+                    else
+                    {
+                        FlushPendingSize(writer, ref pendingFixed);
+                        WriteCollectionPropertySize(writer, prop);
+                    }
+                }
+                else if (prop.SerializationKind is TypeSerializationKind.ShockwaveItem)
                 {
                     FlushPendingSize(writer, ref pendingFixed);
                     writer.WriteLine($"size += {prop.Name}.GetBodySize(options);");
@@ -93,7 +106,7 @@ public partial class ShockwaveItemGenerator
         if (item.SizePrefixed)
         {
             writer.WriteGeneratedAttributes(nameof(ShockwaveItemGenerator));
-            using (writer.WriteBlock($"public void WriteTo({FullyQualifiedShockwaveWriterName} output, {FullyQualifiedWriterOptionsName} options)"))
+            using (writer.WriteBlock($"public void WriteTo(ref {FullyQualifiedShockwaveWriterName} output, {FullyQualifiedWriterOptionsName} options)"))
             {
                 writer.WriteLine("WriteTo(ref output, options, GetBodySize(options));");
             }
@@ -113,7 +126,11 @@ public partial class ShockwaveItemGenerator
                 {
                     if (prop.Kind is PropertyKind.Sequential)
                     {
-                        if (prop.SerializationKind is TypeSerializationKind.ShockwaveItem)
+                        if (prop.IsArray || prop.IsList)
+                        {
+                            WriteCollectionPropertyWrite(writer, prop, suffix);
+                        }
+                        else if (prop.SerializationKind is TypeSerializationKind.ShockwaveItem)
                         {
                             WriteShockwaveItemPropertyWrite(writer, prop, suffix);
                         }
@@ -133,13 +150,17 @@ public partial class ShockwaveItemGenerator
         else
         {
             writer.WriteGeneratedAttributes(nameof(ShockwaveItemGenerator));
-            using (writer.WriteBlock($"public void WriteTo({FullyQualifiedShockwaveWriterName} output, {FullyQualifiedWriterOptionsName} options)"))
+            using (writer.WriteBlock($"public void WriteTo(ref {FullyQualifiedShockwaveWriterName} output, {FullyQualifiedWriterOptionsName} options)"))
             {
                 foreach (PropertySerializationInfo prop in item.Properties.AsSpan())
                 {
                     if (prop.Kind is PropertyKind.Sequential)
                     {
-                        if (prop.SerializationKind is TypeSerializationKind.ShockwaveItem)
+                        if (prop.IsArray || prop.IsList)
+                        {
+                            WriteCollectionPropertyWrite(writer, prop, suffix);
+                        }
+                        else if (prop.SerializationKind is TypeSerializationKind.ShockwaveItem)
                         {
                             WriteShockwaveItemPropertyWrite(writer, prop, suffix);
                         }
@@ -169,8 +190,50 @@ public partial class ShockwaveItemGenerator
         }
         else
         {
-            writer.WriteLine($"{prop.Name}.WriteTo(output, options);");
+            writer.WriteLine($"{prop.Name}.WriteTo(ref output, options);");
         }
+    }
+
+    private static void WriteCollectionPropertySize(IndentedTextWriter writer, PropertySerializationInfo prop)
+    {
+        if (prop.PadBefore > 0) writer.WriteLine($"size += {prop.PadBefore};");
+
+        string lenProp = prop.IsArray ? $"{prop.Name}.Length" : $"{prop.Name}.Count";
+        int elemFixedSize = GetFixedSize(prop.ArrayElementSerializationKind);
+
+        if (elemFixedSize > 0)
+        {
+            writer.WriteLine($"size += {lenProp} * {elemFixedSize};");
+        }
+        else if (prop.ArrayElementSerializationKind is TypeSerializationKind.ShockwaveItem)
+        {
+            using (writer.WriteBlock($"for (int i = 0; i < {lenProp}; i++)"))
+            {
+                writer.WriteLine($"size += {prop.Name}[i].GetBodySize(options);");
+            }
+        }
+        else if (prop.ArrayElementSerializationKind is TypeSerializationKind.String)
+        {
+            using (writer.WriteBlock($"for (int i = 0; i < {lenProp}; i++)"))
+            {
+                writer.WriteLine($"size += {FullyQualifiedShockwaveWriterName}.GetPStringSize({prop.Name}[i]);");
+            }
+        }
+
+        if (prop.PadAfter > 0) writer.WriteLine($"size += {prop.PadAfter};");
+    }
+
+    private static void WriteCollectionPropertyWrite(IndentedTextWriter writer, PropertySerializationInfo prop, string suffix)
+    {
+        if (prop.PadBefore > 0) writer.WriteLine($"output.WriteZeroes({prop.PadBefore});");
+
+        string lenProp = prop.IsArray ? $"{prop.Name}.Length" : $"{prop.Name}.Count";
+        using (writer.WriteBlock($"for (int i = 0; i < {lenProp}; i++)"))
+        {
+            WriteElementValue(writer, prop.ArrayElementSerializationKind, prop.ArrayElementEnumUnderlyingTypeFullName, $"{prop.Name}[i]", suffix);
+        }
+
+        if (prop.PadAfter > 0) writer.WriteLine($"output.WriteZeroes({prop.PadAfter});");
     }
 
     private static void WriteSequentialPropertySize(IndentedTextWriter writer, PropertySerializationInfo prop)
@@ -206,6 +269,19 @@ public partial class ShockwaveItemGenerator
     private static int TryGetFixedPropertySizeContribution(PropertySerializationInfo prop)
     {
         if (prop.Condition is not null || prop.IsNullable) return -1;
+
+        if (prop.IsArray || prop.IsList)
+        {
+            if (prop.FixedCount >= 0)
+            {
+                int elemSize = GetFixedSize(prop.ArrayElementSerializationKind);
+                if (elemSize > 0)
+                {
+                    return prop.PadBefore + prop.FixedCount * elemSize + prop.PadAfter;
+                }
+            }
+            return -1;
+        }
 
         int fixedSize = GetFixedSize(prop);
         if (fixedSize <= 0) return -1;
@@ -330,7 +406,18 @@ public partial class ShockwaveItemGenerator
                 return;
         }
 
-        switch (prop.SerializationKind)
+        if (prop.SerializationKind is TypeSerializationKind.ShockwaveItem)
+        {
+            writer.WriteLine($"{valueExpression}.WriteTo(ref output, options);");
+            return;
+        }
+
+        WriteElementValue(writer, prop.SerializationKind, prop.EnumUnderlyingTypeFullName, valueExpression, suffix);
+    }
+
+    private static void WriteElementValue(IndentedTextWriter writer, TypeSerializationKind kind, string? enumUnderlyingTypeFullName, string valueExpression, string suffix)
+    {
+        switch (kind)
         {
             case TypeSerializationKind.Byte:
                 writer.WriteLine($"output.WriteByte({valueExpression});");
@@ -359,15 +446,17 @@ public partial class ShockwaveItemGenerator
             case TypeSerializationKind.Double:
                 writer.WriteLine($"output.WriteDouble{suffix}({valueExpression});");
                 break;
+            case TypeSerializationKind.Color:
+                writer.WriteLine($"output.WriteColor({valueExpression});");
+                break;
             case TypeSerializationKind.String:
                 writer.WriteLine($"output.WritePString({valueExpression});");
                 break;
             case TypeSerializationKind.Enum:
-                writer.WriteLine($"{GetEnumWriteExpression(prop, valueExpression, suffix)};");
+                writer.WriteLine($"{GetEnumWriteExpressionForUnderlying(enumUnderlyingTypeFullName, valueExpression, suffix)};");
                 break;
             case TypeSerializationKind.ShockwaveItem:
-                writer.WriteLine($"{valueExpression}.WriteTo(output, options);");
-                writer.WriteLine($"output.Advance({valueExpression}.GetBodySize(options));");
+                writer.WriteLine($"{valueExpression}.WriteTo(ref output, options);");
                 break;
         }
     }
@@ -395,6 +484,7 @@ public partial class ShockwaveItemGenerator
             TypeSerializationKind.Byte or TypeSerializationKind.SByte or TypeSerializationKind.Boolean => 1,
             TypeSerializationKind.Int16 or TypeSerializationKind.UInt16 => 2,
             TypeSerializationKind.Int32 or TypeSerializationKind.UInt32 => 4,
+            TypeSerializationKind.Color => 6,
             TypeSerializationKind.UInt64 or TypeSerializationKind.Double => 8,
             TypeSerializationKind.Enum => GetFixedSize(GetSerializationKindForTypeName(prop.EnumUnderlyingTypeFullName)),
             _ => 0,
@@ -408,6 +498,7 @@ public partial class ShockwaveItemGenerator
             TypeSerializationKind.Byte or TypeSerializationKind.SByte or TypeSerializationKind.Boolean => 1,
             TypeSerializationKind.Int16 or TypeSerializationKind.UInt16 => 2,
             TypeSerializationKind.Int32 or TypeSerializationKind.UInt32 => 4,
+            TypeSerializationKind.Color => 6,
             TypeSerializationKind.UInt64 or TypeSerializationKind.Double => 8,
             _ => 0,
         };
@@ -415,8 +506,13 @@ public partial class ShockwaveItemGenerator
 
     private static string GetEnumWriteExpression(PropertySerializationInfo prop, string valueExpression, string suffix)
     {
-        TypeSerializationKind underlyingKind = GetSerializationKindForTypeName(prop.EnumUnderlyingTypeFullName);
-        string castType = GetTypeKeyword(prop.EnumUnderlyingTypeFullName);
+        return GetEnumWriteExpressionForUnderlying(prop.EnumUnderlyingTypeFullName, valueExpression, suffix);
+    }
+
+    private static string GetEnumWriteExpressionForUnderlying(string? enumUnderlyingTypeFullName, string valueExpression, string suffix)
+    {
+        TypeSerializationKind underlyingKind = GetSerializationKindForTypeName(enumUnderlyingTypeFullName);
+        string castType = GetTypeKeyword(enumUnderlyingTypeFullName);
         string castExpression = $"({castType}){valueExpression}";
 
         return underlyingKind switch

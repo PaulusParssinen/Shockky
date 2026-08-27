@@ -30,5 +30,5 @@ public sealed class FileCompressionTypesResource : IShockwaveItem, IResource
     }
 
     public int GetBodySize(WriterOptions options) => throw new NotImplementedException();
-    public void WriteTo(ShockwaveWriter output, WriterOptions options) => throw new NotImplementedException();
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options) => throw new NotImplementedException();
 }

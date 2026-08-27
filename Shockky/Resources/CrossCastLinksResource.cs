@@ -19,7 +19,7 @@ public sealed class CrossCastLinksResource : IShockwaveItem, IResource
         throw new NotImplementedException();
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         throw new NotImplementedException();
     }

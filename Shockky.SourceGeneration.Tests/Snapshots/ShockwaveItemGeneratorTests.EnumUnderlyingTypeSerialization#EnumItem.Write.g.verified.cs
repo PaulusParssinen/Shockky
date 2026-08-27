@@ -20,7 +20,7 @@ partial class EnumItem
     [global::System.CodeDom.Compiler.GeneratedCode("ShockwaveItemGenerator", "1.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCode]
     [global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    public void WriteTo(global::Shockky.IO.ShockwaveWriter output, global::Shockky.IO.WriterOptions options)
+    public void WriteTo(ref global::Shockky.IO.ShockwaveWriter output, global::Shockky.IO.WriterOptions options)
     {
         output.WriteUInt16BigEndian((ushort)Kind);
     }

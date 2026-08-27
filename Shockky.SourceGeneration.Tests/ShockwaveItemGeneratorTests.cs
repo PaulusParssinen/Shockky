@@ -210,7 +210,7 @@ public sealed class ShockwaveItemGeneratorTests
             {
                 public int Id { get; set; }
 
-                public void WriteTo(ShockwaveWriter output, WriterOptions options)
+                public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
                 { }
             }
             """;
@@ -230,6 +230,84 @@ public sealed class ShockwaveItemGeneratorTests
             {
                 public object Value { get; set; } = new();
             }
+            """;
+
+        return Verify(CreateDriver<ShockwaveItemGenerator>(source));
+    }
+
+    [Fact]
+    public Task ArrayAndCollectionProperties()
+    {
+        // lang=C#
+        string source = """
+            using System.Collections.Generic;
+            using Shockky;
+
+            [ShockwaveItem(BigEndian = true, GenerateSerialization = true)]
+            public partial class DynamicArrayItem
+            {
+                public int Count { get; set; }
+
+                [Count(nameof(Count))]
+                public int[] Values { get; set; }
+
+                [Count(nameof(Count))]
+                public List<short> ShortList { get; set; }
+            }
+
+            [ShockwaveItem(BigEndian = true, GenerateSerialization = true)]
+            public partial class FixedArrayItem
+            {
+                [Count(4)]
+                public int[] Coordinates { get; set; }
+            }
+
+            [ShockwaveItem(BigEndian = true, GenerateSerialization = true)]
+            public partial class NestedItemArray
+            {
+                public int ElementCount { get; set; }
+
+                [Count(nameof(ElementCount))]
+                public ElementData[] Elements { get; set; }
+
+                [ShockwaveItem(GenerateSerialization = true)]
+                public partial class ElementData
+                {
+                    public short Id { get; set; }
+                    public int Value { get; set; }
+                }
+            }
+            """;
+
+        return Verify(CreateDriver<ShockwaveItemGenerator>(source));
+    }
+
+    [Fact]
+    public Task MissingCountAttributeDiagnostics()
+    {
+        // lang=C#
+        string source = """
+            using Shockky;
+
+            [ShockwaveItem]
+            public partial class MissingCountItem
+            {
+                public int[] Values { get; set; }
+            }
+            """;
+
+        return Verify(CreateDriver<ShockwaveItemGenerator>(source));
+    }
+
+    [Fact]
+    public Task PositionalRecordSerialization()
+    {
+        // lang=C#
+        string source = """
+            using Shockky;
+
+            [ShockwaveItem(BigEndian = true, GenerateSerialization = true)]
+            public readonly partial record struct PositionalRecordItem(short A, short B);
             """;
 
         return Verify(CreateDriver<ShockwaveItemGenerator>(source));

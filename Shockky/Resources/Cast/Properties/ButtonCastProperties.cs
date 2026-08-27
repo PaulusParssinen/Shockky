@@ -22,9 +22,9 @@ public sealed class ButtonCastProperties : TextCastProperties, IMemberProperties
         return size;
     }
 
-    public new void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public new void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
-        base.WriteTo(output, options);
+        base.WriteTo(ref output, options);
         output.WriteInt16BigEndian((short)ButtonType);
     }
 }

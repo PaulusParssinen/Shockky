@@ -45,7 +45,7 @@ public sealed class ScoreReferenceResource : IShockwaveItem, IResource
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         const short ENTRY_OFFSET = 24;
         const short UNKNOWN = 8;

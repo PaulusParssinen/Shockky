@@ -19,73 +19,172 @@ public partial class ShockwaveItemGenerator
     {
         string typeName = item.Hierarchy.Hierarchy[0].QualifiedName;
         string suffix = item.BigEndian ? "BigEndian" : "LittleEndian";
-
-        string ctorParams = item.SizePrefixed
+        string readParams = item.SizePrefixed
             ? $"ref {FullyQualifiedShockwaveReaderName} input, {FullyQualifiedReaderContextName} context, int bodySize"
             : $"ref {FullyQualifiedShockwaveReaderName} input, {FullyQualifiedReaderContextName} context";
 
-        writer.WriteGeneratedAttributes(nameof(ShockwaveItemGenerator));
-        writer.WriteLine("[global::System.Diagnostics.CodeAnalysis.SetsRequiredMembers]");
-        using (writer.WriteBlock($"public {typeName}({ctorParams})"))
+        if (item.HasPrimaryConstructor)
         {
-            if (!item.ExpectedSizes.IsEmpty)
+            writer.WriteGeneratedAttributes(nameof(ShockwaveItemGenerator));
+            using (writer.WriteBlock($"public static {typeName} Read({readParams})"))
             {
-                var sizes = string.Join(" || ", item.ExpectedSizes.AsSpan().ToArray().Select(size => $"bodySize == {size}"));
-                writer.WriteLine($"global::System.Diagnostics.Debug.Assert({sizes}, $\"Unexpected body size {{bodySize}}\");");
-                writer.WriteLine();
+                WriteReadBody(writer, item, suffix, isFactory: true, typeName);
             }
-
-            if (item.IgnoreContainerEndianness)
-            {
-                writer.WriteLine("bool previousReverseEndianness = input.ReverseEndianness;");
-                writer.WriteLine("input.ReverseEndianness = false;");
-            }
-
-            using (item.IgnoreContainerEndianness ? writer.WriteBlock("try") : default)
-            {
-                foreach (var prop in item.Properties.AsSpan())
-                {
-                    if (prop.Kind is PropertyKind.Sequential)
-                    {
-                        if (prop.SerializationKind is TypeSerializationKind.ShockwaveItem)
-                        {
-                            WriteShockwaveItemPropertyRead(writer, prop, suffix);
-                        }
-                        else
-                        {
-                            WriteSequentialPropertyRead(writer, prop, suffix);
-                        }
-                    }
-                }
-
-                if (item.MaxEntryIndex.HasValue)
-                {
-                    WriteOffsetTableEntriesRead(writer, item, suffix);
-                }
-            }
-
-            if (item.IgnoreContainerEndianness)
-            {
-                using (writer.WriteBlock("finally"))
-                {
-                    writer.WriteLine("input.ReverseEndianness = previousReverseEndianness;");
-                }
-            }
-        }
-
-        writer.WriteLine();
-        writer.WriteLine($"public {typeName}() {{ }}");
-
-        writer.WriteLine();
-        if (item.SizePrefixed)
-        {
-            writer.WriteLine($"public static {typeName} Read(ref {FullyQualifiedShockwaveReaderName} input, {FullyQualifiedReaderContextName} context, int bodySize) => new(ref input, context, bodySize);");
         }
         else
         {
-            writer.WriteLine($"public static {typeName} Read(ref {FullyQualifiedShockwaveReaderName} input, {FullyQualifiedReaderContextName} context) => new(ref input, context);");
+            writer.WriteGeneratedAttributes(nameof(ShockwaveItemGenerator));
+            writer.WriteLine("[global::System.Diagnostics.CodeAnalysis.SetsRequiredMembers]");
+            using (writer.WriteBlock($"public {typeName}({readParams})"))
+            {
+                WriteReadBody(writer, item, suffix, isFactory: false);
+            }
+
+            writer.WriteLine();
+            writer.WriteLine($"public {typeName}() {{ }}");
+
+            writer.WriteLine();
+            string forwardArgs = item.SizePrefixed ? "ref input, context, bodySize" : "ref input, context";
+            writer.WriteLine($"public static {typeName} Read({readParams}) => new({forwardArgs});");
+        }
+    }
+
+    private static void WriteReadBody(
+        IndentedTextWriter writer,
+        ShockwaveItemInfo item,
+        string suffix,
+        bool isFactory,
+        string? typeName = null)
+    {
+        if (!item.ExpectedSizes.IsEmpty)
+        {
+            var sizes = string.Join(" || ", item.ExpectedSizes.AsSpan().ToArray().Select(size => $"bodySize == {size}"));
+            writer.WriteLine($"global::System.Diagnostics.Debug.Assert({sizes}, $\"Unexpected body size {{bodySize}}\");");
+            writer.WriteLine();
         }
 
+        if (item.IgnoreContainerEndianness)
+        {
+            writer.WriteLine("bool previousReverseEndianness = input.ReverseEndianness;");
+            writer.WriteLine("input.ReverseEndianness = false;");
+        }
+
+        using (item.IgnoreContainerEndianness ? writer.WriteBlock("try") : default)
+        {
+            var argNames = isFactory ? new List<string>(item.Properties.Length) : null;
+
+            foreach (var prop in item.Properties.AsSpan())
+            {
+                if (prop.Kind is PropertyKind.Sequential)
+                {
+                    if (isFactory)
+                    {
+                        if (prop.PadBefore > 0)
+                            writer.WriteLine($"input.Advance({prop.PadBefore});");
+
+                        string varName = char.ToLowerInvariant(prop.Name[0]) + prop.Name[1..];
+                        string readExpr = GetPropertyReadExpression(prop, suffix);
+                        writer.WriteLine($"var {varName} = {readExpr};");
+                        argNames!.Add(varName);
+
+                        if (prop.PadAfter > 0)
+                            writer.WriteLine($"input.Advance({prop.PadAfter});");
+                    }
+                    else
+                    {
+                        WritePropertyRead(writer, prop, suffix);
+                    }
+                }
+            }
+
+            if (item.MaxEntryIndex.HasValue && !isFactory)
+            {
+                WriteOffsetTableEntriesRead(writer, item, suffix);
+            }
+
+            if (isFactory)
+            {
+                writer.WriteLine();
+                writer.WriteLine($"return new {typeName}({string.Join(", ", argNames!)});");
+            }
+        }
+
+        if (item.IgnoreContainerEndianness)
+        {
+            using (writer.WriteBlock("finally"))
+            {
+                writer.WriteLine("input.ReverseEndianness = previousReverseEndianness;");
+            }
+        }
+    }
+
+    private static void WritePropertyRead(IndentedTextWriter writer, PropertySerializationInfo prop, string suffix)
+    {
+        if (prop.IsArray || prop.IsList)
+        {
+            WriteCollectionPropertyRead(writer, prop, suffix);
+        }
+        else if (prop.SerializationKind is TypeSerializationKind.ShockwaveItem)
+        {
+            WriteShockwaveItemPropertyRead(writer, prop, suffix);
+        }
+        else
+        {
+            WriteSequentialPropertyRead(writer, prop, suffix);
+        }
+    }
+
+    private static string GetPropertyReadExpression(PropertySerializationInfo prop, string suffix)
+    {
+        return prop.SerializationKind switch
+        {
+            TypeSerializationKind.ShockwaveItem => prop.IsSizePrefixed
+                ? $"{prop.TypeFullName.TrimEnd('?')}.Read(ref input, context, input.ReadInt32{suffix}())"
+                : $"{prop.TypeFullName.TrimEnd('?')}.Read(ref input, context)",
+            _ => GetReadExpression(prop, suffix, null)
+        };
+    }
+
+    private static void WriteCollectionPropertyRead(IndentedTextWriter writer, PropertySerializationInfo prop, string suffix)
+    {
+        if (prop.PadBefore > 0)
+            writer.WriteLine($"input.Advance({prop.PadBefore});");
+
+        if (prop.Condition is not null)
+        {
+            writer.WriteLine($"if ({prop.Condition})");
+            writer.IncreaseIndent();
+        }
+
+        string countExpr = prop.FixedCount >= 0 ? prop.FixedCount.ToString() : $"(int){prop.CountPropertyName}";
+        string elemType = prop.ArrayElementTypeFullName!.TrimEnd('?');
+        string elemReadExpr = GetReadExpressionForKind(prop.ArrayElementSerializationKind, prop.ArrayElementEnumUnderlyingTypeFullName, elemType, suffix);
+        string countVarName = $"{char.ToLowerInvariant(prop.Name[0])}{prop.Name[1..]}Count";
+        string loopVar = "i";
+
+        writer.WriteLine($"int {countVarName} = {countExpr};");
+        if (prop.IsArray)
+        {
+            writer.WriteLine($"{prop.Name} = new {elemType}[{countVarName}];");
+            using (writer.WriteBlock($"for (int {loopVar} = 0; {loopVar} < {countVarName}; {loopVar}++)"))
+            {
+                writer.WriteLine($"{prop.Name}[{loopVar}] = {elemReadExpr};");
+            }
+        }
+        else if (prop.IsList)
+        {
+            writer.WriteLine($"{prop.Name} = new global::System.Collections.Generic.List<{elemType}>({countVarName});");
+            using (writer.WriteBlock($"for (int {loopVar} = 0; {loopVar} < {countVarName}; {loopVar}++)"))
+            {
+                writer.WriteLine($"{prop.Name}.Add({elemReadExpr});");
+            }
+        }
+
+        if (prop.Condition is not null)
+            writer.DecreaseIndent();
+
+        if (prop.PadAfter > 0)
+            writer.WriteLine($"input.Advance({prop.PadAfter});");
     }
 
     private static void WriteSequentialPropertyRead(IndentedTextWriter writer, PropertySerializationInfo prop, string suffix)
@@ -171,9 +270,15 @@ public partial class ShockwaveItemGenerator
         if (prop.ParseKind == ParseKind.FixedBytes && entrySize is not null)
             return $"input.ReadString({entrySize})";
 
-        return prop.SerializationKind switch
+        return GetReadExpressionForKind(prop.SerializationKind, prop.EnumUnderlyingTypeFullName, GetBaseTypeName(prop), suffix);
+    }
+
+    private static string GetReadExpressionForKind(TypeSerializationKind kind, string? enumUnderlyingTypeName, string typeFullName, string suffix)
+    {
+        return kind switch
         {
             TypeSerializationKind.Byte => "input.ReadByte()",
+            TypeSerializationKind.SByte => "(sbyte)input.ReadByte()",
             TypeSerializationKind.Boolean => "input.ReadBoolean()",
             TypeSerializationKind.Int16 => $"input.ReadInt16{suffix}()",
             TypeSerializationKind.UInt16 => $"input.ReadUInt16{suffix}()",
@@ -181,9 +286,11 @@ public partial class ShockwaveItemGenerator
             TypeSerializationKind.UInt32 => $"input.ReadUInt32{suffix}()",
             TypeSerializationKind.UInt64 => $"input.ReadUInt64{suffix}()",
             TypeSerializationKind.Double => $"input.ReadDouble{suffix}()",
+            TypeSerializationKind.Color => "input.ReadColor()",
             TypeSerializationKind.String => "input.ReadPString()",
-            TypeSerializationKind.Enum => $"({GetBaseTypeName(prop)}){GetReadExpressionForUnderlying(prop.EnumUnderlyingTypeFullName, suffix)}",
-            _ => $"default({GetBaseTypeName(prop)})"
+            TypeSerializationKind.Enum => $"({typeFullName}){GetReadExpressionForUnderlying(enumUnderlyingTypeName, suffix)}",
+            TypeSerializationKind.ShockwaveItem => $"{typeFullName}.Read(ref input, context)",
+            _ => $"default({typeFullName})"
         };
     }
 
@@ -223,7 +330,7 @@ public partial class ShockwaveItemGenerator
 
     private static PropertySerializationInfo[] GetEntryProperties(ShockwaveItemInfo item)
     {
-        return item.Properties.AsSpan().ToArray()
+        return item.Properties
             .Where(static prop => prop.Kind is PropertyKind.Entry)
             .OrderBy(static prop => prop.EntryIndex)
             .ToArray();

@@ -15,5 +15,5 @@ public class FontMapResource : IShockwaveItem, IResource, IBinaryDataResource
     }
 
     public int GetBodySize(WriterOptions options) => Data.Length;
-    public void WriteTo(ShockwaveWriter output, WriterOptions options) => output.WriteBytes(Data);
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options) => output.WriteBytes(Data);
 }

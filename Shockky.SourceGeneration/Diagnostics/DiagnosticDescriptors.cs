@@ -59,4 +59,12 @@ internal static class DiagnosticDescriptors
         category: typeof(ShockwaveItemGenerator).FullName,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
+
+    public static readonly DiagnosticDescriptor MissingCountAttributeOnCollection = new(
+        id: "SHCK0106",
+        title: "Collection property requires [Count] attribute",
+        messageFormat: "The collection property {0}.{1} requires a [Count] attribute specifying the element count",
+        category: typeof(ShockwaveItemGenerator).FullName,
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
 }

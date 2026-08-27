@@ -23,7 +23,7 @@ public sealed class CastMapResource : IResource, IShockwaveItem
 
     public int GetBodySize(WriterOptions options) => Members.Length * sizeof(int);
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         for (int i = 0; i < Members.Length; i++)
         {

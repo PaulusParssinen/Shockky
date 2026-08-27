@@ -14,7 +14,7 @@ public readonly record struct Guide(Axis Axis, short Position) : IShockwaveItem
         size += sizeof(short);
         return size;
     }
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteInt16LittleEndian((short)Axis);
         output.WriteInt16LittleEndian(Position);

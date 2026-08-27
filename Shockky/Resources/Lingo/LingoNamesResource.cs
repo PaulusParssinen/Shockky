@@ -42,7 +42,7 @@ public sealed class LingoNamesResource : IShockwaveItem, IResource
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         const short NAME_OFFSET = 20;
         int namesLength = Names?.Sum(static n => sizeof(byte) + n.Length) ?? 0;

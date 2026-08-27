@@ -39,7 +39,7 @@ public sealed class CastListEntry : IShockwaveItem
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteString(Name);
         output.WriteString(FilePath);

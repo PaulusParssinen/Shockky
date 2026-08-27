@@ -5,7 +5,7 @@ public sealed partial class LingoContextItem : IShockwaveItem
 {
     [PadBefore(4)] // Skip garbage ptr
     public int ResourceIndex { get; set; }
-    
+
     public LingoContextItemFlags Flags { get; set; }
 
     /// <summary>

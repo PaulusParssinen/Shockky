@@ -26,7 +26,7 @@ public class StyledTextResource : IShockwaveItem, IResource
         }
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         const int TEXT_OFFSET = 12;
         const int TEXT_FORMAT_SIZE = 20;
@@ -40,7 +40,7 @@ public class StyledTextResource : IShockwaveItem, IResource
         output.WriteInt16LittleEndian((short)Formats.Length);
         for (int i = 0; i < Formats.Length; i++)
         {
-            Formats[i].WriteTo(output, options);
+            Formats[i].WriteTo(ref output, options);
         }
     }
 

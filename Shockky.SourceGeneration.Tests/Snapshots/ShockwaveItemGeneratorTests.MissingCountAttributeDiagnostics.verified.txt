@@ -1,0 +1,23 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    public int[] Values { get; set; }
+                 ^^^^^^
+}
+*/
+ : (5,17)-(5,23),
+      Message: The collection property MissingCountItem.Values requires a [Count] attribute specifying the element count,
+      Severity: Error,
+      Descriptor: {
+        Id: SHCK0106,
+        Title: Collection property requires [Count] attribute,
+        MessageFormat: The collection property {0}.{1} requires a [Count] attribute specifying the element count,
+        Category: Shockky.SourceGeneration.ShockwaveItemGenerator,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

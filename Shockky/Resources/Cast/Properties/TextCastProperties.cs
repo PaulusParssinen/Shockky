@@ -59,7 +59,7 @@ public class TextCastProperties : IMemberProperties
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteByte((byte)BorderSize);
         output.WriteByte((byte)GutterSize);

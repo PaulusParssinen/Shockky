@@ -53,7 +53,7 @@ public class ShapeCastProperties : IMemberProperties
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteInt16BigEndian((short)Type);
         output.WriteRect(Rectangle);

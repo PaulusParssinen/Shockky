@@ -32,7 +32,7 @@ public sealed class LingoLiteral : IShockwaveItem, IEquatable<LingoLiteral>
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         throw new NotImplementedException();
     }

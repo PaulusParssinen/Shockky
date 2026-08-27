@@ -6,4 +6,3 @@ public enum ImageCompression : byte
     Jpeg = 0xFD,
     Standard = 0xFE
 }
-

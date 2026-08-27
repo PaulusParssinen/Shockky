@@ -39,6 +39,28 @@ public sealed class ParseStringAsAttribute(StringParseKind kind) : Attribute
 }
 
 /// <summary>
+/// Specifies the number of elements in an array or collection property, or the name of the property containing the count.
+/// </summary>
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+public sealed class CountAttribute : Attribute
+{
+    public string? PropertyName { get; }
+    public int FixedCount { get; }
+
+    public CountAttribute(string propertyName)
+    {
+        PropertyName = propertyName;
+        FixedCount = -1;
+    }
+
+    public CountAttribute(int fixedCount)
+    {
+        PropertyName = null;
+        FixedCount = fixedCount;
+    }
+}
+
+/// <summary>
 /// Specifies parsing strategy for a string property.
 /// </summary>
 public enum StringParseKind

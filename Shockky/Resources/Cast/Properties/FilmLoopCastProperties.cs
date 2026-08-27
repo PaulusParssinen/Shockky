@@ -27,7 +27,7 @@ public class FilmLoopCastProperties : IMemberProperties
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteRect(Rectangle);
         output.WriteInt32BigEndian((int)Flags);

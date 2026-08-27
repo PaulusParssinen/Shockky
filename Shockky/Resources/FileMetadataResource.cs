@@ -26,7 +26,7 @@ public class FileMetadataResource : IShockwaveItem
         return size;
     }
 
-    public void WriteTo(ShockwaveWriter output, WriterOptions options)
+    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         // TODO: Maybe allow assembly in big-endian
         output.WriteUInt32BigEndian((uint)OsType.XFIR);
