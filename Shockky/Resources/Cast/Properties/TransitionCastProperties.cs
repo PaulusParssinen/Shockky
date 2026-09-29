@@ -1,6 +1,5 @@
 using Shockky.IO;
 
-#nullable enable
 namespace Shockky.Resources.Cast.Properties;
 
 public class TransitionCastProperties : IMemberProperties

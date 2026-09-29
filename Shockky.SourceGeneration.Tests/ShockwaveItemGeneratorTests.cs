@@ -312,4 +312,23 @@ public sealed class ShockwaveItemGeneratorTests
 
         return Verify(CreateDriver<ShockwaveItemGenerator>(source));
     }
+
+    [Fact]
+    public Task GeometricPrimitivesSerialization()
+    {
+        // lang=C#
+        string source = """
+            using System.Drawing;
+            using Shockky;
+
+            [ShockwaveItem(BigEndian = true, GenerateSerialization = true)]
+            public partial class GeometryItem
+            {
+                public Point Location { get; set; }
+                public Rectangle Bounds { get; set; }
+            }
+            """;
+
+        return Verify(CreateDriver<ShockwaveItemGenerator>(source));
+    }
 }

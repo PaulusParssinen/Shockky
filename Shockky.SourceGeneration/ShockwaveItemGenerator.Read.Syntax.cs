@@ -287,6 +287,8 @@ public partial class ShockwaveItemGenerator
             TypeSerializationKind.UInt64 => $"input.ReadUInt64{suffix}()",
             TypeSerializationKind.Double => $"input.ReadDouble{suffix}()",
             TypeSerializationKind.Color => "input.ReadColor()",
+            TypeSerializationKind.Rectangle => $"input.ReadRect{suffix}()",
+            TypeSerializationKind.Point => $"input.ReadPoint{suffix}()",
             TypeSerializationKind.String => "input.ReadPString()",
             TypeSerializationKind.Enum => $"({typeFullName}){GetReadExpressionForUnderlying(enumUnderlyingTypeName, suffix)}",
             TypeSerializationKind.ShockwaveItem => $"{typeFullName}.Read(ref input, context)",
@@ -323,6 +325,8 @@ public partial class ShockwaveItemGenerator
             "int" or "global::System.Int32" => TypeSerializationKind.Int32,
             "uint" or "global::System.UInt32" => TypeSerializationKind.UInt32,
             "ulong" or "global::System.UInt64" => TypeSerializationKind.UInt64,
+            "System.Drawing.Rectangle" or "global::System.Drawing.Rectangle" => TypeSerializationKind.Rectangle,
+            "System.Drawing.Point" or "global::System.Drawing.Point" => TypeSerializationKind.Point,
             "double" or "global::System.Double" => TypeSerializationKind.Double,
             _ => TypeSerializationKind.Unsupported,
         };

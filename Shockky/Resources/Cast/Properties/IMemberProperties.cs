@@ -1,4 +1,3 @@
 namespace Shockky.Resources.Cast;
 
-public interface IMemberProperties : IShockwaveItem
-{ }
+public interface IMemberProperties : IShockwaveItem;

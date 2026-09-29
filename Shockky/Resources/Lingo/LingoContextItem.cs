@@ -1,7 +1,7 @@
 namespace Shockky.Resources;
 
 [ShockwaveItem(BigEndian = true, GenerateSerialization = true)]
-public sealed partial class LingoContextItem : IShockwaveItem
+public sealed partial class LingoContextItem : IShockwaveItem<LingoContextItem>
 {
     [PadBefore(4)] // Skip garbage ptr
     public int ResourceIndex { get; set; }

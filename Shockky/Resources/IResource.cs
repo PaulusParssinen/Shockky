@@ -1,4 +1,5 @@
 using Shockky.IO;
+using Shockky.Resources.Cast;
 
 namespace Shockky.Resources;
 
@@ -35,13 +36,16 @@ public interface IResource
             OsType.Lscr => new LingoScriptResource(ref bodyInput),
             OsType.Lctx or OsType.LctX => new LingoContextResource(ref bodyInput, context),
 
-            OsType.MCsL => new MovieCastListResource(ref bodyInput, context),
+            OsType.MCsL => MovieCastListResource.Read(ref bodyInput, context),
+            OsType.Cinf => CastMetadataResource.Read(ref bodyInput, context),
+            OsType.ccl => CrossCastLinksResource.Read(ref bodyInput, context),
 
             OsType.CASPtr => new CastMapResource(ref bodyInput, context),
             OsType.CASt => new CastMemberPropertiesResource(ref bodyInput, context),
+            OsType.CMAP => CharacterMapResource.Read(ref bodyInput, context),
 
             OsType.SCRF => new ScoreReferenceResource(ref bodyInput, context),
-            OsType.Sord => new ScoreOrderResource(ref bodyInput, context),
+            OsType.Sord => ScoreOrderResource.Read(ref bodyInput, context),
             OsType.CLUT => new PaletteResource(ref bodyInput, context),
             OsType.STXT => new StyledTextResource(ref bodyInput, context),
 
@@ -50,6 +54,7 @@ public interface IResource
             OsType.Fmap => new FontMapResource(ref bodyInput, context),
 
             OsType.GRID => new GridResource(ref bodyInput, context),
+            OsType.VWTL => TilesResource.Read(ref bodyInput, context),
             OsType.FCOL => FavoriteColorsResource.Read(ref bodyInput, context),
 
             OsType.BITD => new BitmapDataResource(ref bodyInput, context),

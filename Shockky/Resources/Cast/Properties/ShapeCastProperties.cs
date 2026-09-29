@@ -56,7 +56,7 @@ public class ShapeCastProperties : IMemberProperties
     public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
         output.WriteInt16BigEndian((short)Type);
-        output.WriteRect(Rectangle);
+        output.WriteRectLittleEndian(Rectangle);
 
         output.WriteInt16BigEndian(Pattern);
         output.WriteByte(ForegroundColor);

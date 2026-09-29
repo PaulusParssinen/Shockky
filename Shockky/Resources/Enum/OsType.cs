@@ -82,10 +82,13 @@ public enum OsType : int
     XMED = 0x584D4544,
     ediM = 0x6564694D,
 
+    CMAP = 0x434D4150,
+
     SCVW = 0x53435657,
     VWFI = 0x56574649,
     VWSC = 0x56575343,
     VWLB = 0x56574C42,
+    VWtc = 0x56577463,
     VWtk = 0x5657746B,
     VWTL = 0x5657544C,
 

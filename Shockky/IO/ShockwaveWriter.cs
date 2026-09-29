@@ -288,13 +288,20 @@ public ref struct ShockwaveWriter
         Advance(6);
     }
 
-    // TODO: Endianness
-    public void WritePoint(Point value)
+    public void WritePoint(Point value) => WritePointLittleEndian(value);
+
+    public void WritePointLittleEndian(Point value)
     {
         WriteInt16LittleEndian((short)value.X);
         WriteInt16LittleEndian((short)value.Y);
     }
-    public void WriteRect(Rectangle value)
+    public void WritePointBigEndian(Point value)
+    {
+        WriteInt16BigEndian((short)value.X);
+        WriteInt16BigEndian((short)value.Y);
+    }
+
+    public void WriteRectLittleEndian(Rectangle value)
     {
         WriteInt16LittleEndian((short)value.Top);
         WriteInt16LittleEndian((short)value.Left);

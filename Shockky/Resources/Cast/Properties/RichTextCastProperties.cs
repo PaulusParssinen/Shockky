@@ -50,7 +50,7 @@ public class RichTextCastProperties : IMemberProperties
 
     public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
-        output.WriteRect(Rectangle);
-        output.WriteRect(Rect2);
+        output.WriteRectLittleEndian(Rectangle);
+        output.WriteRectLittleEndian(Rect2);
     }
 }

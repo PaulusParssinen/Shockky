@@ -63,7 +63,7 @@ public sealed class BitmapCastProperties : IMemberProperties
 
         output.WriteUInt16BigEndian(Stride);
 
-        output.WriteRect(Rectangle);
+        output.WriteRectLittleEndian(Rectangle);
         output.WriteByte(AlphaThreshold);
         output.WriteByte(0);
         output.WriteBytes(OLE);

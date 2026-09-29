@@ -29,12 +29,12 @@ public sealed class CastMemberPropertiesResource : IResource, IShockwaveItem
         return Type switch
         {
             MemberKind.Bitmap or MemberKind.OLE => new BitmapCastProperties(ref input, context),
-            MemberKind.FilmLoop or MemberKind.Movie => new FilmLoopCastProperties(ref input),
-            MemberKind.Text => new TextCastProperties(ref input, context),
-            MemberKind.Button => new ButtonCastProperties(ref input, context),
+            MemberKind.FilmLoop or MemberKind.Movie => FilmLoopCastProperties.Read(ref input, context),
+            MemberKind.Text => TextCastProperties.Read(ref input, context),
+            MemberKind.Button => ButtonCastProperties.Read(ref input, context),
             MemberKind.Shape => new ShapeCastProperties(ref input, context),
             MemberKind.DigitalVideo => new VideoCastProperties(ref input, context),
-            MemberKind.Script => new ScriptCastProperties(ref input, context),
+            MemberKind.Script => ScriptCastProperties.Read(ref input, context),
             MemberKind.RichText => new RichTextCastProperties(ref input),
             MemberKind.Transition => new TransitionCastProperties(ref input, context),
             // TODO: MemberKind.Xtra => new XtraCastProperties(ref input, context),

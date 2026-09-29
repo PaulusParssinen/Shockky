@@ -7,9 +7,13 @@ internal static class GeneratorTestHelper
 {
     public static GeneratorDriver CreateDriver<T>(string source) where T : IIncrementalGenerator, new()
     {
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+            .Concat([typeof(System.Drawing.Point).Assembly])
+            .Distinct();
+
         IEnumerable<MetadataReference> references =
-            from assembly in AppDomain.CurrentDomain.GetAssemblies()
-            where !assembly.IsDynamic
+            from assembly in assemblies
+            where !assembly.IsDynamic && !string.IsNullOrEmpty(assembly.Location)
             select MetadataReference.CreateFromFile(assembly.Location);
 
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp12));

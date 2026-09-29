@@ -449,6 +449,12 @@ public partial class ShockwaveItemGenerator
             case TypeSerializationKind.Color:
                 writer.WriteLine($"output.WriteColor({valueExpression});");
                 break;
+            case TypeSerializationKind.Rectangle:
+                writer.WriteLine($"output.WriteRect{suffix}({valueExpression});");
+                break;
+            case TypeSerializationKind.Point:
+                writer.WriteLine($"output.WritePoint{suffix}({valueExpression});");
+                break;
             case TypeSerializationKind.String:
                 writer.WriteLine($"output.WritePString({valueExpression});");
                 break;
@@ -483,9 +489,9 @@ public partial class ShockwaveItemGenerator
         {
             TypeSerializationKind.Byte or TypeSerializationKind.SByte or TypeSerializationKind.Boolean => 1,
             TypeSerializationKind.Int16 or TypeSerializationKind.UInt16 => 2,
-            TypeSerializationKind.Int32 or TypeSerializationKind.UInt32 => 4,
+            TypeSerializationKind.Int32 or TypeSerializationKind.UInt32 or TypeSerializationKind.Point => 4,
             TypeSerializationKind.Color => 6,
-            TypeSerializationKind.UInt64 or TypeSerializationKind.Double => 8,
+            TypeSerializationKind.UInt64 or TypeSerializationKind.Double or TypeSerializationKind.Rectangle => 8,
             TypeSerializationKind.Enum => GetFixedSize(GetSerializationKindForTypeName(prop.EnumUnderlyingTypeFullName)),
             _ => 0,
         };
@@ -497,9 +503,9 @@ public partial class ShockwaveItemGenerator
         {
             TypeSerializationKind.Byte or TypeSerializationKind.SByte or TypeSerializationKind.Boolean => 1,
             TypeSerializationKind.Int16 or TypeSerializationKind.UInt16 => 2,
-            TypeSerializationKind.Int32 or TypeSerializationKind.UInt32 => 4,
+            TypeSerializationKind.Int32 or TypeSerializationKind.UInt32 or TypeSerializationKind.Point => 4,
             TypeSerializationKind.Color => 6,
-            TypeSerializationKind.UInt64 or TypeSerializationKind.Double => 8,
+            TypeSerializationKind.UInt64 or TypeSerializationKind.Double or TypeSerializationKind.Rectangle => 8,
             _ => 0,
         };
     }

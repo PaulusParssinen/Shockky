@@ -30,6 +30,8 @@ public readonly ref struct OffsetTable
     /// </summary>
     public int GetTableSize() => sizeof(ushort) + _offsets.Length * sizeof(int);
 
+    public static int GetTableSize(int length) => sizeof(ushort) + (length + 1) * sizeof(int);
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int GetEntrySize(int index)
     {

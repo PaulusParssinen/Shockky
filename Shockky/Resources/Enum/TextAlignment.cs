@@ -1,6 +1,6 @@
 namespace Shockky.Resources;
 
-public enum TextAlignment
+public enum TextAlignment : short
 {
     Right = -1,
     Left = 0,

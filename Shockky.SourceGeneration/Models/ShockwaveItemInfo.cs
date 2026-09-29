@@ -60,6 +60,8 @@ internal enum TypeSerializationKind
     Double,
     String,
     Color,
+    Rectangle,
+    Point,
     Enum,
     ShockwaveItem,
 }

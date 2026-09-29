@@ -1,27 +1,7 @@
-using Shockky.IO;
-
 namespace Shockky.Resources.Cast;
 
-public class ScriptCastProperties : IMemberProperties
+[ShockwaveItem(BigEndian = true, GenerateSerialization = true)]
+public sealed partial class ScriptCastProperties : IMemberProperties, IShockwaveItem<ScriptCastProperties>
 {
     public ScriptKind Kind { get; set; }
-
-    public ScriptCastProperties()
-    { }
-    public ScriptCastProperties(ref ShockwaveReader input, ReaderContext context)
-    {
-        Kind = (ScriptKind)input.ReadInt16BigEndian();
-    }
-
-    public int GetBodySize(WriterOptions options)
-    {
-        int size = 0;
-        size += sizeof(short);
-        return size;
-    }
-
-    public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
-    {
-        output.WriteInt16BigEndian((short)Kind);
-    }
 }

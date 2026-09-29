@@ -226,6 +226,8 @@ public sealed partial class ShockwaveItemGenerator
         if (type.TryGetAttributeWithFullyQualifiedMetadataName(ShockwaveItemAttributeName, out _)) return TypeSerializationKind.ShockwaveItem;
 
         if (type.HasFullyQualifiedMetadataName("System.Drawing.Color")) return TypeSerializationKind.Color;
+        if (type.HasFullyQualifiedMetadataName("System.Drawing.Rectangle")) return TypeSerializationKind.Rectangle;
+        if (type.HasFullyQualifiedMetadataName("System.Drawing.Point")) return TypeSerializationKind.Point;
 
         return type.SpecialType switch
         {
