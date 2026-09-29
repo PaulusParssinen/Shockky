@@ -13,7 +13,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Update="Data\d101_empty.dcr" CopyToOutputDirectory="PreserveNewest" />
-    <None Update="Data\d101_empty.dir" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Data\d*\empty.dir;Data\d*\empty.dcr" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

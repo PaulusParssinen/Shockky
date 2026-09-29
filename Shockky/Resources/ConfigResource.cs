@@ -14,6 +14,12 @@ public sealed class ConfigResource : IShockwaveItem, IResource
     public const short Length = 100;
 
     /// <summary>
+    /// The length recorded in this configuration resource. It participates in the
+    /// checksum and is set from <see cref="WriterOptions.Version"/> when writing.
+    /// </summary>
+    public short StoredLength { get; private set; } = Length;
+
+    /// <summary>
     /// The movie version.
     /// </summary>
     /// <remarks>When equal to <see cref="DirectorVersion.Protected"/> magic value, the actual version is stored in the <see cref="OriginalVersion"/> field.</remarks>
@@ -98,6 +104,11 @@ public sealed class ConfigResource : IShockwaveItem, IResource
     public ConfigFlags Flags { get; set; }
 
     /// <summary>
+    /// The four-byte field at offset 0x2C in Director 3 configurations.
+    /// </summary>
+    public uint Field2C { get; set; }
+
+    /// <summary>
     /// A bitmask of used score channels.
     /// </summary>
     /// <remarks>Not always populated even if there are used score channels.</remarks>
@@ -175,7 +186,7 @@ public sealed class ConfigResource : IShockwaveItem, IResource
     {
         input.ReverseEndianness = false;
 
-        input.ReadInt16BigEndian();
+        StoredLength = input.ReadInt16BigEndian();
         Version = (DirectorVersion)input.ReadInt16BigEndian();
 
         Rect = input.ReadRectBigEndian();
@@ -193,13 +204,15 @@ public sealed class ConfigResource : IShockwaveItem, IResource
         CommentSize = input.ReadInt16BigEndian();
         CommentStyle = input.ReadInt16BigEndian();
 
-        if (Version < DirectorVersion.V1025) return;
+        if (!input.IsDataAvailable) return;
 
         StagePalette = input.ReadInt16LittleEndian();
 
+        if (!input.IsDataAvailable) return;
+
         DefaultColorDepth = input.ReadInt16BigEndian();
 
-        // D2 -> D3 did not update the version apparently
+        // Director 2 and 3 can both store 1024 as the primary version.
         if (!input.IsDataAvailable) return;
 
         ImageCompression = (ImageCompression)input.ReadByte();
@@ -209,6 +222,14 @@ public sealed class ConfigResource : IShockwaveItem, IResource
         OriginalVersion = (DirectorVersion)input.ReadInt16BigEndian();
         MaxCastColorDepth = input.ReadInt16BigEndian();
         Flags = (ConfigFlags)input.ReadInt32BigEndian();
+
+        // Director 3 has one four-byte field here, before the channel mask was added.
+        if (input.Length == 48)
+        {
+            Field2C = input.ReadUInt32BigEndian();
+            return;
+        }
+
         ScoreUsedChannelsMask = input.ReadUInt64BigEndian();
 
         Trial = input.ReadBoolean();
@@ -217,19 +238,21 @@ public sealed class ConfigResource : IShockwaveItem, IResource
         Tempo = input.ReadInt16BigEndian();
         Platform = (Platform)input.ReadInt16BigEndian();
 
-        if (Version < DirectorVersion.V1113) return;
+        if (!input.IsDataAvailable) return;
         SaveSeed = input.ReadInt16BigEndian();
         Field3C = input.ReadInt32BigEndian();
         Checksum = input.ReadUInt32BigEndian();
 
-        if (Version < DirectorVersion.V1114) return;
+        if (!input.IsDataAvailable) return;
         CastMemberCount = input.ReadInt16BigEndian();
 
-        if (Version < DirectorVersion.V1115) return;
+        if (!input.IsDataAvailable) return;
         Field46 = input.ReadInt16BigEndian();
 
         MaxCastResourceNum = input.ReadInt32BigEndian();
         DefaultPalette = new CastMemberId(input.ReadInt16BigEndian(), input.ReadInt16BigEndian());
+
+        if (!input.IsDataAvailable) return;
 
         Field50 = input.ReadByte();
         Field51 = input.ReadByte();
@@ -250,7 +273,8 @@ public sealed class ConfigResource : IShockwaveItem, IResource
 
     public uint CalculateChecksum()
     {
-        uint checksum = (uint)Length + 1;
+        DirectorVersion movieVersion = OriginalVersion == DirectorVersion.Unknown ? Version : OriginalVersion;
+        uint checksum = (uint)StoredLength + 1;
         unchecked
         {
             checksum *= (uint)Version + 2;
@@ -262,11 +286,11 @@ public sealed class ConfigResource : IShockwaveItem, IResource
             checksum *= (uint)MaxMemberNum + 8;
             checksum -= (uint)LegacyTempo + 9;
             checksum -= (uint)(LightSwitch ? 1 : 0) + 10;
-            checksum += (uint)(short)(StageColor.G | (StageColor.B << 8)) + 11;
+            checksum += (uint)(short)((StageColor.G << 8) | StageColor.B) + 11;
             checksum *= (uint)CommentFont + 12;
             checksum += (uint)CommentSize + 13;
-            checksum *= (uint)(ushort)CommentStyle + 14;
-            checksum += (uint)(byte)(StagePalette >> 8) + 15;
+            checksum *= (uint)(movieVersion < DirectorVersion.V1600 ? (byte)(CommentStyle >> 8) : (ushort)CommentStyle) + 14;
+            checksum += (uint)(movieVersion < DirectorVersion.V1406 ? (ushort)BinaryPrimitives.ReverseEndianness(StagePalette) : (byte)(StagePalette >> 8)) + 15;
             checksum += (uint)DefaultColorDepth + 16;
             checksum += (uint)(byte)ImageCompression + 17;
             checksum *= (uint)Field1F + 18;
@@ -285,11 +309,25 @@ public sealed class ConfigResource : IShockwaveItem, IResource
         return checksum;
     }
 
-    public int GetBodySize(WriterOptions options) => Length;
+    public int GetBodySize(WriterOptions options) => options.Version switch
+    {
+        < DirectorVersion.V1024 => 28,
+        DirectorVersion.V1024 => 30,
+        < DirectorVersion.V1113 => 48,
+        DirectorVersion.V1113 => 68,
+        DirectorVersion.V1114 => 70,
+        < DirectorVersion.V1222 => 80,
+        <= DirectorVersion.V1850 => 84,
+        _ => Length
+    };
 
     public void WriteTo(ref ShockwaveWriter output, WriterOptions options)
     {
-        output.WriteInt16BigEndian(Length);
+        DirectorVersion version = options.Version;
+        int bodySize = GetBodySize(options);
+        StoredLength = (short)bodySize;
+
+        output.WriteInt16BigEndian(StoredLength);
         output.WriteInt16BigEndian((short)Version);
         output.WriteRectBigEndian(Rect);
         output.WriteInt16BigEndian(MinMemberNum);
@@ -304,7 +342,12 @@ public sealed class ConfigResource : IShockwaveItem, IResource
         output.WriteInt16BigEndian(CommentStyle);
 
         output.WriteInt16LittleEndian(StagePalette);
+
+        if (version < DirectorVersion.V1024) return;
+
         output.WriteInt16BigEndian(DefaultColorDepth);
+
+        if (version == DirectorVersion.V1024) return;
 
         output.WriteByte((byte)ImageCompression);
         output.WriteByte(Field1F);
@@ -313,22 +356,41 @@ public sealed class ConfigResource : IShockwaveItem, IResource
         output.WriteInt16BigEndian((short)OriginalVersion);
         output.WriteInt16BigEndian(MaxCastColorDepth);
         output.WriteInt32BigEndian((int)Flags);
+
+        if (version < DirectorVersion.V1113)
+        {
+            output.WriteUInt32BigEndian(Field2C);
+            return;
+        }
+
         output.WriteUInt64BigEndian(ScoreUsedChannelsMask);
         output.WriteBoolean(Trial);
         output.WriteByte(ImageQuality);
         output.WriteInt16BigEndian(Tempo);
         output.WriteInt16BigEndian((short)Platform);
+
         output.WriteInt16BigEndian(SaveSeed);
         output.WriteInt32BigEndian(Field3C);
-        output.WriteUInt32BigEndian(Checksum); // TODO: CalculateChecksum()
+        Checksum = CalculateChecksum();
+        output.WriteUInt32BigEndian(Checksum);
+
+        if (version == DirectorVersion.V1113) return;
+
         output.WriteInt16BigEndian(CastMemberCount);
+
+        if (version == DirectorVersion.V1114) return;
 
         output.WriteInt16BigEndian(Field46);
         output.WriteInt32BigEndian(MaxCastResourceNum);
         output.WriteMemberIdBigEndian(DefaultPalette);
+
+        if (version < DirectorVersion.V1222) return;
+
         output.WriteByte(Field50);
         output.WriteByte(Field51);
         output.WriteInt16BigEndian(Field52);
+
+        if (version <= DirectorVersion.V1850) return;
 
         output.WriteInt32BigEndian(DownloadFramesBeforePlaying);
         output.WriteInt16BigEndian(Field58);
